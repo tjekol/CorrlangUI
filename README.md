@@ -1,2 +1,2 @@
 # CorrlangUI
-Graphic Interface for Corrlang – semantic intergration tool
+Graphic Interface for Corrlang – a lightweight semantic intergration tool
