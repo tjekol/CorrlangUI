@@ -13,9 +13,9 @@ export default function Home() {
         <hr className='w-80' />
         <ul>
           {tasks.map((t) => (
-            <li key={t}>
-              <Link href={`/task/${t}`}>Task {t}</Link>
-            </li>
+            <Link key={t} href={`/task/${t}`}>
+              <li>Task {t}</li>
+            </Link>
           ))}
         </ul>
       </div>
