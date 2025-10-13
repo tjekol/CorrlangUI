@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import tasks from '@/taskData.json';
 import Link from 'next/link';
+import Diagram from '@/app/component/diagram';
 
 export default function Task() {
   const params = useParams();
@@ -26,7 +27,7 @@ export default function Task() {
       <h2>Task {slug}</h2>
       {currentTask?.taskText}
 
-      <div className='grid grid-cols-2 gap-x-6 gap-y-2 m-auto'>
+      <div className='grid grid-cols-1 gap-x-6 gap-y-2 m-auto'>
         <div className='flex justify-between'>
           <p className='self-end'>Input</p>
           <button
@@ -36,8 +37,8 @@ export default function Task() {
             Compile
           </button>
         </div>
-        <p className='self-end'>Output</p>
-        <textarea
+
+        {/* <textarea
           className='bg-gray border-1 p-5 rounded-sm'
           rows={10}
           cols={10}
@@ -45,8 +46,10 @@ export default function Task() {
           defaultValue={Object.entries(classes ?? {})
             .map(([k, v]) => `${k}: ${v.join(', ')} \n`)
             .join('')}
-        />
-        <p className='bg-gray p-5 rounded-sm border-1 whitespace-pre-wrap'>
+        /> */}
+        <Diagram />
+        <p className='self-end'>Output</p>
+        <p className='bg-gray min-h-100 p-5 rounded-sm border-1 whitespace-pre-wrap'>
           {output}
         </p>
       </div>
