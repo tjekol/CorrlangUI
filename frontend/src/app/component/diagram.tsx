@@ -1,22 +1,24 @@
-import Class from './class';
+import Node from './node';
 
 export default function Diagram() {
-  const classes = [
+  const nodes = [
     { id: 1, title: 'Person', labels: ['firstName', 'lastName'] },
     { id: 2, title: 'Person', labels: ['fullName'] },
   ];
 
+  const edges = [{ id: 1, connectingNodes: [1, 2] }];
+
   return (
-    <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9]'>
+    <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
-        {classes.map((c, i) => (
-          <Class
+        {nodes.map((n, i) => (
+          <Node
             key={i}
-            id={c.id}
-            title={c.title}
+            id={n.id}
+            title={n.title}
             posX={50 + i * 180}
             posY={50 + i * 30}
-            labels={c.labels}
+            labels={n.labels}
           />
         ))}
       </svg>
