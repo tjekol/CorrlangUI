@@ -1,14 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-interface INode {
-  id: number;
-  title: string;
-  posX: number;
-  posY: number;
-  labels: string[];
-}
+import { INode } from '@/app/interface/INode';
 
 export default function Node({ id, title, posX, posY, labels }: INode) {
   const [position, setPosition] = useState({ x: posX, y: posY });
