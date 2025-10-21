@@ -5,7 +5,6 @@ import Edge from './edge';
 
 export default function Diagram() {
   const nodes = useAtomValue(nodeAtom);
-  const edges = useAtomValue(edgeAtom);
   const setEdgePosition = useSetAtom(edgeAtom);
 
   const handleCircleClick = (
@@ -24,6 +23,7 @@ export default function Diagram() {
         incompleteEdge?.edgeID ||
         Math.max(0, ...prevEdges.map((e) => e.edgeID)) + 1;
 
+      console.log(`Created edge: ${edgeID} from node ${id}`);
       return [...prevEdges, { edgeID, nodeID: id, position: circlePosition }];
     });
   };
