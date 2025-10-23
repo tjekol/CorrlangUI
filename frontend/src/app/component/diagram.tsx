@@ -1,40 +1,25 @@
-import { useSetAtom } from 'jotai';
-import { edgeAtom } from '../GlobalValues';
 import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
+import { useEdges } from '../hooks/useEdges';
 
 export default function Diagram() {
   const { nodes, loading } = useNodes();
-  const setEdgePosition = useSetAtom(edgeAtom);
+  const { edges, createEdge } = useEdges();
 
   const handleCircleClick = (
     id: number,
     circlePosition: { x: number; y: number }
   ) => {
-    setEdgePosition((prevEdges) => {
-      // Find incomplete edge (only 1 position) from different node
-      const incompleteEdge = prevEdges.find(
-        (edge) =>
-          prevEdges.filter((e) => e.edgeID === edge.edgeID).length === 1 &&
-          edge.nodeID !== id
-      );
+    const incompleteEdge = edges.find(
+      (edge) =>
+        edges.filter((e) => e.edgeID === edge.edgeID).length === 1 &&
+        edge.nodeID !== id
+    );
 
-      const edgeID =
-        incompleteEdge?.edgeID ||
-        Math.max(0, ...prevEdges.map((e) => e.edgeID)) + 1;
-
-      console.log(`Created edge: ${edgeID} from node ${id}`);
-      return [
-        ...prevEdges,
-        {
-          edgeID,
-          nodeID: id,
-          positionX: circlePosition.x,
-          positionY: circlePosition.y,
-        },
-      ];
-    });
+    const edgeID =
+      incompleteEdge?.edgeID || Math.max(0, ...edges.map((e) => e.edgeID)) + 1;
+    createEdge(edgeID, id, circlePosition.x, circlePosition.y);
   };
 
   return (

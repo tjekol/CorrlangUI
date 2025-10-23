@@ -17,3 +17,49 @@ export async function GET() {
     );
   }
 }
+
+// POST - Create a new node
+export async function POST(request: NextRequest) {
+  try {
+    const { edgeID, nodeID, positionX, positionY } = await request.json();
+
+    const edge = await prisma.edge.create({
+      data: {
+        edgeID,
+        nodeID,
+        positionX,
+        positionY
+      },
+    });
+
+    return NextResponse.json(edge, { status: 201 });
+  } catch (error) {
+    console.error('Error creating edge:', error);
+    return NextResponse.json(
+      { error: 'Failed to create edge' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE - Delete edges by ID
+export async function DELETE(request: NextRequest) {
+  try {
+    const { id } = await request.json();
+
+    // Delete related edges
+    const deletedEdge = await prisma.edge.deleteMany({
+      where: {
+        edgeID: id,
+      },
+    });
+
+    return NextResponse.json(deletedEdge);
+  } catch (error) {
+    console.error('Error deleting edge:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete edge' },
+      { status: 500 }
+    );
+  }
+}
