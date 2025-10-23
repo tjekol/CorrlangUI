@@ -25,7 +25,15 @@ export default function Diagram() {
         Math.max(0, ...prevEdges.map((e) => e.edgeID)) + 1;
 
       console.log(`Created edge: ${edgeID} from node ${id}`);
-      return [...prevEdges, { edgeID, nodeID: id, position: circlePosition }];
+      return [
+        ...prevEdges,
+        {
+          edgeID,
+          nodeID: id,
+          positionX: circlePosition.x,
+          positionY: circlePosition.y,
+        },
+      ];
     });
   };
 

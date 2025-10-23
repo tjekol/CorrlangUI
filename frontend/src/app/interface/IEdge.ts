@@ -1,8 +1,6 @@
 export interface IEdge {
   edgeID: number,
   nodeID: number,
-  position: {
-    x: number,
-    y: number
-  }
+  positionX: number,
+  positionY: number
 }

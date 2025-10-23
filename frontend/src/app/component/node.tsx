@@ -40,7 +40,8 @@ export default function Node({
         edge.nodeID === id
           ? {
               ...edge,
-              position: { x: circlePosition.x, y: circlePosition.y },
+              positionX: circlePosition.x,
+              positionY: circlePosition.y,
             }
           : edge
       )

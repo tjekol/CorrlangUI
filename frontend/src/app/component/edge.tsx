@@ -1,8 +1,11 @@
-import { useAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { edgeAtom } from '../GlobalValues';
+import { useEdges } from '../hooks/useEdges';
 
 export default function Edge() {
-  const [edges, setEdges] = useAtom(edgeAtom);
+  const setEdges = useSetAtom(edgeAtom);
+  const { edges, loading } = useEdges();
+
   const uniqueEdgeIDs = [...new Set(edges.map((edge) => edge.edgeID))];
   const edgePosition = (index: number) =>
     edges.filter((edge) => edge.edgeID === index).slice(0, 2);
@@ -26,10 +29,11 @@ export default function Edge() {
         // draw edge if exactly 2 positions have different nodeIDs
         if (
           positions.length === 2 &&
-          positions[0].nodeID !== positions[1].nodeID
+          positions[0].nodeID !== positions[1].nodeID &&
+          !loading
         ) {
-          const pos1 = positions[0].position;
-          const pos2 = positions[1].position;
+          const pos1 = { x: positions[0].positionX, y: positions[0].positionY };
+          const pos2 = { x: positions[1].positionX, y: positions[1].positionY };
 
           return (
             <line
