@@ -1,10 +1,11 @@
-import { useAtomValue, useSetAtom } from 'jotai';
-import { nodeAtom, edgeAtom } from '../GlobalValues';
+import { useSetAtom } from 'jotai';
+import { edgeAtom } from '../GlobalValues';
 import Node from './node';
 import Edge from './edge';
+import { useNodes } from '../hooks/useNodes';
 
 export default function Diagram() {
-  const nodes = useAtomValue(nodeAtom);
+  const { nodes, loading } = useNodes();
   const setEdgePosition = useSetAtom(edgeAtom);
 
   const handleCircleClick = (
@@ -32,17 +33,23 @@ export default function Diagram() {
     <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
         <Edge />
-        {nodes.map((n, i) => (
-          <Node
-            key={i}
-            id={n.id}
-            title={n.title}
-            posX={50 + i * 180}
-            posY={50 + i * 30}
-            labels={n.labels}
-            onCircleClick={handleCircleClick}
-          />
-        ))}
+        {loading ? (
+          <text x={50} y={50}>
+            Loading…
+          </text>
+        ) : (
+          nodes.map((n, i) => (
+            <Node
+              key={i}
+              id={n.id}
+              title={n.title}
+              nodeLabels={n.nodeLabels}
+              posX={50 + i * 180}
+              posY={50 + i * 30}
+              onCircleClick={handleCircleClick}
+            />
+          ))
+        )}
       </svg>
     </div>
   );

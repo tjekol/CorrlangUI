@@ -6,15 +6,17 @@ import { useSetAtom } from 'jotai';
 import { edgeAtom } from '../GlobalValues';
 
 interface NodeProps extends INode {
+  posX: number;
+  posY: number;
   onCircleClick: (id: number, circlePosition: { x: number; y: number }) => void;
 }
 
 export default function Node({
   id,
   title,
+  nodeLabels,
   posX,
   posY,
-  labels,
   onCircleClick,
 }: NodeProps) {
   const [position, setPosition] = useState({ x: posX, y: posY });
@@ -23,6 +25,7 @@ export default function Node({
 
   const setEdgePosition = useSetAtom(edgeAtom);
 
+  const labels = nodeLabels.map((label) => label.text);
   const strLenghts = labels.map((str) => str.length);
   const maxStringLength = Math.max(...strLenghts);
   const width = maxStringLength * 15;
