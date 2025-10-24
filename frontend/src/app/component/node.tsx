@@ -8,7 +8,11 @@ import { edgeAtom } from '../GlobalValues';
 interface NodeProps extends INode {
   posX: number;
   posY: number;
-  onCircleClick: (id: number, circlePosition: { x: number; y: number }) => void;
+  onCircleClick: (
+    id: number,
+    circlePosition: { x: number; y: number },
+    isAttributeNode: boolean
+  ) => void;
 }
 
 export default function Node({
@@ -31,64 +35,48 @@ export default function Node({
   const width = maxStringLength * 15;
   const height = 40;
 
+  const rightCirclePosition = { x: position.x, y: position.y + height / 2 };
   const leftCirclePosition = {
     x: position.x + width,
     y: position.y + height / 2,
   };
-  const rightCirclePosition = { x: position.x, y: position.y + height / 2 };
-  const isRightCircleActive = edgePositions.some(
-    (position) =>
-      position.positionX === rightCirclePosition.x &&
-      position.positionY === rightCirclePosition.y
+
+  const isCircleActive = (posX: number, posY: number): boolean => {
+    return edgePositions.some(
+      (position) => position.positionX === posX && position.positionY === posY
+    );
+  };
+
+  const isRightCircleActive = isCircleActive(
+    rightCirclePosition.x,
+    rightCirclePosition.y
   );
-  const isLeftCircleActive = edgePositions.some(
-    (position) =>
-      position.positionX === leftCirclePosition.x &&
-      position.positionY === leftCirclePosition.y
+  const isLeftCircleActive = isCircleActive(
+    leftCirclePosition.x,
+    leftCirclePosition.y
   );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
 
-    // Calculate new circle positions based on the new node position
-    const newLeftCirclePosition = {
-      x: newX + width,
-      y: newY + height / 2,
-    };
-
-    const newRightCirclePosition = {
-      x: newX,
-      y: newY + height / 2,
-    };
-
     setEdgePositions((prev) =>
       prev.map((edge) => {
-        if (edge.nodeID === id) {
-          const isEdgeOnRightCircle =
-            edge.positionX === rightCirclePosition.x &&
-            edge.positionY === rightCirclePosition.y;
+        if (edge.nodeID !== id) return edge;
 
-          const isEdgeOnLeftCircle =
-            edge.positionX === leftCirclePosition.x &&
-            edge.positionY === leftCirclePosition.y;
+        // Helper function to get new position for any circle
+        const getNewPosition = (currentX: number, currentY: number) => {
+          const deltaX = newX - position.x;
+          const deltaY = newY - position.y;
+          return {
+            positionX: currentX + deltaX,
+            positionY: currentY + deltaY,
+          };
+        };
 
-          if (isEdgeOnRightCircle) {
-            return {
-              ...edge,
-              positionX: newRightCirclePosition.x,
-              positionY: newRightCirclePosition.y,
-            };
-          }
-
-          if (isEdgeOnLeftCircle) {
-            return {
-              ...edge,
-              positionX: newLeftCirclePosition.x,
-              positionY: newLeftCirclePosition.y,
-            };
-          }
-        }
-        return edge;
+        return {
+          ...edge,
+          ...getNewPosition(edge.positionX, edge.positionY),
+        };
       })
     );
   };
@@ -132,26 +120,32 @@ export default function Node({
         className={`hover:cursor-pointer hover:opacity-100 ${
           isRightCircleActive ? 'opacity-100' : 'opacity-40'
         }`}
-        cx={position.x}
-        cy={position.y + height / 2}
+        cx={rightCirclePosition.x}
+        cy={rightCirclePosition.y}
         r={7}
         fill='#D9D9D9'
         stroke='black'
         strokeWidth={1}
-        onClick={() => onCircleClick(id, rightCirclePosition)}
+        onClick={() => (
+          console.log('Clicked on node: ', id),
+          onCircleClick(id, rightCirclePosition, false)
+        )}
       />
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
           isLeftCircleActive ? 'opacity-100' : 'opacity-40'
         }`}
-        cx={position.x + width}
-        cy={position.y + height / 2}
+        cx={leftCirclePosition.x}
+        cy={leftCirclePosition.y}
         r={7}
         fill='#D9D9D9'
         stroke='black'
         strokeWidth={1}
-        onClick={() => onCircleClick(id, leftCirclePosition)}
+        onClick={() => (
+          console.log('Clicked on node: ', id),
+          onCircleClick(id, leftCirclePosition, false)
+        )}
       />
       {/* Header text */}
       <text
@@ -175,40 +169,74 @@ export default function Node({
         rx={5}
       />
 
-      {labels.map((t, i) => (
-        <g key={i}>
-          {/* Right circles */}
-          <circle
-            className='hover:cursor-pointer hover:opacity-100 opacity-40'
-            cx={position.x}
-            cy={position.y + height + (height / 2) * (i + 1)}
-            r={5}
-            fill='#D9D9D9'
-            stroke='black'
-            strokeWidth={1}
-            onClick={() => console.log('clicked: ', t, i)}
-          />
-          {/* Left circles */}
-          <circle
-            className='hover:cursor-pointer hover:opacity-100 opacity-40'
-            cx={position.x + width}
-            cy={position.y + height + (height / 2) * (i + 1)}
-            r={5}
-            fill='#D9D9D9'
-            stroke='black'
-            strokeWidth={1}
-            onClick={() => console.log('clicked: ', t, i)}
-          />
-          <text
-            x={position.x + 10}
-            y={position.y + height + (height / 2) * (i + 1)}
-            textAnchor='start'
-            dominantBaseline='middle'
-          >
-            {t}
-          </text>
-        </g>
-      ))}
+      {labels.map((t, i) => {
+        const rightCirclePosition = {
+          x: position.x,
+          y: position.y + height + (height / 2) * (i + 1),
+        };
+        const leftCirclePosition = {
+          x: position.x + width,
+          y: position.y + height + (height / 2) * (i + 1),
+        };
+        const isRightCircleActive = isCircleActive(
+          rightCirclePosition.x,
+          rightCirclePosition.y
+        );
+        const isLeftCircleActive = isCircleActive(
+          leftCirclePosition.x,
+          leftCirclePosition.y
+        );
+
+        return (
+          <g key={i}>
+            {/* Right circles */}
+            <circle
+              className={`hover:cursor-pointer hover:opacity-100 ${
+                isRightCircleActive ? 'opacity-100' : 'opacity-40'
+              }`}
+              cx={rightCirclePosition.x}
+              cy={rightCirclePosition.y}
+              r={5}
+              fill='#8BACC9'
+              stroke='blue'
+              strokeWidth={1}
+              onClick={() => (
+                console.log(
+                  'Clicked on attribute: ',
+                  t,
+                  i,
+                  rightCirclePosition
+                ),
+                onCircleClick(id, rightCirclePosition, true)
+              )}
+            />
+            {/* Left circles */}
+            <circle
+              className={`hover:cursor-pointer hover:opacity-100 ${
+                isLeftCircleActive ? 'opacity-100' : 'opacity-40'
+              }`}
+              cx={leftCirclePosition.x}
+              cy={leftCirclePosition.y}
+              r={5}
+              fill='#8BACC9'
+              stroke='blue'
+              strokeWidth={1}
+              onClick={() => (
+                console.log('Clicked on attribute: ', t, leftCirclePosition),
+                onCircleClick(id, leftCirclePosition, true)
+              )}
+            />
+            <text
+              x={position.x + 10}
+              y={position.y + height + (height / 2) * (i + 1)}
+              textAnchor='start'
+              dominantBaseline='middle'
+            >
+              {t}
+            </text>
+          </g>
+        );
+      })}
     </>
   );
 }

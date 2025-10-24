@@ -21,14 +21,15 @@ export async function GET() {
 // POST - Create a new node
 export async function POST(request: NextRequest) {
   try {
-    const { edgeID, nodeID, positionX, positionY } = await request.json();
+    const { edgeID, nodeID, positionX, positionY, isAttributeNode } = await request.json();
 
     const edge = await prisma.edge.create({
       data: {
         edgeID,
         nodeID,
         positionX,
-        positionY
+        positionY,
+        isAttributeNode
       },
     });
 

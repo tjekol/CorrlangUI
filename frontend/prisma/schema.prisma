@@ -28,6 +28,7 @@ model Edge {
   nodeID Int
   positionX Int
   positionY Int
+  isAttributeNode Boolean @default(false)
 
   node Node @relation(fields: [nodeID], references: [id])
 }

@@ -9,7 +9,8 @@ export default function Diagram() {
 
   const handleCircleClick = (
     id: number,
-    circlePosition: { x: number; y: number }
+    circlePosition: { x: number; y: number },
+    isAttributeNode: boolean
   ) => {
     const incompleteEdge = edges.find(
       (edge) =>
@@ -19,8 +20,10 @@ export default function Diagram() {
 
     const edgeID =
       incompleteEdge?.edgeID || Math.max(0, ...edges.map((e) => e.edgeID)) + 1;
-    createEdge(edgeID, id, circlePosition.x, circlePosition.y);
+    createEdge(edgeID, id, circlePosition.x, circlePosition.y, isAttributeNode);
   };
+
+  // console.log(edges);
 
   return (
     <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9] overflow-hidden'>
