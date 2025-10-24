@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { INode } from '@/app/interface/INode';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { edgeAtom } from '../GlobalValues';
 
 interface NodeProps extends INode {
@@ -23,28 +23,73 @@ export default function Node({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  const setEdgePosition = useSetAtom(edgeAtom);
+  const [edgePositions, setEdgePositions] = useAtom(edgeAtom);
 
   const labels = nodeLabels.map((label) => label.text);
   const strLenghts = labels.map((str) => str.length);
   const maxStringLength = Math.max(...strLenghts);
   const width = maxStringLength * 15;
   const height = 40;
-  const circlePosition = { x: position.x + width, y: position.y + height / 2 };
+
+  const leftCirclePosition = {
+    x: position.x + width,
+    y: position.y + height / 2,
+  };
+  const rightCirclePosition = { x: position.x, y: position.y + height / 2 };
+  const isRightCircleActive = edgePositions.some(
+    (position) =>
+      position.positionX === rightCirclePosition.x &&
+      position.positionY === rightCirclePosition.y
+  );
+  const isLeftCircleActive = edgePositions.some(
+    (position) =>
+      position.positionX === leftCirclePosition.x &&
+      position.positionY === leftCirclePosition.y
+  );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
 
-    setEdgePosition((prev) =>
-      prev.map((edge) =>
-        edge.nodeID === id
-          ? {
+    // Calculate new circle positions based on the new node position
+    const newLeftCirclePosition = {
+      x: newX + width,
+      y: newY + height / 2,
+    };
+
+    const newRightCirclePosition = {
+      x: newX,
+      y: newY + height / 2,
+    };
+
+    setEdgePositions((prev) =>
+      prev.map((edge) => {
+        if (edge.nodeID === id) {
+          const isEdgeOnRightCircle =
+            edge.positionX === rightCirclePosition.x &&
+            edge.positionY === rightCirclePosition.y;
+
+          const isEdgeOnLeftCircle =
+            edge.positionX === leftCirclePosition.x &&
+            edge.positionY === leftCirclePosition.y;
+
+          if (isEdgeOnRightCircle) {
+            return {
               ...edge,
-              positionX: circlePosition.x,
-              positionY: circlePosition.y,
-            }
-          : edge
-      )
+              positionX: newRightCirclePosition.x,
+              positionY: newRightCirclePosition.y,
+            };
+          }
+
+          if (isEdgeOnLeftCircle) {
+            return {
+              ...edge,
+              positionX: newLeftCirclePosition.x,
+              positionY: newLeftCirclePosition.y,
+            };
+          }
+        }
+        return edge;
+      })
     );
   };
 
@@ -82,16 +127,33 @@ export default function Node({
         onMouseUp={() => (setIsDragging(false), console.log(isDragging))}
         className='hover:cursor-move'
       />
+      {/* Right circle */}
       <circle
-        className='hover:cursor-pointer hover:fill-black/80'
+        className={`hover:cursor-pointer hover:opacity-100 ${
+          isRightCircleActive ? 'opacity-100' : 'opacity-40'
+        }`}
+        cx={position.x}
+        cy={position.y + height / 2}
+        r={7}
+        fill='#D9D9D9'
+        stroke='black'
+        strokeWidth={1}
+        onClick={() => onCircleClick(id, rightCirclePosition)}
+      />
+      {/* Left circle */}
+      <circle
+        className={`hover:cursor-pointer hover:opacity-100 ${
+          isLeftCircleActive ? 'opacity-100' : 'opacity-40'
+        }`}
         cx={position.x + width}
         cy={position.y + height / 2}
         r={7}
         fill='#D9D9D9'
         stroke='black'
         strokeWidth={1}
-        onClick={() => onCircleClick(id, circlePosition)}
+        onClick={() => onCircleClick(id, leftCirclePosition)}
       />
+      {/* Header text */}
       <text
         x={position.x + width / 2}
         y={position.y + height / 2}
@@ -115,8 +177,20 @@ export default function Node({
 
       {labels.map((t, i) => (
         <g key={i}>
+          {/* Right circles */}
           <circle
-            className='hover:cursor-pointer hover:fill-black/80 hidden'
+            className='hover:cursor-pointer hover:opacity-100 opacity-40'
+            cx={position.x}
+            cy={position.y + height + (height / 2) * (i + 1)}
+            r={5}
+            fill='#D9D9D9'
+            stroke='black'
+            strokeWidth={1}
+            onClick={() => console.log('clicked: ', t, i)}
+          />
+          {/* Left circles */}
+          <circle
+            className='hover:cursor-pointer hover:opacity-100 opacity-40'
             cx={position.x + width}
             cy={position.y + height + (height / 2) * (i + 1)}
             r={5}
