@@ -18,7 +18,7 @@ model Node {
   id  Int   @id @default(autoincrement())
   title String
 
-  nodeLabels NodeLabel[]
+  attributes Attribute[]
   edges Edge[]
 }
 
@@ -28,15 +28,25 @@ model Edge {
   nodeID Int
   positionX Int
   positionY Int
-  isAttributeNode Boolean @default(false)
 
   node Node @relation(fields: [nodeID], references: [id])
 }
 
-model NodeLabel {
+model Attribute {
   id  Int   @id @default(autoincrement())
   nodeID Int
   text String
-
+  
   node Node @relation(fields: [nodeID], references: [id])
+  attributeEdges AttributeEdge[]
+}
+
+model AttributeEdge {
+  id  Int   @id @default(autoincrement())
+  attributeEdgeID Int
+  attributeID Int
+  positionX Int
+  positionY Int
+
+  attribute Attribute @relation(fields: [attributeID], references: [id])
 }

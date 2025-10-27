@@ -3,7 +3,7 @@ import { PrismaClient } from '@/generated/prisma'
 const prisma = new PrismaClient()
 
 async function main() {
-  const nodes = await prisma.nodeLabel.findMany();
+  const nodes = await prisma.attribute.findMany();
   console.log(nodes)
 }
 

@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
-// GET - Fetch all edges
+// GET - Fetch all attribute edges
 export async function GET() {
   try {
-    const edges = await prisma.edge.findMany({
+    const edges = await prisma.attributeEdge.findMany({
       include: {
-        node: true
+        attribute: true
       }
     });
 
@@ -25,12 +25,12 @@ export async function GET() {
 // POST - Create a new node
 export async function POST(request: NextRequest) {
   try {
-    const { edgeID, nodeID, positionX, positionY, isAttributeNode } = await request.json();
+    const { attributeEdgeID, attributeID, positionX, positionY } = await request.json();
 
-    const edge = await prisma.edge.create({
+    const edge = await prisma.attributeEdge.create({
       data: {
-        edgeID,
-        nodeID,
+        attributeEdgeID,
+        attributeID,
         positionX,
         positionY
       },
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(edge, { status: 201 });
   } catch (error) {
-    console.error('Error creating edge:', error);
+    console.error('Error creating attribute edge:', error);
     return NextResponse.json(
       { error: 'Failed to create edge' },
       { status: 500 }
@@ -52,9 +52,9 @@ export async function DELETE(request: NextRequest) {
     const { id } = await request.json();
 
     // Delete related edges
-    const deletedEdge = await prisma.edge.deleteMany({
+    const deletedEdge = await prisma.attributeEdge.deleteMany({
       where: {
-        edgeID: id,
+        attributeEdgeID: id,
       },
     });
 
