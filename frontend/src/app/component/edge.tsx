@@ -1,9 +1,27 @@
+'use client';
 import { useAtomValue } from 'jotai';
 import { useEdges } from '../hooks/useEdges';
 import { attributeEdgeAtom, edgeAtom } from '../GlobalValues';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useEffect, useState } from 'react';
 
-export default function Edge() {
+export default function Edge({
+  pendingEdge,
+  pendingAtrEdge,
+}: {
+  pendingEdge: {
+    edgeID: number;
+    nodeID: number;
+    positionX: number;
+    positionY: number;
+  } | null;
+  pendingAtrEdge: {
+    attributeEdgeID: number;
+    attributeID: number;
+    positionX: number;
+    positionY: number;
+  } | null;
+}) {
   const edgeHook = useEdges();
   const attributeEdgeHook = useAttributeEdges();
   const edges = useAtomValue(edgeAtom);
@@ -52,8 +70,63 @@ export default function Edge() {
     return `M ${pos1.x} ${pos1.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2.x} ${pos2.y}`;
   };
 
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const svg = document.querySelector('svg');
+      if (svg) {
+        const rect = svg.getBoundingClientRect();
+        setMousePosition({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        });
+      }
+    };
+
+    if (pendingEdge || pendingAtrEdge) {
+      document.addEventListener('mousemove', handleMouseMove);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [pendingEdge, pendingAtrEdge]);
+
   return (
     <>
+      {/* temporary */}
+      {pendingEdge && mousePosition.x !== 0 && mousePosition.y !== 0 && (
+        <path
+          key={pendingEdge.edgeID}
+          d={getPathData(
+            { x: pendingEdge.positionX, y: pendingEdge.positionY },
+            mousePosition
+          )}
+          stroke='black'
+          strokeWidth={3}
+          strokeDasharray={'5,5'}
+          fill='none'
+          className='hover:cursor-pointer'
+          strokeOpacity={0.6}
+        />
+      )}
+
+      {pendingAtrEdge && mousePosition.x !== 0 && mousePosition.y !== 0 && (
+        <path
+          key={pendingAtrEdge.attributeEdgeID}
+          d={getPathData(
+            { x: pendingAtrEdge.positionX, y: pendingAtrEdge.positionY },
+            mousePosition
+          )}
+          stroke='blue'
+          strokeWidth={3}
+          strokeDasharray={'5,5'}
+          fill='none'
+          className='hover:cursor-pointer'
+          strokeOpacity={0.6}
+        />
+      )}
+
       {/* edges */}
       {uniqueEdgeIDs.map((edgeID) => {
         const positions = edgePosition(edgeID);

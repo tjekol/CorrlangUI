@@ -45,7 +45,7 @@ export default function Diagram() {
   return (
     <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
-        <Edge />
+        <Edge pendingEdge={pendingEdge} pendingAtrEdge={pendingAtrEdge} />
         {loading ? (
           <text x={50} y={50}>
             Loading…
