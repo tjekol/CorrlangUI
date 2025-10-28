@@ -12,9 +12,11 @@ export default function Home() {
         <hr className='w-80' />
         <ul>
           {tasks.map((t) => (
-            <Link key={t} href={`/task/${t}`}>
-              <li>Task {t}</li>
-            </Link>
+            <li key={t}>
+              <Link href={`/task/${t}`} className='hover:underline'>
+                Task {t}
+              </Link>
+            </li>
           ))}
         </ul>
       </div>

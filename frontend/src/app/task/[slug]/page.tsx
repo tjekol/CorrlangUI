@@ -21,9 +21,11 @@ export default function Task() {
 
   return (
     <div className='font-sans items-center justify-items-left min-h-screen p-10'>
-      <Link href={'/'}>
-        <h1 className='pb-10'>Corrlang - semantic interoperability</h1>
-      </Link>
+      <h1 className='pb-10'>
+        <Link href={'/'} className='m-auto'>
+          Corrlang - semantic interoperability
+        </Link>
+      </h1>
       <h2>Task {slug}</h2>
       {currentTask?.taskText}
 

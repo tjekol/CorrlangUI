@@ -45,10 +45,6 @@ h3 {
   font-weight: 600;
 }
 
-li:hover {
-  text-decoration: underline;
-}
-
 button:hover {
   cursor: pointer;
 }
