@@ -3,47 +3,44 @@ import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useEdges } from '../hooks/useEdges';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useState } from 'react';
+import { handleEdge } from '../handler/handleEdge';
+import { handleAttributeEdge } from '../handler/handleAttribute';
 
 export default function Diagram() {
   const { nodes, loading } = useNodes();
   const { edges, createEdge } = useEdges();
   const { attributeEdges, createAttributeEdge } = useAttributeEdges();
 
-  const handleHeaderClick = (
-    id: number,
-    circlePosition: { x: number; y: number }
-  ) => {
-    const incompleteEdge = edges.find(
-      (edge) =>
-        edges.filter((e) => e.edgeID === edge.edgeID).length === 1 &&
-        edge.nodeID !== id
-    );
+  // local state to store the first click data
+  const [pendingEdge, setPendingEdge] = useState<{
+    edgeID: number;
+    nodeID: number;
+    positionX: number;
+    positionY: number;
+  } | null>(null);
 
-    const edgeID =
-      incompleteEdge?.edgeID || Math.max(0, ...edges.map((e) => e.edgeID)) + 1;
-    createEdge(edgeID, id, circlePosition.x, circlePosition.y);
-  };
+  // local state for attribute edge
+  const [pendingAtrEdge, setPendingAtrEdge] = useState<{
+    attributeEdgeID: number;
+    attributeID: number;
+    positionX: number;
+    positionY: number;
+  } | null>(null);
 
-  const handleAttributeClick = (
-    id: number,
-    circlePosition: { x: number; y: number }
-  ) => {
-    const incompleteEdge = attributeEdges.find(
-      (edge) =>
-        attributeEdges.filter((e) => e.attributeEdgeID === edge.attributeEdgeID)
-          .length === 1 && edge.attributeID !== id
-    );
+  const handleHeaderClick = handleEdge(
+    edges,
+    createEdge,
+    pendingEdge,
+    setPendingEdge
+  );
 
-    const attributeEdgeID =
-      incompleteEdge?.attributeEdgeID ||
-      Math.max(0, ...attributeEdges.map((e) => e.attributeEdgeID)) + 1;
-    createAttributeEdge(
-      attributeEdgeID,
-      id,
-      circlePosition.x,
-      circlePosition.y
-    );
-  };
+  const handleAttributeClick = handleAttributeEdge(
+    attributeEdges,
+    createAttributeEdge,
+    pendingAtrEdge,
+    setPendingAtrEdge
+  );
 
   return (
     <div className='border-1 rounded-sm h-100 w-full bg-[#F9F9F9] overflow-hidden'>
