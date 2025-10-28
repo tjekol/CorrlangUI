@@ -21,6 +21,37 @@ export default function Edge() {
   const attributeEdgePosition = (index: number) =>
     atrributeEdges.filter((edge) => edge.attributeEdgeID === index).slice(0, 2);
 
+  const getPathData = (
+    pos1: { x: number; y: number },
+    pos2: { x: number; y: number }
+  ): string => {
+    const diffY = pos1.y - pos2.y;
+    const diffX = pos1.x - pos2.x;
+    // mid point of path
+    const midX = (pos1.x + pos2.x) / 2;
+    const midY = (pos1.y + pos2.y) / 2;
+    let curve = 0.2;
+
+    if (diffX >= 0) {
+      curve = 0.8;
+    }
+
+    if (diffY === 0) {
+      return `M ${pos1.x} ${pos1.y} , ${pos2.x} ${pos2.y}`;
+    } else if (diffY <= 0) {
+      const controlPoint1X = midX - (pos1.y - pos2.y) * curve;
+      const controlPoint1Y = midY - (pos2.x - pos1.x) * curve;
+      const controlPoint2X = midX + (pos1.y - pos2.y) * curve;
+      const controlPoint2Y = midY + (pos2.x - pos1.x) * curve;
+      return `M ${pos1.x} ${pos1.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2.x} ${pos2.y}`;
+    }
+    const controlPoint1X = midX + (pos1.y - pos2.y) * curve;
+    const controlPoint1Y = midY + (pos2.x - pos1.x) * curve;
+    const controlPoint2X = midX - (pos1.y - pos2.y) * curve;
+    const controlPoint2Y = midY - (pos2.x - pos1.x) * curve;
+    return `M ${pos1.x} ${pos1.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2.x} ${pos2.y}`;
+  };
+
   return (
     <>
       {/* edges */}
@@ -37,16 +68,16 @@ export default function Edge() {
           const pos2 = { x: positions[1].positionX, y: positions[1].positionY };
 
           return (
-            <line
+            <path
               key={edgeID}
-              x1={pos1.x}
-              y1={pos1.y}
-              x2={pos2.x}
-              y2={pos2.y}
+              d={getPathData(pos1, pos2)}
               stroke='black'
               strokeWidth={3}
+              strokeDasharray={'5,5'}
+              fill='none'
               onClick={() => edgeHook.deleteEdges(edgeID)}
               className='hover:cursor-pointer'
+              strokeOpacity={0.6}
             />
           );
         }
@@ -66,16 +97,16 @@ export default function Edge() {
           const pos2 = { x: positions[1].positionX, y: positions[1].positionY };
 
           return (
-            <line
+            <path
               key={edgeID}
-              x1={pos1.x}
-              y1={pos1.y}
-              x2={pos2.x}
-              y2={pos2.y}
+              d={getPathData(pos1, pos2)}
               stroke='blue'
               strokeWidth={3}
+              strokeDasharray={'5,5'}
+              fill='none'
               onClick={() => attributeEdgeHook.deleteAttributeEdges(edgeID)}
               className='hover:cursor-pointer'
+              strokeOpacity={0.6}
             />
           );
         }
