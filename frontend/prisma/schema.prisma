@@ -26,8 +26,6 @@ model Edge {
   id  Int   @id @default(autoincrement())
   edgeID Int
   nodeID Int
-  positionX Int
-  positionY Int
 
   node Node @relation(fields: [nodeID], references: [id])
 }

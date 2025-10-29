@@ -29,11 +29,11 @@ export const useEdges = () => {
     setEdges(edgesData)
   })
 
-  const createEdge = (edgeID: number, nodeID: number, positionX: number, positionY: number) => handleAsync(async () => {
+  const createEdge = (edgeID: number, nodeID: number) => handleAsync(async () => {
     const res = await fetch('/api/edges', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edgeID, nodeID, positionX, positionY }),
+      body: JSON.stringify({ edgeID, nodeID }),
     })
 
     if (!res.ok) {

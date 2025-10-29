@@ -2,7 +2,7 @@ import { IEdge } from '../interface/IEdge';
 
 export const handleEdge = (
   edges: IEdge[],
-  createEdge: (edgeID: number, nodeID: number, positionX: number, positionY: number) => void,
+  createEdge: (edgeID: number, nodeID: number) => void,
   pendingEdge: {
     edgeID: number;
     nodeID: number;
@@ -44,13 +44,11 @@ export const handleEdge = (
         // Create first edge (from pending data)
         createEdge(
           pendingEdge.edgeID,
-          pendingEdge.nodeID,
-          pendingEdge.positionX,
-          pendingEdge.positionY
+          pendingEdge.nodeID
         );
 
         // create second edge (from current click)
-        createEdge(pendingEdge.edgeID, id, circlePosition.x, circlePosition.y);
+        createEdge(pendingEdge.edgeID, id);
 
         setPendingEdge(null);
       } else {
