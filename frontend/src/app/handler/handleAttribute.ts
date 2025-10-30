@@ -44,13 +44,11 @@ export const handleAttributeEdge = (
         // Create first edge (from pending data)
         createAttributeEdge(
           pendingAtrEdge.attributeEdgeID,
-          pendingAtrEdge.attributeID,
-          pendingAtrEdge.positionX,
-          pendingAtrEdge.positionY
+          pendingAtrEdge.attributeID
         );
 
         // create second edge (from current click)
-        createAttributeEdge(pendingAtrEdge.attributeEdgeID, id, circlePosition.x, circlePosition.y);
+        createAttributeEdge(pendingAtrEdge.attributeEdgeID, id);
 
         setPendingAtrEdge(null);
       } else {

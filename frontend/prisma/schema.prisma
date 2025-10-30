@@ -43,8 +43,6 @@ model AttributeEdge {
   id  Int   @id @default(autoincrement())
   attributeEdgeID Int
   attributeID Int
-  positionX Int
-  positionY Int
 
   attribute Attribute @relation(fields: [attributeID], references: [id])
 }
