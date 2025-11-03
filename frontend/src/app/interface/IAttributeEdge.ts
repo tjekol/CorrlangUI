@@ -4,5 +4,5 @@ export interface IAttributeEdge {
   attributeEdgeID: number,
   attributeID: number
 
-  attribute: IAttribute
+  attribute: IAttribute[]
 }

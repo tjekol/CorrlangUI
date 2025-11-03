@@ -17,6 +17,8 @@ datasource db {
 model Node {
   id  Int   @id @default(autoincrement())
   title String
+  positionX Int @default(50)
+  positionY Int @default(50)
 
   attributes Attribute[]
   edges Edge[]

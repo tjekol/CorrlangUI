@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { INode } from '@/app/interface/INode';
-import { useAtom } from 'jotai';
-import { attributeEdgeAtom, edgeAtom } from '../GlobalValues';
+import { useAtom, useAtomValue } from 'jotai';
+import {
+  liveNodePositionsAtom,
+  nodeLengthAtom,
+  edgeAtom,
+} from '../GlobalValues';
 
 interface NodeProps extends INode {
-  posX: number;
-  posY: number;
   onHeaderClick: (id: number, circlePosition: { x: number; y: number }) => void;
   onAttributeClick: (
     id: number,
@@ -19,95 +21,52 @@ export default function Node({
   id,
   title,
   attributes,
-  posX,
-  posY,
+  positionX,
+  positionY,
   onHeaderClick,
   onAttributeClick,
 }: NodeProps) {
-  const [position, setPosition] = useState({ x: posX, y: posY });
+  const [position, setPosition] = useState({ x: positionX, y: positionY });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  const [edgePositions, setEdgePositions] = useAtom(edgeAtom);
-  const [atrEdgePositions, setAtrEdgePositions] = useAtom(attributeEdgeAtom);
-
-  const labels = attributes.map((label) => label.text);
-  const strLenghts = labels.map((str) => str.length);
-  const maxStringLength = Math.max(...strLenghts);
-  const width = maxStringLength * 15;
+  const [livePositions, setLivePositions] = useAtom(liveNodePositionsAtom);
+  const [nodeLength, setNodeLength] = useAtom(nodeLengthAtom);
+  const edges = useAtomValue(edgeAtom);
   const height = 40;
+
+  useEffect(() => {
+    const labels = attributes.map((label) => label.text);
+    const strLenghts = labels.map((str) => str.length);
+    const maxStringLength = Math.max(...strLenghts);
+    const width = maxStringLength * 15;
+
+    setNodeLength(width);
+  });
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
   const rightCirclePosition = {
-    x: position.x + width,
+    x: position.x + nodeLength,
     y: position.y + height / 2,
   };
 
-  const isCircleActive = (posX: number, posY: number): boolean => {
-    return edgePositions.some(
-      (position) => position.positionX === posX && position.positionY === posY
-    );
+  const hasEdges = () => {
+    return edges.some((edge) => edge.nodeID === id);
   };
-
-  const isAttributeCircleActive = (posX: number, posY: number): boolean => {
-    return atrEdgePositions.some(
-      (position) => position.positionX === posX && position.positionY === posY
-    );
-  };
-
-  const isLeftCircleActive = isCircleActive(
-    leftCirclePosition.x,
-    leftCirclePosition.y
-  );
-  const isRightCircleActive = isCircleActive(
-    rightCirclePosition.x,
-    rightCirclePosition.y
-  );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
 
-    setEdgePositions((prev) =>
-      prev.map((edge) => {
-        if (edge.nodeID !== id) return edge;
-
-        // Helper function to get new position for any circle
-        const getNewPosition = (currentX: number, currentY: number) => {
-          const deltaX = newX - position.x;
-          const deltaY = newY - position.y;
-          return {
-            positionX: currentX + deltaX,
-            positionY: currentY + deltaY,
-          };
-        };
-
-        return {
-          ...edge,
-          ...getNewPosition(edge.positionX, edge.positionY),
-        };
-      })
-    );
-
-    setAtrEdgePositions((prev) =>
-      prev.map((edge) => {
-        if (edge.attributeID !== id) return edge;
-
-        // Helper function to get new position for any circle
-        const getNewPosition = (currentX: number, currentY: number) => {
-          const deltaX = newX - position.x;
-          const deltaY = newY - position.y;
-          return {
-            positionX: currentX + deltaX,
-            positionY: currentY + deltaY,
-          };
-        };
-
-        return {
-          ...edge,
-          ...getNewPosition(edge.positionX, edge.positionY),
-        };
-      })
-    );
+    setLivePositions((prev) => {
+      const existing = prev.find((pos) => pos.nodeID === id);
+      if (existing) {
+        return prev.map((pos) =>
+          pos.nodeID === id ? { nodeID: id, x: newX, y: newY } : pos
+        );
+      } else {
+        return [...prev, { nodeID: id, x: newX, y: newY }];
+      }
+    });
   };
 
   const handleMouseDown = (clientX: number, clientY: number) => {
@@ -131,7 +90,7 @@ export default function Node({
       <rect
         x={position.x}
         y={position.y}
-        width={width}
+        width={nodeLength}
         height={height}
         fill='#FFFFFF'
         stroke='black'
@@ -147,7 +106,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          isLeftCircleActive ? 'opacity-100' : 'opacity-40'
+          hasEdges() ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -163,7 +122,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          isRightCircleActive ? 'opacity-100' : 'opacity-40'
+          hasEdges() ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -178,7 +137,7 @@ export default function Node({
       />
       {/* Header text */}
       <text
-        x={position.x + width / 2}
+        x={position.x + nodeLength / 2}
         y={position.y + height / 2}
         textAnchor='middle'
         dominantBaseline='middle'
@@ -190,7 +149,7 @@ export default function Node({
       <rect
         x={position.x}
         y={position.y + height}
-        width={width}
+        width={nodeLength}
         height={
           attributes.length === 1 ? height : (height * attributes.length) / 1.4
         }
@@ -206,17 +165,12 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
         const rightCirclePosition = {
-          x: position.x + width,
+          x: position.x + nodeLength,
           y: position.y + height + (height / 2) * (i + 1),
         };
-        const isLeftCircleActive = isAttributeCircleActive(
-          leftCirclePosition.x,
-          leftCirclePosition.y
-        );
-        const isRightCircleActive = isAttributeCircleActive(
-          rightCirclePosition.x,
-          rightCirclePosition.y
-        );
+
+        const isLeftCircleActive = false;
+        const isRightCircleActive = false;
 
         return (
           <g key={i}>
