@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { INode } from '@/app/interface/INode';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   liveNodePositionsAtom,
+  liveAtrPositionsAtom,
   nodeLengthAtom,
   edgeAtom,
+  attrEdgeAtom,
 } from '../GlobalValues';
 
 interface NodeProps extends INode {
@@ -30,9 +32,11 @@ export default function Node({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  const [livePositions, setLivePositions] = useAtom(liveNodePositionsAtom);
+  const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
+  const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
   const [nodeLength, setNodeLength] = useAtom(nodeLengthAtom);
   const edges = useAtomValue(edgeAtom);
+  const attrEdges = useAtomValue(attrEdgeAtom);
   const height = 40;
 
   useEffect(() => {
@@ -50,22 +54,43 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasEdges = () => {
-    return edges.some((edge) => edge.nodeID === id);
-  };
+  const hasEdges = edges.some((edge) => edge.nodeID === id);
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
 
-    setLivePositions((prev) => {
+    setLiveNodePositions((prev) => {
       const existing = prev.find((pos) => pos.nodeID === id);
       if (existing) {
         return prev.map((pos) =>
-          pos.nodeID === id ? { nodeID: id, x: newX, y: newY } : pos
+          pos.nodeID === id
+            ? { nodeID: id, positionX: newX, positionY: newY }
+            : pos
         );
       } else {
-        return [...prev, { nodeID: id, x: newX, y: newY }];
+        return [...prev, { nodeID: id, positionX: newX, positionY: newY }];
       }
+    });
+
+    setLiveAtrPosition((prev) => {
+      const filteredPrev = prev.filter(
+        (atr) => !attributes.some((attr) => attr.id === atr.attributeID)
+      );
+
+      const newAtrPositions = attributes
+        .map((attribute, i) => {
+          const leftPos = {
+            attributeID: attribute.id,
+            nodeID: id,
+            positionX: newX,
+            positionY: newY + height + (height / 2) * (i + 1),
+          };
+
+          return [leftPos];
+        })
+        .flat();
+
+      return [...filteredPrev, ...newAtrPositions];
     });
   };
 
@@ -106,7 +131,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges() ? 'opacity-100' : 'opacity-40'
+          hasEdges ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -122,7 +147,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges() ? 'opacity-100' : 'opacity-40'
+          hasEdges ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -169,15 +194,16 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isLeftCircleActive = false;
-        const isRightCircleActive = false;
+        const isActive = attrEdges.some(
+          (atr) => atr.attributeID === attribute.id
+        );
 
         return (
           <g key={i}>
             {/* Left circles */}
             <circle
               className={`hover:cursor-pointer hover:opacity-100 ${
-                isLeftCircleActive ? 'opacity-100' : 'opacity-40'
+                isActive ? 'opacity-100' : 'opacity-40'
               }`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
@@ -198,7 +224,7 @@ export default function Node({
             {/* Right circles */}
             <circle
               className={`hover:cursor-pointer hover:opacity-100 ${
-                isRightCircleActive ? 'opacity-100' : 'opacity-40'
+                isActive ? 'opacity-100' : 'opacity-40'
               }`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}

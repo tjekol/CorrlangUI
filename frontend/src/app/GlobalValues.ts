@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { IEdge } from './interface/IEdge';
 import { INode } from './interface/INode';
 import { IAttributeEdge } from './interface/IAttributeEdge';
-import { LiveNodePosition } from './interface/IStates';
+import { LiveAtrPosition, LiveNodePosition } from './interface/IStates';
 
 // Dynamic atoms
 export const nodeAtom = atom<INode[]>([]);
@@ -13,8 +13,9 @@ export const nodeLengthAtom = atom<number>(0);
 
 // Edge/AtrEdge positions
 export const liveNodePositionsAtom = atom<LiveNodePosition[]>([]);
+export const liveAtrPositionsAtom = atom<LiveAtrPosition[]>([]);
 
 // [{ edgeID: 1, nodeID: 1, edgeID: 1, nodeID: 2 }]
 export const edgeAtom = atom<IEdge[]>([]);
 
-export const attributeEdgeAtom = atom<IAttributeEdge[]>([]);
+export const attrEdgeAtom = atom<IAttributeEdge[]>([]);

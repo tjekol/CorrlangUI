@@ -1,15 +1,12 @@
 'use client';
+
 import { useAtomValue } from 'jotai';
 import { useEdges } from '../hooks/useEdges';
-import {
-  attributeEdgeAtom,
-  edgeAtom,
-  liveNodePositionsAtom,
-  nodeAtom,
-  nodeLengthAtom,
-} from '../GlobalValues';
+import { attrEdgeAtom, edgeAtom, nodeLengthAtom } from '../GlobalValues';
 import { useEffect, useState } from 'react';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
+import { usePositionCalculators } from '../hooks/useCalulatePosition';
+import { useAttributeEdges } from '../hooks/useAttributeEdges';
 
 export default function Edge({
   pendingEdge,
@@ -19,32 +16,11 @@ export default function Edge({
   pendingAtrEdge: IPendingAtrEdge | null;
 }) {
   const edgeHook = useEdges();
+  const atrEdgeHook = useAttributeEdges();
   const edges = useAtomValue(edgeAtom);
-  const nodes = useAtomValue(nodeAtom);
-  const atrributeEdges = useAtomValue(attributeEdgeAtom);
-  const livePositions = useAtomValue(liveNodePositionsAtom);
+  const atrributeEdges = useAtomValue(attrEdgeAtom);
   const nodeLength = useAtomValue(nodeLengthAtom);
-  const height = 40;
-
-  const getNodePosition = (nodeID: number) => {
-    const livePos = livePositions.find((pos) => pos.nodeID === nodeID);
-    if (livePos) {
-      return {
-        x: livePos.x,
-        y: livePos.y + height / 2,
-      };
-    }
-    const node = nodes.find((n) => n.id === nodeID);
-    if (node) {
-      const position = { x: node.positionX || 0, y: node.positionY || 0 };
-      return {
-        x: position.x,
-        y: position.y + height / 2,
-      };
-    }
-
-    return null;
-  };
+  const { getNodePosition, getAttributePosition } = usePositionCalculators();
 
   // edges
   const uniqueEdgeIDs = [...new Set(edges.map((edge) => edge.edgeID))];
@@ -92,6 +68,13 @@ export default function Edge({
     return `M ${pos1X} ${pos1.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2X} ${pos2.y}`;
   };
 
+  const getTempPathData = (
+    pos1: { x: number; y: number },
+    pos2: { x: number; y: number }
+  ): string => {
+    return `M ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y}`;
+  };
+
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -120,7 +103,7 @@ export default function Edge({
       {pendingEdge && mousePosition.x !== 0 && mousePosition.y !== 0 && (
         <path
           key={pendingEdge.edgeID}
-          d={getPathData(
+          d={getTempPathData(
             { x: pendingEdge.positionX, y: pendingEdge.positionY },
             mousePosition
           )}
@@ -136,7 +119,7 @@ export default function Edge({
       {pendingAtrEdge && mousePosition.x !== 0 && mousePosition.y !== 0 && (
         <path
           key={pendingAtrEdge.attributeEdgeID}
-          d={getPathData(
+          d={getTempPathData(
             { x: pendingAtrEdge.positionX, y: pendingAtrEdge.positionY },
             mousePosition
           )}
@@ -182,6 +165,35 @@ export default function Edge({
       })}
 
       {/* attribute edges */}
+      {uniqueAttributeEdgeIDs.map((atrID) => {
+        const positions = attributeEdgePosition(atrID);
+
+        if (
+          positions.length === 2 &&
+          positions[0].attributeID !== positions[1].attributeID &&
+          !edgeHook.loading
+        ) {
+          const pos1 = getAttributePosition(positions[0].attributeID);
+          const pos2 = getAttributePosition(positions[1].attributeID);
+
+          if (pos1 && pos2) {
+            return (
+              <path
+                key={atrID}
+                d={getPathData(pos1, pos2)}
+                stroke='blue'
+                strokeWidth={3}
+                strokeDasharray={'5,5'}
+                fill='none'
+                onClick={() => atrEdgeHook.deleteAttributeEdges(atrID)}
+                className='hover:cursor-pointer'
+                strokeOpacity={0.6}
+              />
+            );
+          }
+        }
+        return null;
+      })}
     </>
   );
 }

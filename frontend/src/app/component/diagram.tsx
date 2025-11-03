@@ -1,4 +1,5 @@
 'use client';
+
 import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
@@ -28,8 +29,8 @@ export default function Diagram() {
       setLivePositions(
         nodes.map((node) => ({
           nodeID: node.id,
-          x: node.positionX || 0,
-          y: node.positionY || 0,
+          positionX: node.positionX || 0,
+          positionY: node.positionY || 0,
         }))
       );
     }

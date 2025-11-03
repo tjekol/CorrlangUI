@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { attributeEdgeAtom } from '../GlobalValues';
+import { attrEdgeAtom } from '../GlobalValues';
 import { IAttributeEdge } from '../interface/IAttributeEdge';
 
 export const useAttributeEdges = () => {
   const [loading, setLoading] = useState(true);
-  const [attributeEdges, setAttributeEdges] = useAtom(attributeEdgeAtom);
+  const [attributeEdges, setAttributeEdges] = useAtom(attrEdgeAtom);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
