@@ -1,8 +1,9 @@
 import { INode } from './INode'
 
 export interface IEdge {
-  edgeID: number,
-  nodeID: number
+  id: number;
+  edgeID: number;
+  nodeID: number;
 
   node: INode[]
 }

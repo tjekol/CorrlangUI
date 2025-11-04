@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
+    "elkjs": "^0.11.0",
     "jotai": "^2.15.0",
     "next": "15.5.4",
     "react": "19.1.0",

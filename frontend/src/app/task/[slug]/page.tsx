@@ -50,10 +50,10 @@ export default function Task() {
             .join('')}
         /> */}
         <Diagram />
-        <p className='self-end'>Output</p>
+        {/* <p className='self-end'>Output</p>
         <p className='bg-gray min-h-100 p-5 rounded-sm border-1 whitespace-pre-wrap'>
           {output}
-        </p>
+        </p> */}
       </div>
     </div>
   );

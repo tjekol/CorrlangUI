@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const nodes = await prisma.node.findMany({
       include: {
-        nodeLabels: true
+        attributes: true
       }
     });
 
