@@ -1,20 +1,11 @@
 import { IAttributeEdge } from '../interface/IAttributeEdge';
+import { IPendingAtrEdge } from '../interface/IStates';
 
 export const handleAttributeEdge = (
   edges: IAttributeEdge[],
-  createAttributeEdge: (attributeEdgeID: number, attributeID: number, positionX: number, positionY: number) => void,
-  pendingAtrEdge: {
-    attributeEdgeID: number;
-    attributeID: number;
-    positionX: number;
-    positionY: number;
-  } | null,
-  setPendingAtrEdge: (pendingEdge: {
-    attributeEdgeID: number;
-    attributeID: number;
-    positionX: number;
-    positionY: number;
-  } | null) => void
+  createAttributeEdge: (attributeEdgeID: number, attributeID: number) => void,
+  pendingAtrEdge: IPendingAtrEdge | null,
+  setPendingAtrEdge: (pendingEdge: IPendingAtrEdge | null) => void
 ) => {
   return (id: number, circlePosition: { x: number; y: number }) => {
     if (!pendingAtrEdge) {

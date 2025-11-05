@@ -1,4 +1,3 @@
-import { useSetAtom } from 'jotai';
 import { IEdge } from '../interface/IEdge';
 import { IPendingEdge } from '../interface/IStates';
 
