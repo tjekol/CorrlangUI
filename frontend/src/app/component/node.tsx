@@ -198,13 +198,16 @@ export default function Node({
           (atr) => atr.attributeID === attribute.id
         );
 
+        const alertMsg =
+          'Node needs to be connected to node before connecting attributes.';
+
         return (
           <g key={i}>
             {/* Left circles */}
             <circle
-              className={`hover:cursor-pointer hover:opacity-100 ${
-                isActive ? 'opacity-100' : 'opacity-40'
-              }`}
+              className={`hover:cursor-pointer ${
+                hasEdges && 'hover:opacity-100'
+              }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
               r={5}
@@ -212,20 +215,24 @@ export default function Node({
               stroke='blue'
               strokeWidth={1}
               onClick={() => {
-                console.log(
-                  'Clicked on attribute: ',
-                  attribute,
-                  attribute.id,
-                  leftCirclePosition
-                ),
-                  onAttributeClick(attribute.id, leftCirclePosition);
+                if (hasEdges) {
+                  console.log(
+                    'Clicked on attribute: ',
+                    attribute,
+                    attribute.id,
+                    leftCirclePosition
+                  ),
+                    onAttributeClick(attribute.id, leftCirclePosition);
+                } else {
+                  alert(alertMsg);
+                }
               }}
             />
             {/* Right circles */}
             <circle
-              className={`hover:cursor-pointer hover:opacity-100 ${
-                isActive ? 'opacity-100' : 'opacity-40'
-              }`}
+              className={`hover:cursor-pointer ${
+                hasEdges && 'hover:opacity-100'
+              } ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
               r={5}
@@ -233,13 +240,17 @@ export default function Node({
               stroke='blue'
               strokeWidth={1}
               onClick={() => {
-                console.log(
-                  'Clicked on attribute: ',
-                  attribute,
-                  attribute.id,
-                  leftCirclePosition
-                ),
-                  onAttributeClick(attribute.id, rightCirclePosition);
+                if (hasEdges) {
+                  console.log(
+                    'Clicked on attribute: ',
+                    attribute,
+                    attribute.id,
+                    leftCirclePosition
+                  ),
+                    onAttributeClick(attribute.id, rightCirclePosition);
+                } else {
+                  alert(alertMsg);
+                }
               }}
             />
             <text

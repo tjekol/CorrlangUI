@@ -55,7 +55,7 @@ export const useAttributeEdges = () => {
     if (!res.ok) {
       throw new Error('Failed to delete edges');
     }
-    console.log(`Removed edges with id: ${id}`);
+    console.log(`Removed attribute edges with id: ${id}`);
     setAttributeEdges(prev => prev.filter(edge => edge.attributeEdgeID !== id));
   })
 

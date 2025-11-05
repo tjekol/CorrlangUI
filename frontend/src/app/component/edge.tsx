@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
 import { usePositionCalculators } from '../hooks/useCalulatePosition';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useAttributes } from '../hooks/useAttributes';
 
 export default function Edge({
   pendingEdge,
@@ -18,6 +19,7 @@ export default function Edge({
   const edgeHook = useEdges();
   const atrEdgeHook = useAttributeEdges();
   const edges = useAtomValue(edgeAtom);
+  const { attributes } = useAttributes();
   const atrributeEdges = useAtomValue(attrEdgeAtom);
   const nodeLength = useAtomValue(nodeLengthAtom);
   const { getNodePosition, getAttributePosition } = usePositionCalculators();
@@ -154,7 +156,45 @@ export default function Edge({
                 strokeWidth={3}
                 strokeDasharray={'5,5'}
                 fill='none'
-                onClick={() => edgeHook.deleteEdges(edgeID)}
+                onClick={() => {
+                  const nodeAAttr = attributes.filter(
+                    (attr) => attr.nodeID === positions[0].nodeID
+                  );
+                  const nodeBAttr = attributes.filter(
+                    (attr) => attr.nodeID === positions[1].nodeID
+                  );
+                  const nodeAAttrIDs = new Set(nodeAAttr.map((a) => a.id));
+                  const nodeBAttrIDs = new Set(nodeBAttr.map((a) => a.id));
+
+                  // attribute edges between nodes
+                  const relevantAttrEdges = atrributeEdges.filter(
+                    (atrEdge) =>
+                      nodeAAttrIDs.has(atrEdge.attributeID) ||
+                      nodeBAttrIDs.has(atrEdge.attributeID)
+                  );
+
+                  // count occurrences
+                  const edgeIDCounts = relevantAttrEdges.reduce(
+                    (counts, edge) => {
+                      // each edge, increment the count for its attributeEdgeID
+                      counts[edge.attributeEdgeID] =
+                        (counts[edge.attributeEdgeID] || 0) + 1;
+                      return counts;
+                    },
+                    {} as Record<number, number>
+                  ); // empty object
+
+                  // complete connection has count 2
+                  const completeConnectionIDs = Object.entries(edgeIDCounts)
+                    .filter(([_, count]) => count === 2)
+                    .map(([edgeID, _]) => Number(edgeID));
+
+                  // delete the node edge and all complete attribute connections
+                  edgeHook.deleteEdges(edgeID);
+                  completeConnectionIDs.forEach((atrEdgeID) => {
+                    atrEdgeHook.deleteAttributeEdges(atrEdgeID);
+                  });
+                }}
                 className='hover:cursor-pointer'
                 strokeOpacity={0.6}
               />
@@ -165,9 +205,8 @@ export default function Edge({
       })}
 
       {/* attribute edges */}
-      {uniqueAttributeEdgeIDs.map((atrID) => {
-        const positions = attributeEdgePosition(atrID);
-
+      {uniqueAttributeEdgeIDs.map((atrEdgeID) => {
+        const positions = attributeEdgePosition(atrEdgeID);
         if (
           positions.length === 2 &&
           positions[0].attributeID !== positions[1].attributeID &&
@@ -179,13 +218,13 @@ export default function Edge({
           if (pos1 && pos2) {
             return (
               <path
-                key={atrID}
+                key={atrEdgeID}
                 d={getPathData(pos1, pos2)}
                 stroke='blue'
                 strokeWidth={3}
                 strokeDasharray={'5,5'}
                 fill='none'
-                onClick={() => atrEdgeHook.deleteAttributeEdges(atrID)}
+                onClick={() => atrEdgeHook.deleteAttributeEdges(atrEdgeID)}
                 className='hover:cursor-pointer'
                 strokeOpacity={0.6}
               />
