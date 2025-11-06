@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { INode } from '@/app/interface/INode';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
@@ -39,14 +39,14 @@ export default function Node({
   const attrEdges = useAtomValue(attrEdgeAtom);
   const height = 40;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const labels = attributes.map((label) => label.text);
     const strLenghts = labels.map((str) => str.length);
     const maxStringLength = Math.max(...strLenghts);
     const width = maxStringLength * 15;
 
     setNodeLength(width);
-  });
+  }, []);
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
   const rightCirclePosition = {

@@ -106,18 +106,17 @@ export default function Diagram() {
         const graph = {
           id: 'root',
           layoutOptions: {
-            'elk.algorithm': 'layered',
-            'elk.direction': 'RIGHT',
-            'elk.spacing.nodeNode': '30',
-            'elk.layered.spacing.nodeNodeBetweenLayers': '80',
+            'elk.algorithm': 'org.eclipse.elk.force',
+            'elk.spacing.nodeNode': '60',
+            'elk.spacing.edgeNode': '40',
+            'elk.force.repulsivePower': '0.5',
+            'elk.direction': 'UNDEFINED',
           },
           children,
           edges: elkEdges,
         };
 
         const layoutedGraph = await elk.layout(graph);
-        console.log('ELK Layout Result:', layoutedGraph);
-
         if (layoutedGraph.children) {
           const newPositions = layoutedGraph.children.map((child) => ({
             nodeID: parseInt(child.id),
@@ -139,7 +138,11 @@ export default function Diagram() {
   return (
     <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
-        <Edge pendingEdge={pendingEdge} pendingAtrEdge={pendingAtrEdge} />
+        <Edge
+          onHeaderClick={handleHeaderClick}
+          pendingEdge={pendingEdge}
+          pendingAtrEdge={pendingAtrEdge}
+        />
         {loading || layoutLoading ? (
           <text x={50} y={50}>
             {loading ? 'Loading nodes...' : 'Calculating layout...'}

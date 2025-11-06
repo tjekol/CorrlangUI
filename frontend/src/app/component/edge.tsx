@@ -12,9 +12,20 @@ import { useAttributes } from '../hooks/useAttributes';
 export default function Edge({
   pendingEdge,
   pendingAtrEdge,
+  onHeaderClick,
 }: {
   pendingEdge: IPendingEdge | null;
   pendingAtrEdge: IPendingAtrEdge | null;
+  onHeaderClick: (
+    id1: number,
+    circlePosition1: { x: number; y: number },
+    id2: number,
+    circlePosition2: { x: number; y: number }
+  ) => void;
+  // onAttributeClick: (
+  //   id: number,
+  //   circlePosition: { x: number; y: number }
+  // ) => void;
 }) {
   const edgeHook = useEdges();
   const atrEdgeHook = useAttributeEdges();
@@ -23,6 +34,10 @@ export default function Edge({
   const atrributeEdges = useAtomValue(attrEdgeAtom);
   const nodeLength = useAtomValue(nodeLengthAtom);
   const { getNodePosition, getAttributePosition } = usePositionCalculators();
+  // midpoints for circle on edges
+  const [midCircles, setMidCircles] = useState<
+    Record<number, { x: number; y: number }>
+  >({});
 
   // edges
   const uniqueEdgeIDs = [...new Set(edges.map((edge) => edge.edgeID))];
@@ -75,6 +90,18 @@ export default function Edge({
     pos2: { x: number; y: number }
   ): string => {
     return `M ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y}`;
+  };
+
+  // Function to calculate midpoint for a path
+  const calculateMidpoint = (pathElement: SVGPathElement, edgeID: number) => {
+    const totalLength = pathElement.getTotalLength();
+    if (!isFinite(totalLength) || totalLength === 0) return;
+
+    const pt = pathElement.getPointAtLength(totalLength / 2);
+    setMidCircles((prev) => ({
+      ...prev,
+      [edgeID]: { x: pt.x, y: pt.y },
+    }));
   };
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -149,55 +176,83 @@ export default function Edge({
 
           if (pos1 && pos2) {
             return (
-              <path
-                key={edgeID}
-                d={getPathData(pos1, pos2)}
-                stroke='black'
-                strokeWidth={3}
-                strokeDasharray={'5,5'}
-                fill='none'
-                onClick={() => {
-                  const nodeAAttr = attributes.filter(
-                    (attr) => attr.nodeID === positions[0].nodeID
-                  );
-                  const nodeBAttr = attributes.filter(
-                    (attr) => attr.nodeID === positions[1].nodeID
-                  );
-                  const nodeAAttrIDs = new Set(nodeAAttr.map((a) => a.id));
-                  const nodeBAttrIDs = new Set(nodeBAttr.map((a) => a.id));
+              <g key={edgeID}>
+                <path
+                  ref={(pathElement) => {
+                    if (pathElement) {
+                      setTimeout(
+                        () => calculateMidpoint(pathElement, edgeID),
+                        0
+                      );
+                    }
+                  }}
+                  d={getPathData(pos1, pos2)}
+                  stroke='black'
+                  strokeWidth={3.5}
+                  // strokeDasharray={'10,10'}
+                  fill='none'
+                  onClick={() => {
+                    const nodeAAttr = attributes.filter(
+                      (attr) => attr.nodeID === positions[0].nodeID
+                    );
+                    const nodeBAttr = attributes.filter(
+                      (attr) => attr.nodeID === positions[1].nodeID
+                    );
+                    const nodeAAttrIDs = new Set(nodeAAttr.map((a) => a.id));
+                    const nodeBAttrIDs = new Set(nodeBAttr.map((a) => a.id));
 
-                  // attribute edges between nodes
-                  const relevantAttrEdges = atrributeEdges.filter(
-                    (atrEdge) =>
-                      nodeAAttrIDs.has(atrEdge.attributeID) ||
-                      nodeBAttrIDs.has(atrEdge.attributeID)
-                  );
+                    // attribute edges between nodes
+                    const relevantAttrEdges = atrributeEdges.filter(
+                      (atrEdge) =>
+                        nodeAAttrIDs.has(atrEdge.attributeID) ||
+                        nodeBAttrIDs.has(atrEdge.attributeID)
+                    );
 
-                  // count occurrences
-                  const edgeIDCounts = relevantAttrEdges.reduce(
-                    (counts, edge) => {
-                      // each edge, increment the count for its attributeEdgeID
-                      counts[edge.attributeEdgeID] =
-                        (counts[edge.attributeEdgeID] || 0) + 1;
-                      return counts;
-                    },
-                    {} as Record<number, number>
-                  ); // empty object
+                    // count occurrences
+                    const edgeIDCounts = relevantAttrEdges.reduce(
+                      (counts, edge) => {
+                        // each edge, increment the count for its attributeEdgeID
+                        counts[edge.attributeEdgeID] =
+                          (counts[edge.attributeEdgeID] || 0) + 1;
+                        return counts;
+                      },
+                      {} as Record<number, number>
+                    ); // empty object
 
-                  // complete connection has count 2
-                  const completeConnectionIDs = Object.entries(edgeIDCounts)
-                    .filter(([_, count]) => count === 2)
-                    .map(([edgeID, _]) => Number(edgeID));
+                    // complete connection has count 2
+                    const completeConnectionIDs = Object.entries(edgeIDCounts)
+                      .filter(([_, count]) => count === 2)
+                      .map(([edgeID, _]) => Number(edgeID));
 
-                  // delete the node edge and all complete attribute connections
-                  edgeHook.deleteEdges(edgeID);
-                  completeConnectionIDs.forEach((atrEdgeID) => {
-                    atrEdgeHook.deleteAttributeEdges(atrEdgeID);
-                  });
-                }}
-                className='hover:cursor-pointer'
-                strokeOpacity={0.6}
-              />
+                    // delete the node edge and all complete attribute connections
+                    edgeHook.deleteEdges(edgeID);
+                    completeConnectionIDs.forEach((atrEdgeID) => {
+                      atrEdgeHook.deleteAttributeEdges(atrEdgeID);
+                    });
+                  }}
+                  className='hover:cursor-pointer'
+                  strokeOpacity={0.6}
+                />
+                {midCircles[edgeID] && (
+                  <circle
+                    cx={midCircles[edgeID].x}
+                    cy={midCircles[edgeID].y}
+                    r={6}
+                    fill='white'
+                    stroke='black'
+                    className='hover:opacity-100 opacity-70'
+                    onClick={() => {
+                      if (pendingEdge) {
+                        const node1 = positions[0].nodeID;
+                        const node2 = positions[1].nodeID;
+                        onHeaderClick(node1, pos1, node2, pos2);
+                      } else {
+                        alert('Click a node first.');
+                      }
+                    }}
+                  />
+                )}
+              </g>
             );
           }
         }
@@ -222,7 +277,7 @@ export default function Edge({
                 d={getPathData(pos1, pos2)}
                 stroke='blue'
                 strokeWidth={3}
-                strokeDasharray={'5,5'}
+                // strokeDasharray={'5,5'}
                 fill='none'
                 onClick={() => atrEdgeHook.deleteAttributeEdges(atrEdgeID)}
                 className='hover:cursor-pointer'
