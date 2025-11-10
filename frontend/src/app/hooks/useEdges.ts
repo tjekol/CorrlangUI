@@ -29,11 +29,11 @@ export const useEdges = () => {
     setEdges(edgesData)
   })
 
-  const createEdge = (edgeID: number, nodeID: number) => handleAsync(async () => {
+  const createEdge = (srcNodeID: number, trgtNodeID: number) => handleAsync(async () => {
     const res = await fetch('/api/edges', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edgeID, nodeID }),
+      body: JSON.stringify({ srcNodeID, trgtNodeID }),
     })
 
     if (!res.ok) {
@@ -41,7 +41,7 @@ export const useEdges = () => {
       return;
     }
     const edgeData: IEdge = await res.json();
-    console.log(`Added edge: ${edgeID} from node ${nodeID}`);
+    console.log(`Added edge: ${edgeData.id} between nodes ${srcNodeID}-${trgtNodeID}`);
     setEdges(prev => [...prev, edgeData]);
   })
 
@@ -56,7 +56,7 @@ export const useEdges = () => {
       throw new Error('Failed to delete edges');
     }
     console.log(`Removed edges with id: ${id}`);
-    setEdges(prev => prev.filter(edge => edge.edgeID !== id));
+    setEdges(prev => prev.filter(edge => edge.id !== id));
   })
 
   useEffect(() => { fetchEdges() }, [])

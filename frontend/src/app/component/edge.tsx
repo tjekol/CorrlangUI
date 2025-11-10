@@ -40,9 +40,13 @@ export default function Edge({
   >({});
 
   // edges
-  const uniqueEdgeIDs = [...new Set(edges.map((edge) => edge.edgeID))];
-  const edgePosition = (index: number) =>
-    edges.filter((edge) => edge.edgeID === index).slice(0, 2);
+  const uniqueEdgeIDs = edges.map((edge) => edge.id);
+  const getNodes = (
+    edgeID: number
+  ): { srcNodeID: number; trgtNodeID: number } | undefined => {
+    const edge = edges.find((edge) => edge.id === edgeID);
+    if (edge) return { srcNodeID: edge.srcNodeID, trgtNodeID: edge.trgtNodeID };
+  };
 
   // attribute edges
   const uniqueAttributeEdgeIDs = [
@@ -163,16 +167,12 @@ export default function Edge({
 
       {/* edges */}
       {uniqueEdgeIDs.map((edgeID) => {
-        const positions = edgePosition(edgeID);
+        const nodes = getNodes(edgeID);
 
-        // draw edge if exactly 2 positions have different nodeIDs
-        if (
-          positions.length === 2 &&
-          positions[0].nodeID !== positions[1].nodeID &&
-          !edgeHook.loading
-        ) {
-          const pos1 = getNodePosition(positions[0].nodeID);
-          const pos2 = getNodePosition(positions[1].nodeID);
+        if (nodes && !edgeHook.loading) {
+          const { srcNodeID, trgtNodeID } = nodes;
+          const pos1 = getNodePosition(srcNodeID);
+          const pos2 = getNodePosition(trgtNodeID);
 
           if (pos1 && pos2) {
             return (
@@ -193,10 +193,10 @@ export default function Edge({
                   fill='none'
                   onClick={() => {
                     const nodeAAttr = attributes.filter(
-                      (attr) => attr.nodeID === positions[0].nodeID
+                      (attr) => attr.nodeID === srcNodeID
                     );
                     const nodeBAttr = attributes.filter(
-                      (attr) => attr.nodeID === positions[1].nodeID
+                      (attr) => attr.nodeID === trgtNodeID
                     );
                     const nodeAAttrIDs = new Set(nodeAAttr.map((a) => a.id));
                     const nodeBAttrIDs = new Set(nodeBAttr.map((a) => a.id));
@@ -243,9 +243,7 @@ export default function Edge({
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingEdge) {
-                        const node1 = positions[0].nodeID;
-                        const node2 = positions[1].nodeID;
-                        onHeaderClick(node1, pos1, node2, pos2);
+                        onHeaderClick(srcNodeID, pos1, trgtNodeID, pos2);
                       } else {
                         alert('Click a node first.');
                       }

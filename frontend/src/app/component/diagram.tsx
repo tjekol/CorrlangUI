@@ -79,28 +79,13 @@ export default function Diagram() {
 
         const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
           [];
-        const edgeGroups: { [key: number]: IEdge[] } = {};
 
         edges.forEach((edge) => {
-          if (!edgeGroups[edge.edgeID]) {
-            edgeGroups[edge.edgeID] = [];
-            edgeGroups[edge.edgeID].push(edge);
-          } else if (
-            edgeGroups[edge.edgeID] &&
-            edgeGroups[edge.edgeID].length < 2
-          ) {
-            edgeGroups[edge.edgeID].push(edge);
-          }
-        });
-
-        Object.values(edgeGroups).forEach((edgeGroup) => {
-          if (edgeGroup.length === 2) {
-            elkEdges.push({
-              id: `edgeID-${edgeGroup[0].edgeID}`,
-              sources: [edgeGroup[0].nodeID.toString()],
-              targets: [edgeGroup[1].nodeID.toString()],
-            });
-          }
+          elkEdges.push({
+            id: `edgeID-${edge.id}`,
+            sources: [edge.srcNodeID.toString()],
+            targets: [edge.trgtNodeID.toString()],
+          });
         });
 
         const graph = {

@@ -10,7 +10,7 @@ export const nodeAtom = atom<INode[]>([]);
 export const attrAtom = atom<IAttribute[]>([]);
 
 // Edges
-// [{ edgeID: 1, nodeID: 1, edgeID: 1, nodeID: 2 }]
+// [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
 export const edgeAtom = atom<IEdge[]>([]);
 export const attrEdgeAtom = atom<IAttributeEdge[]>([]);
 

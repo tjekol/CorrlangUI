@@ -54,7 +54,9 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasEdges = edges.some((edge) => edge.nodeID === id);
+  const hasEdges = edges.some(
+    (edge) => edge.srcNodeID === id || edge.trgtNodeID === id
+  );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });

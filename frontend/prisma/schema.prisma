@@ -21,15 +21,17 @@ model Node {
   positionY Int @default(50)
 
   attributes Attribute[]
-  edges Edge[]
+  srcEdges Edge[] @relation(name: "source")
+  trgtEdges Edge[] @relation(name: "target")
 }
 
 model Edge {
   id  Int   @id @default(autoincrement())
-  edgeID Int
-  nodeID Int
+  srcNodeID Int
+  trgtNodeID Int
 
-  node Node @relation(fields: [nodeID], references: [id])
+  srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
+  trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
 }
 
 model Attribute {
