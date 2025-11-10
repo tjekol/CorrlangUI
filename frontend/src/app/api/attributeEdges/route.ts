@@ -6,11 +6,7 @@ const prisma = new PrismaClient();
 // GET - Fetch all attribute edges
 export async function GET() {
   try {
-    const edges = await prisma.attributeEdge.findMany({
-      include: {
-        attribute: true
-      }
-    });
+    const edges = await prisma.attributeEdge.findMany();
 
     return NextResponse.json(edges);
   } catch (error) {
@@ -25,12 +21,12 @@ export async function GET() {
 // POST - Create a new node
 export async function POST(request: NextRequest) {
   try {
-    const { attributeEdgeID, attributeID } = await request.json();
+    const { srcAtrID, trgtAtrID } = await request.json();
 
     const edge = await prisma.attributeEdge.create({
       data: {
-        attributeEdgeID,
-        attributeID
+        srcAtrID,
+        trgtAtrID
       },
     });
 
@@ -52,7 +48,7 @@ export async function DELETE(request: NextRequest) {
     // Delete related edges
     const deletedEdge = await prisma.attributeEdge.deleteMany({
       where: {
-        attributeEdgeID: id,
+        id: id,
       },
     });
 

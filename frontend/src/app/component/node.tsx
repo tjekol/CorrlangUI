@@ -197,7 +197,8 @@ export default function Node({
         };
 
         const isActive = attrEdges.some(
-          (atr) => atr.attributeID === attribute.id
+          (atr) =>
+            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id
         );
 
         const alertMsg =

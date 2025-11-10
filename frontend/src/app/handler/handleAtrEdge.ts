@@ -3,13 +3,13 @@ import { IPendingAtrEdge } from '../interface/IStates';
 
 export const handleAttributeEdge = (
   edges: IAttributeEdge[],
-  createAttributeEdge: (attributeEdgeID: number, attributeID: number) => void,
+  createAttributeEdge: (srcAtrID: number, trgtAtrID: number) => void,
   pendingAtrEdge: IPendingAtrEdge | null,
   setPendingAtrEdge: (pendingEdge: IPendingAtrEdge | null) => void
 ) => {
   return (id: number, circlePosition: { x: number; y: number }) => {
     if (!pendingAtrEdge) {
-      const newattributeEdgeID = Math.max(0, ...edges.map((e) => e.attributeEdgeID)) + 1;
+      const newattributeEdgeID = Math.max(0, ...edges.map((e) => e.id)) + 1;
 
       setPendingAtrEdge({
         attributeEdgeID: newattributeEdgeID,
@@ -18,29 +18,23 @@ export const handleAttributeEdge = (
         positionY: circlePosition.y,
       });
 
-      console.log('First node selected:', {
+      console.log('First attribute selected:', {
         attributeID: id,
         position: circlePosition,
       });
     } else {
       if (pendingAtrEdge.attributeID !== id) {
-        // create both edges with the same attributeEdgeID (completing the connection)
         console.log(
-          'Creating edge connection between nodes:',
+          'Creating edge between attributes:',
           pendingAtrEdge.attributeID,
           'and',
           id
         );
 
-        // Create first edge (from pending data)
         createAttributeEdge(
-          pendingAtrEdge.attributeEdgeID,
-          pendingAtrEdge.attributeID
+          pendingAtrEdge.attributeID,
+          id
         );
-
-        // create second edge (from current click)
-        createAttributeEdge(pendingAtrEdge.attributeEdgeID, id);
-
         setPendingAtrEdge(null);
       } else {
         console.log('Same node clicked, canceling edge creation');

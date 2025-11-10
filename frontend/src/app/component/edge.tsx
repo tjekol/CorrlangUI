@@ -40,7 +40,7 @@ export default function Edge({
   >({});
 
   // edges
-  const uniqueEdgeIDs = edges.map((edge) => edge.id);
+  const edgeIDs = edges.map((edge) => edge.id);
   const getNodes = (
     edgeID: number
   ): { srcNodeID: number; trgtNodeID: number } | undefined => {
@@ -49,11 +49,14 @@ export default function Edge({
   };
 
   // attribute edges
-  const uniqueAttributeEdgeIDs = [
-    ...new Set(atrributeEdges.map((edge) => edge.attributeEdgeID)),
-  ];
-  const attributeEdgePosition = (index: number) =>
-    atrributeEdges.filter((edge) => edge.attributeEdgeID === index).slice(0, 2);
+  const attributeEdgeIDs = atrributeEdges.map((atrEdge) => atrEdge.id);
+  const getAttributes = (
+    atrEdgeID: number
+  ): { srcAtrID: number; trgtAtrID: number } | undefined => {
+    const atrEdge = atrributeEdges.find((atrEdge) => atrEdge.id === atrEdgeID);
+    if (atrEdge)
+      return { srcAtrID: atrEdge.srcAtrID, trgtAtrID: atrEdge.trgtAtrID };
+  };
 
   const getPathData = (
     pos1: { x: number; y: number },
@@ -166,7 +169,7 @@ export default function Edge({
       )}
 
       {/* edges */}
-      {uniqueEdgeIDs.map((edgeID) => {
+      {edgeIDs.map((edgeID) => {
         const nodes = getNodes(edgeID);
 
         if (nodes && !edgeHook.loading) {
@@ -192,42 +195,28 @@ export default function Edge({
                   // strokeDasharray={'10,10'}
                   fill='none'
                   onClick={() => {
-                    const nodeAAttr = attributes.filter(
+                    const nodeAAtr = attributes.filter(
                       (attr) => attr.nodeID === srcNodeID
                     );
-                    const nodeBAttr = attributes.filter(
+                    const nodeBAtr = attributes.filter(
                       (attr) => attr.nodeID === trgtNodeID
                     );
-                    const nodeAAttrIDs = new Set(nodeAAttr.map((a) => a.id));
-                    const nodeBAttrIDs = new Set(nodeBAttr.map((a) => a.id));
+                    const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
+                    const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
 
                     // attribute edges between nodes
                     const relevantAttrEdges = atrributeEdges.filter(
                       (atrEdge) =>
-                        nodeAAttrIDs.has(atrEdge.attributeID) ||
-                        nodeBAttrIDs.has(atrEdge.attributeID)
+                        (nodeAAtrIDs.has(atrEdge.srcAtrID) &&
+                          nodeBAtrIDs.has(atrEdge.trgtAtrID)) ||
+                        (nodeAAtrIDs.has(atrEdge.trgtAtrID) &&
+                          nodeBAtrIDs.has(atrEdge.srcAtrID))
                     );
-
-                    // count occurrences
-                    const edgeIDCounts = relevantAttrEdges.reduce(
-                      (counts, edge) => {
-                        // each edge, increment the count for its attributeEdgeID
-                        counts[edge.attributeEdgeID] =
-                          (counts[edge.attributeEdgeID] || 0) + 1;
-                        return counts;
-                      },
-                      {} as Record<number, number>
-                    ); // empty object
-
-                    // complete connection has count 2
-                    const completeConnectionIDs = Object.entries(edgeIDCounts)
-                      .filter(([_, count]) => count === 2)
-                      .map(([edgeID, _]) => Number(edgeID));
 
                     // delete the node edge and all complete attribute connections
                     edgeHook.deleteEdges(edgeID);
-                    completeConnectionIDs.forEach((atrEdgeID) => {
-                      atrEdgeHook.deleteAttributeEdges(atrEdgeID);
+                    relevantAttrEdges.forEach((atrEdge) => {
+                      atrEdgeHook.deleteAttributeEdges(atrEdge.id);
                     });
                   }}
                   className='hover:cursor-pointer'
@@ -258,15 +247,12 @@ export default function Edge({
       })}
 
       {/* attribute edges */}
-      {uniqueAttributeEdgeIDs.map((atrEdgeID) => {
-        const positions = attributeEdgePosition(atrEdgeID);
-        if (
-          positions.length === 2 &&
-          positions[0].attributeID !== positions[1].attributeID &&
-          !edgeHook.loading
-        ) {
-          const pos1 = getAttributePosition(positions[0].attributeID);
-          const pos2 = getAttributePosition(positions[1].attributeID);
+      {attributeEdgeIDs.map((atrEdgeID) => {
+        const attrs = getAttributes(atrEdgeID);
+        if (attrs && !edgeHook.loading) {
+          const { srcAtrID, trgtAtrID } = attrs;
+          const pos1 = getAttributePosition(srcAtrID);
+          const pos2 = getAttributePosition(trgtAtrID);
 
           if (pos1 && pos2) {
             return (

@@ -7,7 +7,7 @@ import { useEdges } from '../hooks/useEdges';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
 import { useEffect, useState } from 'react';
 import { handleEdge } from '../handler/handleEdge';
-import { handleAttributeEdge } from '../handler/handleAttribute';
+import { handleAttributeEdge } from '../handler/handleAtrEdge';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom } from '../GlobalValues';

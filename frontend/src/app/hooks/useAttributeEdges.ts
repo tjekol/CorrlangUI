@@ -29,11 +29,11 @@ export const useAttributeEdges = () => {
     setAttributeEdges(edgesData)
   })
 
-  const createAttributeEdge = (attributeEdgeID: number, attributeID: number) => handleAsync(async () => {
+  const createAttributeEdge = (srcAtrID: number, trgtAtrID: number) => handleAsync(async () => {
     const res = await fetch('/api/attributeEdges', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attributeEdgeID, attributeID }),
+      body: JSON.stringify({ srcAtrID, trgtAtrID }),
     })
 
     if (!res.ok) {
@@ -41,7 +41,7 @@ export const useAttributeEdges = () => {
       return;
     }
     const edgeData: IAttributeEdge = await res.json();
-    console.log(`Added attribute edge: ${attributeEdgeID} from attribute ${attributeID}`);
+    console.log(`Added attribute edge: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
     setAttributeEdges(prev => [...prev, edgeData]);
   })
 
@@ -56,7 +56,7 @@ export const useAttributeEdges = () => {
       throw new Error('Failed to delete edges');
     }
     console.log(`Removed attribute edges with id: ${id}`);
-    setAttributeEdges(prev => prev.filter(edge => edge.attributeEdgeID !== id));
+    setAttributeEdges(prev => prev.filter(atrEdge => atrEdge.id !== id));
   })
 
   useEffect(() => { fetchAttributeEdges() }, [])

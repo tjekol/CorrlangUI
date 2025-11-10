@@ -40,13 +40,15 @@ model Attribute {
   text String
   
   node Node @relation(fields: [nodeID], references: [id])
-  attributeEdges AttributeEdge[]
+  srcAtrs AttributeEdge[] @relation(name: "source")
+  trgtAtrs AttributeEdge[] @relation(name: "target")
 }
 
 model AttributeEdge {
   id  Int   @id @default(autoincrement())
-  attributeEdgeID Int
-  attributeID Int
+  srcAtrID Int
+  trgtAtrID Int
 
-  attribute Attribute @relation(fields: [attributeID], references: [id])
+  srcAtr Attribute @relation(name: "source", fields: [srcAtrID], references: [id])
+  trgtAtr Attribute @relation(name: "target", fields: [trgtAtrID], references: [id])
 }
