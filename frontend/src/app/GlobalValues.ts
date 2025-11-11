@@ -4,10 +4,14 @@ import { INode } from './interface/INode';
 import { IAttributeEdge } from './interface/IAttributeEdge';
 import { LiveAtrPosition, LiveNodePosition } from './interface/IStates';
 import { IAttribute } from './interface/IAttribute';
+import { ISchema } from './interface/ISchema';
 
 // Node/attribute
+export const schemaAtom = atom<ISchema[]>([]);
 export const nodeAtom = atom<INode[]>([]);
 export const attrAtom = atom<IAttribute[]>([]);
+
+export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F', '#F78DA7']
 
 // Edges
 // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]

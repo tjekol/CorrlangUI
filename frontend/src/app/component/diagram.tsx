@@ -10,12 +10,13 @@ import { handleEdge } from '../handler/handleEdge';
 import { handleAttributeEdge } from '../handler/handleAtrEdge';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
 import { useAtom } from 'jotai';
-import { liveNodePositionsAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
-import { IEdge } from '../interface/IEdge';
+import { useSchemas } from '../hooks/useSchemas';
 
 export default function Diagram() {
+  const { schemas } = useSchemas();
   const { nodes, loading } = useNodes();
   const { edges, createEdge } = useEdges();
   const { attributeEdges, createAttributeEdge } = useAttributeEdges();
@@ -123,6 +124,17 @@ export default function Diagram() {
   return (
     <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
+        <text x={10} y={20}>
+          Schemas:
+        </text>
+        {schemas.map((s, i) => {
+          const color = i < nodeColor.length ? nodeColor[i] : nodeColor[0];
+          return (
+            <text x={100 + i * 80} y={20} key={i} fill={color}>
+              {s.title}
+            </text>
+          );
+        })}
         <Edge
           onHeaderClick={handleHeaderClick}
           pendingEdge={pendingEdge}
@@ -137,6 +149,14 @@ export default function Diagram() {
             const livePositions = liveNodePositions.find(
               (pos) => pos.nodeID === n.id
             );
+
+            const schemaIndex = schemas.findIndex((s) => s.id === n.schemaID);
+            // default color if schemaIndex fails
+            const color =
+              schemaIndex >= 0 && schemaIndex < nodeColor.length
+                ? nodeColor[schemaIndex]
+                : nodeColor[0];
+
             return (
               <Node
                 key={i}
@@ -145,6 +165,8 @@ export default function Diagram() {
                 attributes={n.attributes}
                 positionX={livePositions?.positionX || n.positionX || 0}
                 positionY={livePositions?.positionY || n.positionY || 0}
+                schemaID={n.schemaID}
+                color={color}
                 onHeaderClick={handleHeaderClick}
                 onAttributeClick={handleAttributeClick}
               />

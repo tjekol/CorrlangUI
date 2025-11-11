@@ -9,9 +9,11 @@ import {
   nodeLengthAtom,
   edgeAtom,
   attrEdgeAtom,
+  nodeAtom,
 } from '../GlobalValues';
 
 interface NodeProps extends INode {
+  color: string;
   onHeaderClick: (id: number, circlePosition: { x: number; y: number }) => void;
   onAttributeClick: (
     id: number,
@@ -25,6 +27,8 @@ export default function Node({
   attributes,
   positionX,
   positionY,
+  schemaID,
+  color,
   onHeaderClick,
   onAttributeClick,
 }: NodeProps) {
@@ -35,17 +39,26 @@ export default function Node({
   const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
   const [nodeLength, setNodeLength] = useAtom(nodeLengthAtom);
+
+  const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
   const attrEdges = useAtomValue(attrEdgeAtom);
   const height = 40;
 
   useLayoutEffect(() => {
-    const labels = attributes.map((label) => label.text);
+    const labels = [
+      ...attributes.map((label) => label.text),
+      ...nodes.map((node) => node.title),
+    ];
     const strLenghts = labels.map((str) => str.length);
     const maxStringLength = Math.max(...strLenghts);
     const width = maxStringLength * 15;
 
-    setNodeLength(width);
+    if (!width || width < 5) {
+      setNodeLength(60 * 15);
+    } else {
+      setNodeLength(width);
+    }
   }, []);
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
@@ -120,14 +133,14 @@ export default function Node({
         width={nodeLength}
         height={height}
         fill='#FFFFFF'
-        stroke='black'
+        stroke={color}
         strokeWidth={1}
         rx={5}
         onMouseDown={(e) => (
           setIsDragging(true), handleMouseDown(e.clientX, e.clientY)
         )}
         onMouseMove={(e) => handleMouseMove(e.clientX, e.clientY)}
-        onMouseUp={() => (setIsDragging(false), console.log(isDragging))}
+        onMouseUp={() => setIsDragging(false)}
         className='hover:cursor-move'
       />
       {/* Left circle */}
@@ -181,7 +194,7 @@ export default function Node({
           attributes.length === 1 ? height : (height * attributes.length) / 1.4
         }
         fill='#FFFFFF'
-        stroke='black'
+        stroke={color}
         strokeWidth={1}
         rx={5}
       />
@@ -214,8 +227,8 @@ export default function Node({
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
               r={5}
-              fill='#8BACC9'
-              stroke='blue'
+              fill={color}
+              stroke='#818181'
               strokeWidth={1}
               onClick={() => {
                 if (hasEdges) {
@@ -239,8 +252,8 @@ export default function Node({
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
               r={5}
-              fill='#8BACC9'
-              stroke='blue'
+              fill={color}
+              stroke='#818181'
               strokeWidth={1}
               onClick={() => {
                 if (hasEdges) {

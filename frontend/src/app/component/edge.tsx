@@ -159,7 +159,7 @@ export default function Edge({
             { x: pendingAtrEdge.positionX, y: pendingAtrEdge.positionY },
             mousePosition
           )}
-          stroke='blue'
+          stroke='grey'
           strokeWidth={3}
           strokeDasharray={'5,5'}
           fill='none'
@@ -259,7 +259,7 @@ export default function Edge({
               <path
                 key={atrEdgeID}
                 d={getPathData(pos1, pos2)}
-                stroke='blue'
+                stroke='#818181'
                 strokeWidth={3}
                 // strokeDasharray={'5,5'}
                 fill='none'

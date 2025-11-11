@@ -5,6 +5,7 @@ export interface INode {
   title: string;
   positionX: number;
   positionY: number;
+  schemaID: number;
 
   attributes: IAttribute[];
 }

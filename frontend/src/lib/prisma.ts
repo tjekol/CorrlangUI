@@ -3,8 +3,13 @@ import { PrismaClient } from '@/generated/prisma'
 const prisma = new PrismaClient()
 
 async function main() {
-  const nodes = await prisma.edge.findMany();
-  console.log(nodes)
+  // const nodes = await prisma.edge.findMany();
+  const schemas = await prisma.schema.findMany({
+    include: {
+      nodes: true
+    }
+  });
+  console.log(schemas)
 }
 
 main()
