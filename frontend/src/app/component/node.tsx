@@ -181,6 +181,7 @@ export default function Node({
         y={position.y + height / 2}
         textAnchor='middle'
         dominantBaseline='middle'
+        pointerEvents='none'
       >
         {title}
       </text>
@@ -274,6 +275,7 @@ export default function Node({
               y={position.y + height + (height / 2) * (i + 1)}
               textAnchor='start'
               dominantBaseline='middle'
+              pointerEvents='none'
             >
               {attribute.text}
             </text>
