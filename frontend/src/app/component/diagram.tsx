@@ -124,6 +124,32 @@ export default function Diagram() {
   return (
     <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
+        <defs>
+          <marker
+            id='arrow'
+            viewBox='0 0 10 10'
+            refX='10'
+            refY='5'
+            markerWidth='6'
+            markerHeight='6'
+            orient='auto'
+          >
+            <path d='M 0 0 L 10 5 L 0 10 z' />
+          </marker>
+
+          <marker
+            id='arrow-ih'
+            viewBox='0 0 10 10'
+            refX='10'
+            refY='5'
+            markerWidth='6'
+            markerHeight='6'
+            orient='auto'
+          >
+            <path stroke='black' fill='white' d='M 0 0 L 10 5 L 0 10 z' />
+          </marker>
+        </defs>
+
         <text x={10} y={20}>
           Schemas:
         </text>

@@ -2,12 +2,14 @@
 
 import { useAtomValue } from 'jotai';
 import { useEdges } from '../hooks/useEdges';
-import { attrEdgeAtom, edgeAtom, nodeLengthAtom } from '../GlobalValues';
+import { attrEdgeAtom, edgeAtom, nodeAtom, schemaAtom } from '../GlobalValues';
 import { useEffect, useState } from 'react';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
-import { usePositionCalculators } from '../hooks/useCalulatePosition';
+import { usePositionCalculation } from '../hooks/usePositionCalculation';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
 import { useAttributes } from '../hooks/useAttributes';
+import { INode } from '../interface/INode';
+import { EdgeType } from '../interface/IEdge';
 
 export default function Edge({
   pendingEdge,
@@ -29,77 +31,44 @@ export default function Edge({
 }) {
   const edgeHook = useEdges();
   const atrEdgeHook = useAttributeEdges();
+  const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
   const { attributes } = useAttributes();
-  const atrributeEdges = useAtomValue(attrEdgeAtom);
-  const nodeLength = useAtomValue(nodeLengthAtom);
-  const { getNodePosition, getAttributePosition } = usePositionCalculators();
+  const attributeEdges = useAtomValue(attrEdgeAtom);
+  const {
+    getNodePosition,
+    getAttributePosition,
+    getPathData,
+    getTempPathData,
+    getArrowData,
+  } = usePositionCalculation();
   // midpoints for circle on edges
   const [midCircles, setMidCircles] = useState<
     Record<number, { x: number; y: number }>
   >({});
 
-  // edges
-  const edgeIDs = edges.map((edge) => edge.id);
   const getNodes = (
     edgeID: number
-  ): { srcNodeID: number; trgtNodeID: number } | undefined => {
+  ):
+    | { srcNode: INode | undefined; trgtNode: INode | undefined }
+    | undefined => {
     const edge = edges.find((edge) => edge.id === edgeID);
-    if (edge) return { srcNodeID: edge.srcNodeID, trgtNodeID: edge.trgtNodeID };
+    if (edge)
+      return {
+        srcNode: nodes.find((n) => n.id === edge.srcNodeID),
+        trgtNode: nodes.find((n) => n.id === edge.trgtNodeID),
+      };
   };
 
-  // attribute edges
-  const attributeEdgeIDs = atrributeEdges.map((atrEdge) => atrEdge.id);
   const getAttributes = (
     atrEdgeID: number
   ): { srcAtrID: number; trgtAtrID: number } | undefined => {
-    const atrEdge = atrributeEdges.find((atrEdge) => atrEdge.id === atrEdgeID);
+    const atrEdge = attributeEdges.find((atrEdge) => atrEdge.id === atrEdgeID);
     if (atrEdge)
       return { srcAtrID: atrEdge.srcAtrID, trgtAtrID: atrEdge.trgtAtrID };
   };
 
-  const getPathData = (
-    pos1: { x: number; y: number },
-    pos2: { x: number; y: number }
-  ): string => {
-    // calculate shortest paths for pos1 and pos2
-    const diff1X = pos2.x - pos1.x;
-    const diff1XWidth = pos2.x - (pos1.x + nodeLength);
-    const pos1X =
-      Math.abs(diff1X) < Math.abs(diff1XWidth) ? pos1.x : pos1.x + nodeLength;
-
-    const diff2X = pos1X - pos2.x;
-    const diff2XWidth = pos1X - (pos2.x + nodeLength);
-    const pos2X =
-      Math.abs(diff2X) < Math.abs(diff2XWidth) ? pos2.x : pos2.x + nodeLength;
-
-    const actualDiffY = pos1.y - pos2.y;
-
-    if (actualDiffY === 0) {
-      return `M ${pos1X} ${pos1.y} L ${pos2X} ${pos2.y}`;
-    }
-
-    const distance = Math.abs(pos2X - pos1X);
-    const curveStrength = Math.min(distance * 0.8, 100);
-
-    const controlPoint1X =
-      pos1X + (pos1X === pos1.x ? -curveStrength : curveStrength);
-    const controlPoint1Y = pos1.y;
-    const controlPoint2X =
-      pos2X + (pos2X === pos2.x ? -curveStrength : curveStrength);
-    const controlPoint2Y = pos2.y;
-
-    return `M ${pos1X} ${pos1.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2X} ${pos2.y}`;
-  };
-
-  const getTempPathData = (
-    pos1: { x: number; y: number },
-    pos2: { x: number; y: number }
-  ): string => {
-    return `M ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y}`;
-  };
-
-  // Function to calculate midpoint for a path
+  // calculate midpoint for a path
   const calculateMidpoint = (pathElement: SVGPathElement, edgeID: number) => {
     const totalLength = pathElement.getTotalLength();
     if (!isFinite(totalLength) || totalLength === 0) return;
@@ -168,86 +137,105 @@ export default function Edge({
         />
       )}
 
-      {/* edges */}
-      {edgeIDs.map((edgeID) => {
+      {edges.map((edge) => {
+        const edgeID = edge.id;
         const nodes = getNodes(edgeID);
 
         if (nodes && !edgeHook.loading) {
-          const { srcNodeID, trgtNodeID } = nodes;
-          const pos1 = getNodePosition(srcNodeID);
-          const pos2 = getNodePosition(trgtNodeID);
-
-          if (pos1 && pos2) {
-            return (
-              <g key={edgeID}>
-                <path
-                  ref={(pathElement) => {
-                    if (pathElement) {
-                      setTimeout(
-                        () => calculateMidpoint(pathElement, edgeID),
-                        0
-                      );
-                    }
-                  }}
-                  d={getPathData(pos1, pos2)}
-                  stroke='black'
-                  strokeWidth={3.5}
-                  // strokeDasharray={'10,10'}
-                  fill='none'
-                  onClick={() => {
-                    const nodeAAtr = attributes.filter(
-                      (attr) => attr.nodeID === srcNodeID
-                    );
-                    const nodeBAtr = attributes.filter(
-                      (attr) => attr.nodeID === trgtNodeID
-                    );
-                    const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
-                    const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
-
-                    // attribute edges between nodes
-                    const relevantAttrEdges = atrributeEdges.filter(
-                      (atrEdge) =>
-                        (nodeAAtrIDs.has(atrEdge.srcAtrID) &&
-                          nodeBAtrIDs.has(atrEdge.trgtAtrID)) ||
-                        (nodeAAtrIDs.has(atrEdge.trgtAtrID) &&
-                          nodeBAtrIDs.has(atrEdge.srcAtrID))
-                    );
-
-                    // delete the node edge and all complete attribute connections
-                    edgeHook.deleteEdges(edgeID);
-                    relevantAttrEdges.forEach((atrEdge) => {
-                      atrEdgeHook.deleteAttributeEdges(atrEdge.id);
-                    });
-                  }}
-                  className='hover:cursor-pointer'
-                  strokeOpacity={0.6}
-                />
-                {midCircles[edgeID] && (
-                  <circle
-                    cx={midCircles[edgeID].x}
-                    cy={midCircles[edgeID].y}
-                    r={6}
-                    fill='white'
+          const { srcNode, trgtNode } = nodes;
+          if (srcNode && trgtNode) {
+            const pos1 = getNodePosition(srcNode.id);
+            const pos2 = getNodePosition(trgtNode.id);
+            if (pos1 && pos2) {
+              if (srcNode.schemaID === trgtNode.schemaID) {
+                return (
+                  <path
+                    key={edgeID}
+                    d={getArrowData(pos1, pos2, trgtNode)}
+                    strokeWidth={2}
                     stroke='black'
-                    className='hover:opacity-100 opacity-70'
-                    onClick={() => {
-                      if (pendingEdge) {
-                        onHeaderClick(srcNodeID, pos1, trgtNodeID, pos2);
-                      } else {
-                        alert('Click a node first.');
+                    markerEnd={`${
+                      edge.type === EdgeType.dirAssoc
+                        ? 'url(#arrow)'
+                        : edge.type === EdgeType.inherit
+                        ? 'url(#arrow-ih)'
+                        : ''
+                    }`}
+                  />
+                );
+              }
+              // normal edges
+              return (
+                <g key={edgeID}>
+                  <path
+                    ref={(pathElement) => {
+                      if (pathElement) {
+                        setTimeout(
+                          () => calculateMidpoint(pathElement, edgeID),
+                          0
+                        );
                       }
                     }}
+                    d={getPathData(pos1, pos2)}
+                    stroke='black'
+                    strokeWidth={3.5}
+                    // strokeDasharray={'10,10'}
+                    fill='none'
+                    onClick={() => {
+                      const nodeAAtr = attributes.filter(
+                        (attr) => attr.nodeID === srcNode.id
+                      );
+                      const nodeBAtr = attributes.filter(
+                        (attr) => attr.nodeID === trgtNode.id
+                      );
+                      const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
+                      const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
+
+                      // attribute edges between nodes
+                      const relevantAttrEdges = attributeEdges.filter(
+                        (atrEdge) =>
+                          (nodeAAtrIDs.has(atrEdge.srcAtrID) &&
+                            nodeBAtrIDs.has(atrEdge.trgtAtrID)) ||
+                          (nodeAAtrIDs.has(atrEdge.trgtAtrID) &&
+                            nodeBAtrIDs.has(atrEdge.srcAtrID))
+                      );
+
+                      // delete the node edge and all complete attribute connections
+                      edgeHook.deleteEdges(edgeID);
+                      relevantAttrEdges.forEach((atrEdge) => {
+                        atrEdgeHook.deleteAttributeEdges(atrEdge.id);
+                      });
+                    }}
+                    className='hover:cursor-pointer'
+                    strokeOpacity={0.6}
                   />
-                )}
-              </g>
-            );
+                  {midCircles[edgeID] && (
+                    <circle
+                      cx={midCircles[edgeID].x}
+                      cy={midCircles[edgeID].y}
+                      r={6}
+                      fill='white'
+                      stroke='black'
+                      className='hover:opacity-100 opacity-70'
+                      onClick={() => {
+                        if (pendingEdge) {
+                          onHeaderClick(srcNode.id, pos1, trgtNode.id, pos2);
+                        } else {
+                          alert('Click a node first.');
+                        }
+                      }}
+                    />
+                  )}
+                </g>
+              );
+            }
           }
         }
         return null;
       })}
 
-      {/* attribute edges */}
-      {attributeEdgeIDs.map((atrEdgeID) => {
+      {attributeEdges.map((atrEdge) => {
+        const atrEdgeID = atrEdge.id;
         const attrs = getAttributes(atrEdgeID);
         if (attrs && !edgeHook.loading) {
           const { srcAtrID, trgtAtrID } = attrs;

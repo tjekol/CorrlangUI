@@ -37,6 +37,7 @@ model Edge {
   id  Int   @id @default(autoincrement())
   srcNodeID Int
   trgtNodeID Int
+  type Int @default(0)
 
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
