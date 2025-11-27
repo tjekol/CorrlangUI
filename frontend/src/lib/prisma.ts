@@ -4,12 +4,21 @@ const prisma = new PrismaClient()
 
 async function main() {
   // const nodes = await prisma.edge.findMany();
-  const schemas = await prisma.schema.findMany({
+  // const multiEdge = await prisma.multiEdge.create({
+  //   data: {
+  //     nodes: {
+  //       connect: [
+  //         { id: 4 }, { id: 5 },
+  //       ]
+  //     }
+  //   }
+  // });
+  const multiEdge = await prisma.multiEdge.findMany({
     include: {
       nodes: true
     }
-  });
-  console.log(schemas)
+  })
+  console.log(JSON.stringify(multiEdge, null, 2))
 }
 
 main()

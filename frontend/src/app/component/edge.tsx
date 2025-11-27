@@ -2,7 +2,12 @@
 
 import { useAtomValue } from 'jotai';
 import { useEdges } from '../hooks/useEdges';
-import { attrEdgeAtom, edgeAtom, nodeAtom, schemaAtom } from '../GlobalValues';
+import {
+  attrEdgeAtom,
+  edgeAtom,
+  multiEdgeAtom,
+  nodeAtom,
+} from '../GlobalValues';
 import { useEffect, useState } from 'react';
 import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
 import { usePositionCalculation } from '../hooks/usePositionCalculation';
@@ -14,16 +19,11 @@ import { EdgeType } from '../interface/IEdge';
 export default function Edge({
   pendingEdge,
   pendingAtrEdge,
-  onHeaderClick,
+  onEdgeClick,
 }: {
   pendingEdge: IPendingEdge | null;
   pendingAtrEdge: IPendingAtrEdge | null;
-  onHeaderClick: (
-    id1: number,
-    circlePosition1: { x: number; y: number },
-    id2: number,
-    circlePosition2: { x: number; y: number }
-  ) => void;
+  onEdgeClick: (nodeIDs: number[]) => void;
   // onAttributeClick: (
   //   id: number,
   //   circlePosition: { x: number; y: number }
@@ -33,12 +33,15 @@ export default function Edge({
   const atrEdgeHook = useAttributeEdges();
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
+  const multiEdges = useAtomValue(multiEdgeAtom);
   const { attributes } = useAttributes();
   const attributeEdges = useAtomValue(attrEdgeAtom);
   const {
     getNodePosition,
     getAttributePosition,
     getPathData,
+    getMidpoint,
+    getShortestPath,
     getTempPathData,
     getArrowData,
   } = usePositionCalculation();
@@ -147,6 +150,7 @@ export default function Edge({
             const pos1 = getNodePosition(srcNode.id);
             const pos2 = getNodePosition(trgtNode.id);
             if (pos1 && pos2) {
+              // nodes under same schema - inheritance
               if (srcNode.schemaID === trgtNode.schemaID) {
                 return (
                   <path
@@ -164,7 +168,7 @@ export default function Edge({
                   />
                 );
               }
-              // normal edges
+              // nodes under different schemas
               return (
                 <g key={edgeID}>
                   <path
@@ -209,6 +213,7 @@ export default function Edge({
                     className='hover:cursor-pointer'
                     strokeOpacity={0.6}
                   />
+                  {/* circle in the middle of edge */}
                   {midCircles[edgeID] && (
                     <circle
                       cx={midCircles[edgeID].x}
@@ -219,7 +224,8 @@ export default function Edge({
                       className='hover:opacity-100 opacity-70'
                       onClick={() => {
                         if (pendingEdge) {
-                          onHeaderClick(srcNode.id, pos1, trgtNode.id, pos2);
+                          onEdgeClick([srcNode.id, trgtNode.id]);
+                          edgeHook.deleteEdges(edgeID);
                         } else {
                           alert('Click a node first.');
                         }
@@ -230,6 +236,34 @@ export default function Edge({
               );
             }
           }
+        }
+        return null;
+      })}
+
+      {multiEdges.map((multiEdge) => {
+        const nodeIDs = multiEdge.nodes.map((n) => n.id);
+        const nodePositions = nodeIDs
+          .map((nodeID) => getNodePosition(nodeID))
+          .filter((pos): pos is { x: number; y: number } => pos !== null);
+        const midpoint = getMidpoint(nodePositions);
+
+        if (midpoint && nodePositions.length > 0) {
+          return nodePositions.map((position, index) => (
+            <g key={index}>
+              <path
+                key={`${multiEdge.id}-${index}`}
+                stroke='#818181'
+                strokeWidth={3}
+                d={getShortestPath(midpoint, position)}
+              />
+              <path
+                d={`M ${midpoint.x} ${midpoint.y - 12} 
+                  L ${midpoint.x + 7} ${midpoint.y} 
+                  L ${midpoint.x} ${midpoint.y + 12} 
+                  L ${midpoint.x - 7} ${midpoint.y} Z`}
+              />
+            </g>
+          ));
         }
         return null;
       })}

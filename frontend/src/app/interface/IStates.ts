@@ -25,7 +25,7 @@ export interface LiveAtrPosition {
   positionY: number;
 }
 
-export enum Direction {
-  left,
-  right
-}
+// export enum Direction {
+//   left,
+//   right
+// }

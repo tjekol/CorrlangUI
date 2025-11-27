@@ -87,6 +87,27 @@ export const usePositionCalculation = () => {
     return `M ${pos1X} ${pos1Y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2X} ${pos2Y}`;
   };
 
+  const getMidpoint = (positions: { x: number, y: number }[]) => {
+    if (positions.length === 0) return null;
+
+    const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
+    const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
+
+    return {
+      x: sumX / positions.length,
+      y: sumY / positions.length
+    };
+  }
+
+  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }) => {
+    const diffX = midpoint.x - position.x;
+    const diffXWidth = midpoint.x - (position.x + nodeLength);
+    const positionX =
+      Math.abs(diffX) < Math.abs(diffXWidth) ? position.x : position.x + nodeLength;
+
+    return `M ${midpoint.x} ${midpoint.y} L ${positionX} ${position.y + height / 2}`
+  }
+
   const getTempPathData = (
     pos1: { x: number; y: number },
     pos2: { x: number; y: number }
@@ -111,5 +132,5 @@ export const usePositionCalculation = () => {
     return `M ${pos1X} ${pos1Y} L ${pos2X} ${pos2Y}`
   }
 
-  return { getNodePosition, getAttributePosition, getPathData, getTempPathData, getArrowData }
+  return { getNodePosition, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
 }

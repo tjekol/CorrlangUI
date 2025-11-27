@@ -14,11 +14,14 @@ import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
+import { handleMultiEdge } from '../handler/handleMultiEdge';
+import { useMultiEdges } from '../hooks/useMultiEdges';
 
 export default function Diagram() {
   const { schemas } = useSchemas();
   const { nodes, loading } = useNodes();
   const { edges, createEdge } = useEdges();
+  const { multiEdges, createMultiEdge } = useMultiEdges();
   const { attributeEdges, createAttributeEdge } = useAttributeEdges();
 
   // local state to store first click of node/attribute
@@ -34,6 +37,12 @@ export default function Diagram() {
   const handleHeaderClick = handleEdge(
     edges,
     createEdge,
+    pendingEdge,
+    setPendingEdge
+  );
+
+  const handleEdgeClick = handleMultiEdge(
+    createMultiEdge,
     pendingEdge,
     setPendingEdge
   );
@@ -89,6 +98,21 @@ export default function Diagram() {
           });
         });
 
+        multiEdges.forEach((multiEdge) => {
+          const nodes = multiEdge.nodes;
+          nodes.map((node, index) => {
+            elkEdges.push({
+              id: `edgeID-${multiEdge.id}${index}`,
+              sources: [node.id.toString()],
+              targets: [
+                index >= nodes.length - 1
+                  ? nodes[0].id.toString()
+                  : nodes[index + 1].id.toString(),
+              ],
+            });
+          });
+        });
+
         const graph = {
           id: 'root',
           layoutOptions: {
@@ -119,7 +143,7 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, edges, setLiveNodePositions]);
+  }, [nodes, multiEdges, edges, setLiveNodePositions]);
 
   return (
     <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
@@ -162,7 +186,7 @@ export default function Diagram() {
           );
         })}
         <Edge
-          onHeaderClick={handleHeaderClick}
+          onEdgeClick={handleEdgeClick}
           pendingEdge={pendingEdge}
           pendingAtrEdge={pendingAtrEdge}
         />

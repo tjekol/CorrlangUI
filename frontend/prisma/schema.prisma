@@ -31,6 +31,7 @@ model Node {
   srcEdges Edge[] @relation(name: "source")
   trgtEdges Edge[] @relation(name: "target")
   schema Schema @relation(fields: [schemaID], references: [id])
+  multiEdges MultiEdge[]
 }
 
 model Edge {
@@ -41,6 +42,11 @@ model Edge {
 
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
+}
+
+model MultiEdge {
+  id  Int   @id @default(autoincrement())
+  nodes Node[]
 }
 
 model Attribute {

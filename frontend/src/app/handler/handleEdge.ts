@@ -7,7 +7,7 @@ export const handleEdge = (
   pendingEdge: IPendingEdge | null,
   setPendingEdge: (pendingEdge: IPendingEdge | null) => void
 ) => {
-  return (id: number, circlePosition: { x: number; y: number }, id2?: number, circlePosition2?: { x: number; y: number }) => {
+  return (id: number, circlePosition: { x: number; y: number }) => {
     if (!pendingEdge) {
       const newEdgeID = Math.max(0, ...edges.map((e) => e.id)) + 1;
 
@@ -23,27 +23,14 @@ export const handleEdge = (
         position: circlePosition
       });
     } else {
+      // TODO: restrict one edge between two nodes
       if (pendingEdge.nodeID !== id) {
-
-        if (id2) {
-          console.log(`Creating edge connection between nodes: ${pendingEdge.nodeID}-${id}, ${pendingEdge.nodeID}-${id2}`);
-          createEdge(
-            pendingEdge.nodeID,
-            id
-          );
-          createEdge(
-            pendingEdge.nodeID,
-            id2
-          );
-          setPendingEdge(null);
-        } else {
-          console.log(`Creating edge connection between nodes: ${pendingEdge.nodeID}-${id}`)
-          createEdge(
-            pendingEdge.nodeID,
-            id
-          );
-          setPendingEdge(null);
-        }
+        console.log(`Creating edge connection between nodes: ${pendingEdge.nodeID}-${id}`)
+        createEdge(
+          pendingEdge.nodeID,
+          id
+        );
+        setPendingEdge(null);
       } else {
         console.log('Same node clicked, canceling edge creation');
         setPendingEdge(null);

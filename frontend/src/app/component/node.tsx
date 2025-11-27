@@ -10,6 +10,7 @@ import {
   edgeAtom,
   attrEdgeAtom,
   nodeAtom,
+  multiEdgeAtom,
 } from '../GlobalValues';
 
 interface NodeProps extends INode {
@@ -42,6 +43,7 @@ export default function Node({
 
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
+  const multiEdges = useAtomValue(multiEdgeAtom);
   const attrEdges = useAtomValue(attrEdgeAtom);
   const height = 40;
 
@@ -67,9 +69,11 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasEdges = edges.some(
-    (edge) => edge.srcNodeID === id || edge.trgtNodeID === id
-  );
+  const hasEdges =
+    edges.some((edge) => edge.srcNodeID === id || edge.trgtNodeID === id) ||
+    multiEdges.some((multiEdge) =>
+      multiEdge.nodes.some((node) => node.id === id)
+    );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
