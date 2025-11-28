@@ -30,19 +30,24 @@ export const useEdges = () => {
   })
 
   const createEdge = (srcNodeID: number, trgtNodeID: number) => handleAsync(async () => {
-    const res = await fetch('/api/edges', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ srcNodeID, trgtNodeID }),
-    })
+    if (!edges.some(edge => (edge.srcNodeID === srcNodeID && edge.trgtNodeID === trgtNodeID) || (edge.trgtNodeID === srcNodeID && edge.srcNodeID === trgtNodeID))) {
+      const res = await fetch('/api/edges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ srcNodeID, trgtNodeID }),
+      })
 
-    if (!res.ok) {
-      console.log('Failed to create edge:', res);
-      return;
+      if (!res.ok) {
+        console.log('Failed to create edge:', res);
+        return;
+      }
+      const edgeData: IEdge = await res.json();
+      console.log(`Added edge: ${edgeData.id} between nodes ${srcNodeID}-${trgtNodeID}`);
+      setEdges(prev => [...prev, edgeData]);
     }
-    const edgeData: IEdge = await res.json();
-    console.log(`Added edge: ${edgeData.id} between nodes ${srcNodeID}-${trgtNodeID}`);
-    setEdges(prev => [...prev, edgeData]);
+    else (
+      alert("Edge already exists between nodes.")
+    )
   })
 
   const deleteEdges = (id: number) => handleAsync(async () => {
