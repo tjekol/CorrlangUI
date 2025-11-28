@@ -115,18 +115,24 @@ export const usePositionCalculation = () => {
     return `M ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y}`;
   };
 
-  const getArrowData = (pos1: { x: number; y: number }, pos2: { x: number; y: number }, trgtNode: INode) => {
+  const getArrowData = (pos1: { x: number; y: number }, pos2: { x: number; y: number }, srcNode: INode, trgtNode: INode) => {
     // height of node + attributes
-    const nodeHeight = height + trgtNode.attributes.length * height
+    const srcHeaderHeight = pos1.y + height
+    const srcNodeLength = srcNode.attributes.length
+    const trgtHeaderHeight = pos2.y + height
+    const trgtNodeLength = trgtNode.attributes.length
+
+    const trgtNodeHeight = trgtNodeLength <= 0 ? trgtHeaderHeight : trgtNodeLength === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtNodeLength) / 1.4;
+
+    const pos1Y = srcNodeLength <= 0 ? srcHeaderHeight : srcNodeLength === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcNodeLength) / 1.4;
 
     // connect to top/bottom of node closest to other node
-    const diffY = pos2.y - pos1.y;
-    const diffYHeight = pos2.y - (pos1.y + nodeHeight);
+    const diff2Y = pos1Y - pos2.y;
+    const diff2YHeight = pos1Y - (trgtNodeHeight);
     const pos2Y =
-      Math.abs(diffY) > Math.abs(diffYHeight) ? pos2.y : pos2.y + nodeHeight;
+      Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeHeight;
 
     const pos1X = pos1.x + nodeLength / 2;
-    const pos1Y = pos1.y;
     const pos2X = pos2.x + nodeLength / 2;
 
     return `M ${pos1X} ${pos1Y} L ${pos2X} ${pos2Y}`

@@ -117,8 +117,8 @@ export default function Diagram() {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '60',
-            'elk.spacing.edgeNode': '40',
+            'elk.spacing.nodeNode': '30',
+            'elk.spacing.edgeNode': '20',
             'elk.force.repulsivePower': '0.5',
             'elk.direction': 'UNDEFINED',
           },
@@ -150,7 +150,7 @@ export default function Diagram() {
       <svg width='100%' height='100%'>
         <defs>
           <marker
-            id='arrow'
+            id='line'
             viewBox='0 0 10 10'
             refX='10'
             refY='5'
@@ -159,6 +159,18 @@ export default function Diagram() {
             orient='auto'
           >
             <path d='M 0 0 L 10 5 L 0 10 z' />
+          </marker>
+
+          <marker
+            id='arrow-dir'
+            viewBox='0 0 10 10'
+            refX='10'
+            refY='5'
+            markerWidth='8'
+            markerHeight='6'
+            orient='auto'
+          >
+            <path stroke='black' fill='none' d='M 0 0 L 10 5 L 0 10' />
           </marker>
 
           <marker
@@ -171,6 +183,21 @@ export default function Diagram() {
             orient='auto'
           >
             <path stroke='black' fill='white' d='M 0 0 L 10 5 L 0 10 z' />
+          </marker>
+
+          <marker
+            id='diamond'
+            viewBox='0 0 20 20'
+            refX='7'
+            refY='10'
+            markerWidth='8'
+            markerHeight='15'
+          >
+            <path
+              stroke='black'
+              fill='black'
+              d='M 7 0 L 14 10 L 7 20 L 0 10 Z'
+            />
           </marker>
         </defs>
 

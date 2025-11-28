@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { INode } from '@/app/interface/INode';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
@@ -54,7 +54,7 @@ export default function Node({
     ];
     const strLenghts = labels.map((str) => str.length);
     const maxStringLength = Math.max(...strLenghts);
-    const width = maxStringLength * 15;
+    const width = maxStringLength * 12;
 
     if (!width || width < 5) {
       setNodeLength(60 * 15);

@@ -150,17 +150,29 @@ export default function Edge({
             const pos1 = getNodePosition(srcNode.id);
             const pos2 = getNodePosition(trgtNode.id);
             if (pos1 && pos2) {
-              // nodes under same schema - inheritance
+              // nodes under same schema
               if (srcNode.schemaID === trgtNode.schemaID) {
+                // offset for diamond
+                const pos1Comp = { x: pos1.x, y: pos1.y + 8 };
                 return (
                   <path
                     key={edgeID}
-                    d={getArrowData(pos1, pos2, trgtNode)}
+                    d={
+                      edge.type === EdgeType.comp
+                        ? getArrowData(pos1Comp, pos2, srcNode, trgtNode)
+                        : getArrowData(pos1, pos2, srcNode, trgtNode)
+                    }
                     strokeWidth={2}
                     stroke='black'
+                    markerStart={
+                      edge.type === EdgeType.comp ? 'url(#diamond)' : ''
+                    }
                     markerEnd={`${
-                      edge.type === EdgeType.dirAssoc
-                        ? 'url(#arrow)'
+                      edge.type === EdgeType.assoc
+                        ? 'url(#line)'
+                        : edge.type === EdgeType.direct ||
+                          edge.type === EdgeType.comp
+                        ? 'url(#arrow-dir)'
                         : edge.type === EdgeType.inherit
                         ? 'url(#arrow-ih)'
                         : ''
@@ -256,11 +268,13 @@ export default function Edge({
                 strokeWidth={3}
                 d={getShortestPath(midpoint, position)}
               />
+              {/* diamond */}
               <path
                 d={`M ${midpoint.x} ${midpoint.y - 12} 
                   L ${midpoint.x + 7} ${midpoint.y} 
                   L ${midpoint.x} ${midpoint.y + 12} 
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
+                // TODO: able to click diamond to add node to multiEdge
               />
             </g>
           ));

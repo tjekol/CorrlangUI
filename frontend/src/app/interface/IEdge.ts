@@ -7,6 +7,7 @@ export interface IEdge {
 
 export enum EdgeType {
   assoc, // 0 --
-  dirAssoc, // 1 -->
-  inherit // 2 --|>
+  direct, // 1 -->
+  comp, // 2 <>-->
+  inherit // 3 --|>
 }
