@@ -154,30 +154,68 @@ export default function Edge({
               if (srcNode.schemaID === trgtNode.schemaID) {
                 // offset for diamond
                 const pos1Comp = { x: pos1.x, y: pos1.y + 8 };
+                const compData = getArrowData(
+                  pos1Comp,
+                  pos2,
+                  srcNode,
+                  trgtNode
+                );
+                const arrowData = getArrowData(pos1, pos2, srcNode, trgtNode);
+                const padding = 20;
                 return (
-                  <path
-                    key={edgeID}
-                    d={
-                      edge.type === EdgeType.comp
-                        ? getArrowData(pos1Comp, pos2, srcNode, trgtNode)
-                        : getArrowData(pos1, pos2, srcNode, trgtNode)
-                    }
-                    strokeWidth={2}
-                    stroke='black'
-                    markerStart={
-                      edge.type === EdgeType.comp ? 'url(#diamond)' : ''
-                    }
-                    markerEnd={`${
-                      edge.type === EdgeType.assoc
-                        ? 'url(#line)'
-                        : edge.type === EdgeType.direct ||
-                          edge.type === EdgeType.comp
-                        ? 'url(#arrow-dir)'
-                        : edge.type === EdgeType.inherit
-                        ? 'url(#arrow-ih)'
-                        : ''
-                    }`}
-                  />
+                  <g key={edgeID}>
+                    <path
+                      d={
+                        edge.type === EdgeType.comp
+                          ? `M ${compData.pos1X} ${compData.pos1Y} L ${compData.pos2X} ${compData.pos2Y}`
+                          : `M ${arrowData.pos1X} ${arrowData.pos1Y} L ${arrowData.pos2X} ${arrowData.pos2Y}`
+                      }
+                      strokeWidth={2}
+                      stroke='black'
+                      markerStart={
+                        edge.type === EdgeType.comp ? 'url(#diamond)' : ''
+                      }
+                      markerEnd={`${
+                        edge.type === EdgeType.assoc
+                          ? 'url(#line)'
+                          : edge.type === EdgeType.direct ||
+                            edge.type === EdgeType.comp
+                          ? 'url(#arrow-dir)'
+                          : edge.type === EdgeType.inherit
+                          ? 'url(#arrow-ih)'
+                          : ''
+                      }`}
+                    />
+
+                    {/* multiplicities */}
+                    <text
+                      x={
+                        edge.type === EdgeType.comp
+                          ? compData.pos1X + padding
+                          : arrowData.pos1X + padding
+                      }
+                      y={arrowData.pos1Y + padding}
+                      textAnchor='middle'
+                      dominantBaseline='middle'
+                      pointerEvents='none'
+                    >
+                      {edge.srcMul}
+                    </text>
+                    {/* TODO: Fix Y value accuracy */}
+                    <text
+                      x={arrowData.pos2X + padding}
+                      y={
+                        arrowData.pos1Y < arrowData.pos2Y
+                          ? arrowData.pos2Y - padding
+                          : arrowData.pos2Y + padding
+                      }
+                      textAnchor='middle'
+                      dominantBaseline='middle'
+                      pointerEvents='none'
+                    >
+                      {edge.trgtMul}
+                    </text>
+                  </g>
                 );
               }
               // nodes under different schemas

@@ -135,7 +135,7 @@ export const usePositionCalculation = () => {
     const pos1X = pos1.x + nodeLength / 2;
     const pos2X = pos2.x + nodeLength / 2;
 
-    return `M ${pos1X} ${pos1Y} L ${pos2X} ${pos2Y}`
+    return { pos1X, pos1Y, pos2X, pos2Y }
   }
 
   return { getNodePosition, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }

@@ -116,8 +116,8 @@ export default function Diagram() {
         const graph = {
           id: 'root',
           layoutOptions: {
-            'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '30',
+            'elk.algorithm': 'org.eclipse.elk.mrtree',
+            'elk.spacing.nodeNode': '80',
             'elk.spacing.edgeNode': '20',
             'elk.force.repulsivePower': '0.5',
             'elk.direction': 'UNDEFINED',
@@ -131,7 +131,7 @@ export default function Diagram() {
           const newPositions = layoutedGraph.children.map((child) => ({
             nodeID: parseInt(child.id),
             positionX: child.x || 0,
-            positionY: child.y || 0,
+            positionY: (child.y || 0) + 20,
           }));
           setLiveNodePositions(newPositions);
         }

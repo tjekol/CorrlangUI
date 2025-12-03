@@ -19,7 +19,6 @@ export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID
 export const multiEdgeAtom = atom<IMultiEdge[]>([]); // [ {nodes: [1,2,3]} ]
 export const attrEdgeAtom = atom<IAttributeEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
 
-// export const nodeLengthAtom = atom<{ id: number, length: number }[]>([]);
 export const nodeLengthAtom = atom<number>(0); // [{ id: 1, length: 6 }]
 
 // Live positions for edge source and target
