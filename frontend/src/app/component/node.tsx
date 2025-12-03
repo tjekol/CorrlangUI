@@ -59,7 +59,8 @@ export default function Node({
     if (!width || width < 5) {
       setNodeLength(60 * 15);
     } else {
-      setNodeLength(width);
+      const padding = 5 * 8;
+      setNodeLength(width + padding);
     }
   }, []);
 
@@ -281,7 +282,14 @@ export default function Node({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.text}
+              {attribute.text}:{' '}
+              {attribute.type === 0
+                ? 'Int'
+                : attribute.type === 1
+                ? 'String'
+                : attribute.type === 2
+                ? '[]'
+                : ''}
             </text>
           </g>
         );

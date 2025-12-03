@@ -53,6 +53,7 @@ model Attribute {
   id  Int   @id @default(autoincrement())
   nodeID Int
   text String
+  type Int @default(0)
   
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AttributeEdge[] @relation(name: "source")
