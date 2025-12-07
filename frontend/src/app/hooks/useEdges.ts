@@ -1,20 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { IEdge } from '../interface/IEdge';
 import { useAtom } from 'jotai';
 import { edgeAtom } from '../GlobalValues';
+import { IEdge } from '../interface/IEdge';
 
 export const useEdges = () => {
+  const [edges, setEdges] = useAtom(edgeAtom)
   const [loading, setLoading] = useState(true);
-  const [edges, setEdges] = useAtom(edgeAtom);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
     try {
       await fn();
     } catch (error) {
-      console.error('Node operation failed:', error);
+      console.error('Edge operation failed:', error);
     } finally {
       setLoading(false);
     }
@@ -26,45 +26,10 @@ export const useEdges = () => {
       throw new Error('Failed to fetch edges');
     }
     const edgesData: IEdge[] = await res.json();
-    setEdges(edgesData)
+    setEdges(edgesData);
   })
 
-  const createEdge = (srcNodeID: number, trgtNodeID: number) => handleAsync(async () => {
-    if (!edges.some(edge => (edge.srcNodeID === srcNodeID && edge.trgtNodeID === trgtNodeID) || (edge.trgtNodeID === srcNodeID && edge.srcNodeID === trgtNodeID))) {
-      const res = await fetch('/api/edges', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ srcNodeID, trgtNodeID }),
-      })
+  useEffect(() => { fetchEdges(); }, []);
 
-      if (!res.ok) {
-        console.log('Failed to create edge:', res);
-        return;
-      }
-      const edgeData: IEdge = await res.json();
-      console.log(`Added edge: ${edgeData.id} between nodes ${srcNodeID}-${trgtNodeID}`);
-      setEdges(prev => [...prev, edgeData]);
-    }
-    else (
-      alert("Edge already exists between nodes.")
-    )
-  })
-
-  const deleteEdges = (id: number) => handleAsync(async () => {
-    const res = await fetch('/api/edges', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
-
-    if (!res.ok) {
-      throw new Error('Failed to delete edges');
-    }
-    console.log(`Removed edges with id: ${id}`);
-    setEdges(prev => prev.filter(edge => edge.id !== id));
-  })
-
-  useEffect(() => { fetchEdges() }, [])
-
-  return { edges, loading, createEdge, deleteEdges };
-};
+  return { edges, edgeLoading: loading }
+}

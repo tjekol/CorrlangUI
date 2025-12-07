@@ -1,4 +1,4 @@
-export interface IAttributeEdge {
+export interface IAtrConnection {
   id: number;
   srcAtrID: number;
   trgtAtrID: number;

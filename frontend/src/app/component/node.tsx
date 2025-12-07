@@ -8,7 +8,7 @@ import {
   liveAtrPositionsAtom,
   nodeLengthAtom,
   edgeAtom,
-  attrEdgeAtom,
+  attrConAtom,
   nodeAtom,
   multiEdgeAtom,
 } from '../GlobalValues';
@@ -44,7 +44,7 @@ export default function Node({
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
   const multiEdges = useAtomValue(multiEdgeAtom);
-  const attrEdges = useAtomValue(attrEdgeAtom);
+  const attrEdges = useAtomValue(attrConAtom);
   const height = 40;
 
   useLayoutEffect(() => {

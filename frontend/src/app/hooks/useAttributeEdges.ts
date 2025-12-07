@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { attrEdgeAtom } from '../GlobalValues';
-import { IAttributeEdge } from '../interface/IAttributeEdge';
+import { attrConAtom } from '../GlobalValues';
+import { IConnection } from '../interface/Connection/IAtrConnection';
 
 export const useAttributeEdges = () => {
   const [loading, setLoading] = useState(true);
-  const [attributeEdges, setAttributeEdges] = useAtom(attrEdgeAtom);
+  const [attributeEdges, setAttributeEdges] = useAtom(attrConAtom);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -25,7 +25,7 @@ export const useAttributeEdges = () => {
     if (!res.ok) {
       throw new Error('Failed to fetch edges');
     }
-    const edgesData: IAttributeEdge[] = await res.json();
+    const edgesData: IConnection[] = await res.json();
     setAttributeEdges(edgesData)
   })
 
@@ -40,7 +40,7 @@ export const useAttributeEdges = () => {
       console.log('Failed to create attribute edge:', res);
       return;
     }
-    const edgeData: IAttributeEdge = await res.json();
+    const edgeData: IConnection = await res.json();
     console.log(`Added attribute edge: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
     setAttributeEdges(prev => [...prev, edgeData]);
   })

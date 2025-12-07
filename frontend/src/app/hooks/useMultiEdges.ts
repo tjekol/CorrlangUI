@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { IMultiEdge } from '../interface/IMultiEdge';
+import { IMultiEdge } from '../interface/Connection/IMultiEdge';
 import { useAtom } from 'jotai';
 import { multiEdgeAtom } from '../GlobalValues';
 

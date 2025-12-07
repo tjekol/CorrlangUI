@@ -30,6 +30,8 @@ model Node {
   attributes Attribute[]
   srcEdges Edge[] @relation(name: "source")
   trgtEdges Edge[] @relation(name: "target")
+  srcCons Connection[] @relation(name: "source")
+  trgtCons Connection[] @relation(name: "target")
   schema Schema @relation(fields: [schemaID], references: [id])
   multiEdges MultiEdge[]
 }
@@ -46,11 +48,6 @@ model Edge {
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
 }
 
-model MultiEdge {
-  id  Int   @id @default(autoincrement())
-  nodes Node[]
-}
-
 model Attribute {
   id  Int   @id @default(autoincrement())
   nodeID Int
@@ -58,11 +55,25 @@ model Attribute {
   type Int @default(0)
   
   node Node @relation(fields: [nodeID], references: [id])
-  srcAtrs AttributeEdge[] @relation(name: "source")
-  trgtAtrs AttributeEdge[] @relation(name: "target")
+  srcAtrs AtrConnection[] @relation(name: "source")
+  trgtAtrs AtrConnection[] @relation(name: "target")
 }
 
-model AttributeEdge {
+model Connection {
+  id  Int   @id @default(autoincrement())
+  srcNodeID Int
+  trgtNodeID Int
+
+  srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
+  trgtNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
+}
+
+model MultiEdge {
+  id  Int   @id @default(autoincrement())
+  nodes Node[]
+}
+
+model AtrConnection {
   id  Int   @id @default(autoincrement())
   srcAtrID Int
   trgtAtrID Int

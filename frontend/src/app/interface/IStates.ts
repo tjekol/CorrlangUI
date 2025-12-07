@@ -1,11 +1,11 @@
-export interface IPendingEdge {
-  edgeID: number;
+export interface IPendingCon {
+  connectID: number;
   nodeID: number;
   positionX: number;
   positionY: number;
 }
 
-export interface IPendingAtrEdge {
+export interface IPendingAtrCon {
   attributeEdgeID: number;
   attributeID: number;
   positionX: number;
@@ -24,8 +24,3 @@ export interface LiveAtrPosition {
   positionX: number;
   positionY: number;
 }
-
-// export enum Direction {
-//   left,
-//   right
-// }
