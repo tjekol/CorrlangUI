@@ -1,10 +1,9 @@
-import { IMultiEdge } from '../interface/IMultiEdge';
-import { IPendingEdge } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export const handleMultiEdge = (
   createMultiEdge: (nodeIDs: number[]) => void,
-  pendingEdge: IPendingEdge | null,
-  setPendingEdge: (pendingEdge: IPendingEdge | null) => void
+  pendingEdge: IPendingCon | null,
+  setPendingEdge: (pendingEdge: IPendingCon | null) => void
 ) => {
   return (nodeIDs: number[]) => {
     if (!pendingEdge) {

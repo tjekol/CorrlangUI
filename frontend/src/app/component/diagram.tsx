@@ -3,12 +3,12 @@
 import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
-import { useEdges } from '../hooks/useEdges';
+import { useConnection } from '../hooks/useConnection';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
 import { useEffect, useState } from 'react';
-import { handleEdge } from '../handler/handleEdge';
+import { handleConnection } from '../handler/handleConnection';
 import { handleAttributeEdge } from '../handler/handleAtrEdge';
-import { IPendingAtrEdge, IPendingEdge } from '../interface/IStates';
+import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
@@ -16,17 +16,20 @@ import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
 import { handleMultiEdge } from '../handler/handleMultiEdge';
 import { useMultiEdges } from '../hooks/useMultiEdges';
+import { useEdges } from '../hooks/useEdges';
+import Connection from './connection';
 
 export default function Diagram() {
   const { schemas } = useSchemas();
   const { nodes, loading } = useNodes();
-  const { edges, createEdge } = useEdges();
+  const { edges, edgeLoading } = useEdges();
+  const { cons, createCon } = useConnection();
   const { multiEdges, createMultiEdge } = useMultiEdges();
   const { attributeEdges, createAttributeEdge } = useAttributeEdges();
 
   // local state to store first click of node/attribute
-  const [pendingEdge, setPendingEdge] = useState<IPendingEdge | null>(null);
-  const [pendingAtrEdge, setPendingAtrEdge] = useState<IPendingAtrEdge | null>(
+  const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
+  const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
     null
   );
   const [liveNodePositions, setLiveNodePositions] = useAtom(
@@ -34,24 +37,24 @@ export default function Diagram() {
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
 
-  const handleHeaderClick = handleEdge(
-    edges,
-    createEdge,
-    pendingEdge,
-    setPendingEdge
+  const handleHeaderClick = handleConnection(
+    cons,
+    createCon,
+    pendingCon,
+    setPendingCon
   );
 
   const handleEdgeClick = handleMultiEdge(
     createMultiEdge,
-    pendingEdge,
-    setPendingEdge
+    pendingCon,
+    setPendingCon
   );
 
   const handleAttributeClick = handleAttributeEdge(
     attributeEdges,
     createAttributeEdge,
-    pendingAtrEdge,
-    setPendingAtrEdge
+    pendingAtrCon,
+    setPendingAtrCon
   );
 
   useEffect(() => {
@@ -117,7 +120,7 @@ export default function Diagram() {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.mrtree',
-            'elk.spacing.nodeNode': '80',
+            'elk.spacing.nodeNode': '100',
             'elk.spacing.edgeNode': '20',
             'elk.force.repulsivePower': '0.5',
             'elk.direction': 'UNDEFINED',
@@ -143,7 +146,7 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, multiEdges, edges, setLiveNodePositions]);
+  }, [nodes, cons, multiEdges, edges, setLiveNodePositions]);
 
   return (
     <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
@@ -212,14 +215,15 @@ export default function Diagram() {
             </text>
           );
         })}
-        <Edge
+        <Edge />
+        <Connection
           onEdgeClick={handleEdgeClick}
-          pendingEdge={pendingEdge}
-          pendingAtrEdge={pendingAtrEdge}
+          pendingCon={pendingCon}
+          pendingAtrCon={pendingAtrCon}
         />
-        {loading || layoutLoading ? (
+        {loading || edgeLoading || layoutLoading ? (
           <text x={50} y={50}>
-            {loading ? 'Loading nodes...' : 'Calculating layout...'}
+            {loading ? 'Loading...' : 'Calculating layout...'}
           </text>
         ) : (
           nodes.map((n, i) => {

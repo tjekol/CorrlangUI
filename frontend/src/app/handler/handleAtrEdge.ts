@@ -1,11 +1,11 @@
-import { IAttributeEdge } from '../interface/IAttributeEdge';
-import { IPendingAtrEdge } from '../interface/IStates';
+import { IConnection } from '../interface/Connection/IAtrConnection';
+import { IPendingAtrCon } from '../interface/IStates';
 
 export const handleAttributeEdge = (
-  edges: IAttributeEdge[],
+  edges: IConnection[],
   createAttributeEdge: (srcAtrID: number, trgtAtrID: number) => void,
-  pendingAtrEdge: IPendingAtrEdge | null,
-  setPendingAtrEdge: (pendingEdge: IPendingAtrEdge | null) => void
+  pendingAtrEdge: IPendingAtrCon | null,
+  setPendingAtrEdge: (pendingEdge: IPendingAtrCon | null) => void
 ) => {
   return (id: number, circlePosition: { x: number; y: number }) => {
     if (!pendingAtrEdge) {
