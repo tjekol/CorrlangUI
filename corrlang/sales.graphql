@@ -1,0 +1,71 @@
+type Query {
+    customer(customer: ID!): Customer
+    customers: [Customer]
+    purchase(purchase: ID!): Purchase
+    purchases: [Purchase]
+    store(store: ID!): Store
+    stores: [Store]
+}
+
+type Customer {
+    id: ID!
+    name: String
+    email: String
+    address: Address
+    purchases: [Purchase]
+}
+
+type Address {
+    street: String
+    city: String
+    postalCode: String
+    state: String
+    country: String
+}
+
+type Purchase {
+    id: ID!
+    date: String
+    customer: Customer!
+    store: Store!
+    items: [PurchaseItem]
+}
+
+type Store {
+    id: ID!
+    manager: ID!
+    address: Address
+    purchases: [Purchase]
+}
+
+type PurchaseItem {
+    productId: ID!
+    purchaseId: ID!
+    quantity: Int
+}
+
+type Mutation {
+    createCustomer(name: String!, email: String): Customer!
+    updateCustomer(customer: ID!, name: String, email: String): Customer
+    setAddress(
+        customer: ID!
+        street: String
+        city: String
+        postalCode: String
+        state: String
+        country: String
+    ): Customer
+    deleteCustomer(customer: ID!): Customer
+    createPurchase(customer: ID!, date: String!, store: ID!): Purchase
+    addPurchaseItem(purchase: ID!, product: ID!, quantity: Int): PurchaseItem
+    deletePurchase(purchase: ID!): Purchase
+    createStore(
+        manager: ID
+        street: String
+        city: String
+        postalCode: String
+        state: String
+        country: String
+    ): Store
+    deleteStore(store: ID!): Store
+}

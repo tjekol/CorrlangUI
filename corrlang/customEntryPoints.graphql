@@ -1,0 +1,13 @@
+type MyCoolMutation {
+    push(x: Int): [Int]!
+}
+
+type WeirdNameForAQuery {
+    sum: Int
+    length: Int
+}
+
+schema {
+    mutation: MyCoolMutation
+    query: WeirdNameForAQuery
+}
