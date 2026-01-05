@@ -6,26 +6,33 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "grcp": "node client/index.js"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.2",
+    "@grpc/proto-loader": "^0.8.0",
     "@prisma/client": "^6.19.0",
     "elkjs": "^0.11.0",
-    "jotai": "^2.15.0",
+    "google-protobuf": "^4.0.1",
+    "grpc-tools": "^1.13.1",
+    "jotai": "^2.15.2",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "ts-proto": "^2.8.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20.19.23",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@eslint/eslintrc": "^3.3.3",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "^20.19.25",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.1",
     "eslint-config-next": "15.5.4",
     "prisma": "^6.19.0",
+    "protolint": "^0.56.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
