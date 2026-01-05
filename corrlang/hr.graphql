@@ -1,0 +1,55 @@
+type BankingDetails {
+    iban: String
+    bic: String
+}
+
+type Department {
+    id: ID!
+    name: String
+    manager: Employee
+    workingAt: [Employee]
+}
+
+type Employee {
+    id: ID!
+    worksAt: Department
+    bankAccount: BankingDetails
+    firstname: String
+    lastname: String
+    hiredAt: String
+    email: String
+    phone: String
+}
+
+type Mutation {
+    createEmployee(
+        department: ID
+        firstname: String
+        lastname: String
+        hiredAt: String
+        email: String
+        phone: String
+    ): Employee
+    setBankingDetails(employee: ID!, iban: String, bic: String): Employee
+    updateEmployee(
+        employee: ID!
+        department: ID
+        firstname: String
+        lastname: String
+        hiredAt: String
+        email: String
+        phone: String
+    ): Employee
+    deleteEmployee(employee: ID!): Employee
+    createDepartment(name: String, manager: ID): Department
+    updateDepartment(department: ID!, name: String, manager: ID): Department
+    deleteDepartment(department: ID!): Department
+}
+
+type Query {
+    employee(employee: ID!): Employee
+    employees: [Employee]
+    departments: [Department]
+    department(department: ID!): Department
+}
+

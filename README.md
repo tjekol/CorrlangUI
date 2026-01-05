@@ -4,6 +4,14 @@ Graphic Interface for Corrlang – a lightweight semantic intergration tool
 
 ### Start server
 
+From the root folder
+
+- `./corrlang-1.0-snapshot/bin/corrlang-service`
+
+From the `/frontend` folder
+
+- `npm run grcp`
+
 #### Frontend
 
 `npm run dev` on [localhost:3000](http://localhost:3000)
@@ -18,4 +26,3 @@ Graphic Interface for Corrlang – a lightweight semantic intergration tool
   - `npx prisma migrate dev --name <name>`
 - `npx prisma generate` generate updated client
   - `npx prisma generate --no-engine`
--
