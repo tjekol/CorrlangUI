@@ -10,7 +10,7 @@ From the root folder
 
 From the `/frontend` folder
 
-- `npm run grcp`
+- `npm run grcp`. The command runs the scripts to add the schemas to the server.
 
 #### Frontend
 

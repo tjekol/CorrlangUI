@@ -7,7 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "grcp": "node client/index.js"
+    "seed": "npx tsx src/lib/prisma-seed.ts",
+    "grcp": "node client/index.js && node client/index2.js && node client/index3.js"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.2",
