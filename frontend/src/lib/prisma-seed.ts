@@ -1,41 +1,46 @@
-import { PrismaClient } from '@/generated/prisma'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 async function main() {
-  // const schemas = await prisma.schema.createMany({
-  //   data: [
-  //     { title: 'Sales' },
-  //     { title: 'Invoices' },
-  //     { title: 'HR' }
-  //   ]
-  // })
 
-  // await prisma.node.deleteMany({})
-  // await prisma.attribute.deleteMany({})
-  // await prisma.edge.deleteMany({})
+  await prisma.schema.deleteMany({})
+  await prisma.node.deleteMany({})
+  await prisma.attribute.deleteMany({})
+  await prisma.edge.deleteMany({})
+
+  const sale_schema = await prisma.schema.create({
+    data:
+      { title: 'Sales' }
+  })
+  const invoice_schema = await prisma.schema.create({
+    data:
+      { title: 'Invoices' }
+  })
+  const hr_schema = await prisma.schema.create({
+    data:
+      { title: 'HR' }
+  })
 
   const customer_node = await prisma.node.create({
     data:
-      { title: 'Customer', positionX: 0, positionY: 0, schemaID: 1 }
+      { title: 'Customer', positionX: 0, positionY: 0, schemaID: sale_schema.id }
   })
   const customer_ad_node = await prisma.node.create({
     data:
-      { title: 'Address', positionX: 0, positionY: 0, schemaID: 1 }
+      { title: 'Address', positionX: 0, positionY: 0, schemaID: sale_schema.id }
   })
 
   const client_node = await prisma.node.create({
     data:
-      { title: 'Client', positionX: 0, positionY: 0, schemaID: 2 }
+      { title: 'Client', positionX: 0, positionY: 0, schemaID: invoice_schema.id }
   })
   const client_ad_node = await prisma.node.create({
     data:
-      { title: 'Address', positionX: 0, positionY: 0, schemaID: 2 }
+      { title: 'Address', positionX: 0, positionY: 0, schemaID: invoice_schema.id }
   })
 
   const employee_node = await prisma.node.create({
     data:
-      { title: 'Employee', positionX: 0, positionY: 0, schemaID: 3 }
+      { title: 'Employee', positionX: 0, positionY: 0, schemaID: hr_schema.id }
   })
 
   await prisma.attribute.createMany({
@@ -69,4 +74,4 @@ main()
     process.exit(1)
   })
 
-// npx tsx src/lib/prisma-seed.ts
+// npx tsx src/lib/prisma-seed.ts or npm run seed

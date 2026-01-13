@@ -154,7 +154,7 @@ export default function Diagram() {
   }, [nodes, cons, multiEdges, edges, setLiveNodePositions]);
 
   return (
-    <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
+    <div className='border rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
         <defs>
           <marker
