@@ -1,11 +1,8 @@
-var messages = require('./client/core_pb.js');
-var ccp = require('./client/ccp_pb.js');
-var services = require('./client/core_grpc_pb.js');
-var grpc = require('@grpc/grpc-js');
-
-// npm run grcp
-// in /downloads/ ./bin/corrlang-service
-// Run each step by itself!!
+import messages from './client/core_pb.cjs';
+import ccp from './client/ccp_pb.cjs';
+import services from './client/core_grpc_pb.cjs';
+import grpc from '@grpc/grpc-js';
+import { prisma } from '../prisma.ts';
 
 var client = new services.CoreServiceClient(
   'localhost:6969',
@@ -40,12 +37,21 @@ function callback4(error, schema) {
     console.log(`Error ${error}`);
   } else {
     let elems = schema.getElementsList();
-    console.log(`--------------------`);
-    elems.map((e) => {
+    console.log(`-`);
+    console.log('id', schema.getName());
+    elems.map(async (e) => {
       let n = e.getFullyqualifiedname().getPartsList()[0];
       let t = e.getElementtype();
       if (t === ccp.SchemaElementKind.OBJECT_TYPE) {
         console.log(`Element: ${n} `);
+
+        const s = await prisma.schema.findFirst({
+          where: { title: schema.getName() },
+        });
+
+        await prisma.node.create({
+          data: { title: n, schemaID: s.id },
+        });
       }
     });
   }

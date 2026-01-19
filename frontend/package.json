@@ -9,9 +9,10 @@
     "start": "next start",
     "lint": "eslint",
     "prisma": "npx prisma migrate dev && npx prisma generate && npx prisma db seed",
+    "db:wipe": "npx tsx src/lib/prisma-wipe.ts",
+    "db:seed": "npx tsx src/lib/prisma-seed.ts",
     "studio": "npx prisma studio --config ./prisma.config.ts",
-    "seed": "npx tsx src/lib/prisma-seed.ts",
-    "grcp": "node client/index.js && node client/index2.js && node client/index3.js"
+    "grpc": "node src/lib/client/index.js && node src/lib/client/index2.js && node src/lib/client/index3.js"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.2",

@@ -10,7 +10,7 @@ Unzip `corrlang-1.0-snapshot.zip`. From the root folder
 
 From the `/frontend` folder
 
-- Run `npm run grcp`. The command runs the scripts to add the schemas to the server.
+- Run `npm run grpc`. The command runs the scripts to add the schemas to the server.
 
 #### Frontend
 

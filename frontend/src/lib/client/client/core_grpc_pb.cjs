@@ -2,8 +2,8 @@
 
 'use strict';
 var grpc = require('@grpc/grpc-js');
-var client_core_pb = require('../client/core_pb.js');
-var client_ccp_pb = require('../client/ccp_pb.js');
+var client_core_pb = require('./core_pb.cjs');
+var client_ccp_pb = require('./ccp_pb.cjs');
 
 function serialize_CorrLangServiceStatus(arg) {
   if (!(arg instanceof client_core_pb.CorrLangServiceStatus)) {
@@ -13,7 +13,9 @@ function serialize_CorrLangServiceStatus(arg) {
 }
 
 function deserialize_CorrLangServiceStatus(buffer_arg) {
-  return client_core_pb.CorrLangServiceStatus.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.CorrLangServiceStatus.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetRegisteredEndpointsRequest(arg) {
@@ -24,7 +26,9 @@ function serialize_GetRegisteredEndpointsRequest(arg) {
 }
 
 function deserialize_GetRegisteredEndpointsRequest(buffer_arg) {
-  return client_core_pb.GetRegisteredEndpointsRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetRegisteredEndpointsRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetRegisteredEndpointsResponse(arg) {
@@ -35,7 +39,9 @@ function serialize_GetRegisteredEndpointsResponse(arg) {
 }
 
 function deserialize_GetRegisteredEndpointsResponse(buffer_arg) {
-  return client_core_pb.GetRegisteredEndpointsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetRegisteredEndpointsResponse.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetRegisteredTechSpacesRequest(arg) {
@@ -46,18 +52,24 @@ function serialize_GetRegisteredTechSpacesRequest(arg) {
 }
 
 function deserialize_GetRegisteredTechSpacesRequest(buffer_arg) {
-  return client_core_pb.GetRegisteredTechSpacesRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetRegisteredTechSpacesRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetRegisteredTechSpacesResponse(arg) {
   if (!(arg instanceof client_core_pb.GetRegisteredTechSpacesResponse)) {
-    throw new Error('Expected argument of type GetRegisteredTechSpacesResponse');
+    throw new Error(
+      'Expected argument of type GetRegisteredTechSpacesResponse'
+    );
   }
   return Buffer.from(arg.serializeBinary());
 }
 
 function deserialize_GetRegisteredTechSpacesResponse(buffer_arg) {
-  return client_core_pb.GetRegisteredTechSpacesResponse.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetRegisteredTechSpacesResponse.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetSchemaRequest(arg) {
@@ -68,7 +80,9 @@ function serialize_GetSchemaRequest(arg) {
 }
 
 function deserialize_GetSchemaRequest(buffer_arg) {
-  return client_core_pb.GetSchemaRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetSchemaRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_GetStatusRequest(arg) {
@@ -79,18 +93,24 @@ function serialize_GetStatusRequest(arg) {
 }
 
 function deserialize_GetStatusRequest(buffer_arg) {
-  return client_core_pb.GetStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.GetStatusRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterEndpointDatasetLocationRequest(arg) {
   if (!(arg instanceof client_core_pb.RegisterEndpointDatasetLocationRequest)) {
-    throw new Error('Expected argument of type RegisterEndpointDatasetLocationRequest');
+    throw new Error(
+      'Expected argument of type RegisterEndpointDatasetLocationRequest'
+    );
   }
   return Buffer.from(arg.serializeBinary());
 }
 
 function deserialize_RegisterEndpointDatasetLocationRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointDatasetLocationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterEndpointDatasetLocationRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterEndpointRequest(arg) {
@@ -101,7 +121,9 @@ function serialize_RegisterEndpointRequest(arg) {
 }
 
 function deserialize_RegisterEndpointRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterEndpointRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterEndpointSchemaRequest(arg) {
@@ -112,29 +134,39 @@ function serialize_RegisterEndpointSchemaRequest(arg) {
 }
 
 function deserialize_RegisterEndpointSchemaRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointSchemaRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterEndpointSchemaRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterEndpointServiceSocketRequest(arg) {
   if (!(arg instanceof client_core_pb.RegisterEndpointServiceSocketRequest)) {
-    throw new Error('Expected argument of type RegisterEndpointServiceSocketRequest');
+    throw new Error(
+      'Expected argument of type RegisterEndpointServiceSocketRequest'
+    );
   }
   return Buffer.from(arg.serializeBinary());
 }
 
 function deserialize_RegisterEndpointServiceSocketRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointServiceSocketRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterEndpointServiceSocketRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterEndpointServiceURLRequest(arg) {
   if (!(arg instanceof client_core_pb.RegisterEndpointServiceURLRequest)) {
-    throw new Error('Expected argument of type RegisterEndpointServiceURLRequest');
+    throw new Error(
+      'Expected argument of type RegisterEndpointServiceURLRequest'
+    );
   }
   return Buffer.from(arg.serializeBinary());
 }
 
 function deserialize_RegisterEndpointServiceURLRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointServiceURLRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterEndpointServiceURLRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_RegisterTechSpaceRequest(arg) {
@@ -145,7 +177,9 @@ function serialize_RegisterTechSpaceRequest(arg) {
 }
 
 function deserialize_RegisterTechSpaceRequest(buffer_arg) {
-  return client_core_pb.RegisterTechSpaceRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.RegisterTechSpaceRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_ShutdownAcknowledged(arg) {
@@ -156,7 +190,9 @@ function serialize_ShutdownAcknowledged(arg) {
 }
 
 function deserialize_ShutdownAcknowledged(buffer_arg) {
-  return client_core_pb.ShutdownAcknowledged.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.ShutdownAcknowledged.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_ShutdownRequest(arg) {
@@ -167,7 +203,9 @@ function serialize_ShutdownRequest(arg) {
 }
 
 function deserialize_ShutdownRequest(buffer_arg) {
-  return client_core_pb.ShutdownRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.ShutdownRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_TechSpaceRegistered(arg) {
@@ -178,7 +216,9 @@ function serialize_TechSpaceRegistered(arg) {
 }
 
 function deserialize_TechSpaceRegistered(buffer_arg) {
-  return client_core_pb.TechSpaceRegistered.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.TechSpaceRegistered.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_WriteSchemaRequest(arg) {
@@ -189,7 +229,9 @@ function serialize_WriteSchemaRequest(arg) {
 }
 
 function deserialize_WriteSchemaRequest(buffer_arg) {
-  return client_core_pb.WriteSchemaRequest.deserializeBinary(new Uint8Array(buffer_arg));
+  return client_core_pb.WriteSchemaRequest.deserializeBinary(
+    new Uint8Array(buffer_arg)
+  );
 }
 
 function serialize_ccp_Ack(arg) {
@@ -236,14 +278,13 @@ function deserialize_ccp_TreeData(buffer_arg) {
   return client_ccp_pb.TreeData.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-
 // *
 // This is the service offered by the CorrLang engine.
 // It can both be used by TechSpace plugins (to register themselves)
 // or language clients (language server etc.) to interact with CorrLang.
-var CoreServiceService = exports.CoreServiceService = {
+var CoreServiceService = (exports.CoreServiceService = {
   // General meta-information about the core-service process.
-getStatus: {
+  getStatus: {
     path: '/CoreService/GetStatus',
     requestStream: false,
     responseStream: false,
@@ -255,7 +296,7 @@ getStatus: {
     responseDeserialize: deserialize_CorrLangServiceStatus,
   },
   // Must be called by a TechSpace plugin to be registered as TechSpace.
-registerTechSpace: {
+  registerTechSpace: {
     path: '/CoreService/RegisterTechSpace',
     requestStream: false,
     responseStream: false,
@@ -267,7 +308,7 @@ registerTechSpace: {
     responseDeserialize: deserialize_TechSpaceRegistered,
   },
   // Lists the registered TechSpace plugins.
-getRegisteredTechSpaces: {
+  getRegisteredTechSpaces: {
     path: '/CoreService/GetRegisteredTechSpaces',
     requestStream: false,
     responseStream: false,
@@ -279,7 +320,7 @@ getRegisteredTechSpaces: {
     responseDeserialize: deserialize_GetRegisteredTechSpacesResponse,
   },
   // Retrieves the formal schema presentation for a given endpoint (identified by id).
-getSchema: {
+  getSchema: {
     path: '/CoreService/GetSchema',
     requestStream: false,
     responseStream: false,
@@ -291,7 +332,7 @@ getSchema: {
     responseDeserialize: deserialize_ccp_Schema,
   },
   // Retrieves the endpoints that are currently registered.
-getRegisteredEndpoints: {
+  getRegisteredEndpoints: {
     path: '/CoreService/GetRegisteredEndpoints',
     requestStream: false,
     responseStream: false,
@@ -303,8 +344,8 @@ getRegisteredEndpoints: {
     responseDeserialize: deserialize_GetRegisteredEndpointsResponse,
   },
   // Can be used by SOURCE-endpoints or SERVICE-endpoints that offer a subscribe() method
-// to notify about 'new' data.
-pushData: {
+  // to notify about 'new' data.
+  pushData: {
     path: '/CoreService/PushData',
     requestStream: true,
     responseStream: false,
@@ -326,9 +367,9 @@ pushData: {
     responseSerialize: serialize_ShutdownAcknowledged,
     responseDeserialize: deserialize_ShutdownAcknowledged,
   },
-  // DANGER ZONE: the following methods are most likely going to change a bit 
-//
-registerEndpoint: {
+  // DANGER ZONE: the following methods are most likely going to change a bit
+  //
+  registerEndpoint: {
     path: '/CoreService/RegisterEndpoint',
     requestStream: false,
     responseStream: false,
@@ -394,6 +435,9 @@ registerEndpoint: {
     responseSerialize: serialize_ccp_Ack,
     responseDeserialize: deserialize_ccp_Ack,
   },
-};
+});
 
-exports.CoreServiceClient = grpc.makeGenericClientConstructor(CoreServiceService, 'CoreService');
+exports.CoreServiceClient = grpc.makeGenericClientConstructor(
+  CoreServiceService,
+  'CoreService'
+);

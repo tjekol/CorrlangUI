@@ -128,7 +128,7 @@ export default function Diagram() {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '45',
+            'elk.spacing.nodeNode': '60',
           },
           children,
           edges: elkEdges,
@@ -154,7 +154,7 @@ export default function Diagram() {
   }, [nodes, cons, multiEdges, edges, setLiveNodePositions]);
 
   return (
-    <div className='border rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
+    <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
         <defs>
           <marker

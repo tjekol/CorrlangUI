@@ -59,8 +59,7 @@ export default function Node({
     if (!width || width < 5) {
       setNodeLength(60 * 15);
     } else {
-      const padding = 5 * 8;
-      setNodeLength(width + padding);
+      setNodeLength(width);
     }
   }, []);
 
