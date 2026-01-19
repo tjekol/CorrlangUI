@@ -4,21 +4,26 @@ Graphic Interface for Corrlang – a lightweight semantic intergration tool
 
 ### Start server
 
-From the root folder
+Unzip `corrlang-1.0-snapshot.zip`. From the root folder
 
-- `./corrlang-1.0-snapshot/bin/corrlang-service`
+- Start server with `./corrlang-1.0-snapshot/bin/corrlang-service`
 
 From the `/frontend` folder
 
-- `npm run grcp`
+- Run `npm run grcp`. The command runs the scripts to add the schemas to the server.
 
 #### Frontend
 
-`npm run dev` on [localhost:3000](http://localhost:3000)
-
-#### Backend
+`npm run dev` starts server on [localhost:3000](http://localhost:3000)
 
 ##### Prisma
+
+- Create an `.env` file with `DATABASE_URL="file:./prisma/dev.db"`
+
+- `npm run prisma`. Sets up local database `dev.db`, generates prisma client and seeds database.
+- `npm run studio` to see visual editor of the database.
+
+Other commands:
 
 - `npx prisma init`
 - `npx prisma dev` to start local prisma postgres server

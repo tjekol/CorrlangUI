@@ -1,34 +1,10 @@
-import { PrismaClient } from '@/generated/prisma'
+import "dotenv/config";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaClient } from "@/lib/generated/prisma/client";
 
-const prisma = new PrismaClient()
+const connectionString = `${process.env.DATABASE_URL}`;
 
-async function main() {
-  // const nodes = await prisma.edge.findMany();
-  // const multiEdge = await prisma.multiEdge.create({
-  //   data: {
-  //     nodes: {
-  //       connect: [
-  //         { id: 4 }, { id: 5 },
-  //       ]
-  //     }
-  //   }
-  // });
-  const multiEdge = await prisma.multiEdge.findMany({
-    include: {
-      nodes: true
-    }
-  })
-  console.log(JSON.stringify(multiEdge, null, 2))
-}
+const adapter = new PrismaBetterSqlite3({ url: connectionString });
+const prisma = new PrismaClient({ adapter });
 
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
-
-// npx tsx src/lib/prisma.ts
+export { prisma };

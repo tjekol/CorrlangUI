@@ -26,29 +26,31 @@ function callback1(error, status) {
 }
 client.getStatus(msg, callback1);
 
-/* Request for creating the "endpoint" (needs to be done only once) */
-var req = new messages.RegisterEndpointRequest();
-req.setName('Sales');
-req.setProject('test');
-req.setType(ccp.EndpointType.SERVICE);
+/* Get schema and its elements */
+var req = new messages.GetSchemaRequest();
+req.setEndpointid(1);
 
-var req2 = new messages.RegisterEndpointRequest();
-req2.setName('Invoices');
-req2.setProject('test');
-req2.setType(ccp.EndpointType.SERVICE);
+var req2 = new messages.GetSchemaRequest();
+req2.setEndpointid(2);
 
-var req3 = new messages.RegisterEndpointRequest();
-req3.setName('HR');
-req3.setProject('test');
-req3.setType(ccp.EndpointType.SERVICE);
-function callback2(error, ep) {
+var req3 = new messages.GetSchemaRequest();
+req3.setEndpointid(3);
+function callback4(error, schema) {
   if (error) {
     console.log(`Error ${error}`);
   } else {
-    let id = ep.getId();
-    console.log(`Registered endpoint with id ${id}`);
+    let elems = schema.getElementsList();
+    console.log(`--------------------`);
+    elems.map((e) => {
+      let n = e.getFullyqualifiedname().getPartsList()[0];
+      let t = e.getElementtype();
+      if (t === ccp.SchemaElementKind.OBJECT_TYPE) {
+        console.log(`Element: ${n} `);
+      }
+    });
   }
 }
-client.registerEndpoint(req, callback2);
-client.registerEndpoint(req2, callback2);
-client.registerEndpoint(req3, callback2);
+
+client.getSchema(req, callback4);
+client.getSchema(req2, callback4);
+client.getSchema(req3, callback4);

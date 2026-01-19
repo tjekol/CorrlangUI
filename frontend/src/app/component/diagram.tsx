@@ -101,6 +101,14 @@ export default function Diagram() {
           });
         });
 
+        cons.forEach((con) => {
+          elkEdges.push({
+            id: `edgeID-0${con.id}`,
+            sources: [con.srcNodeID.toString()],
+            targets: [con.trgtNodeID.toString()],
+          });
+        });
+
         multiEdges.forEach((multiEdge) => {
           const nodes = multiEdge.nodes;
           nodes.map((node, index) => {
@@ -119,11 +127,8 @@ export default function Diagram() {
         const graph = {
           id: 'root',
           layoutOptions: {
-            'elk.algorithm': 'org.eclipse.elk.mrtree',
-            'elk.spacing.nodeNode': '100',
-            'elk.spacing.edgeNode': '20',
-            'elk.force.repulsivePower': '0.5',
-            'elk.direction': 'UNDEFINED',
+            'elk.algorithm': 'org.eclipse.elk.force',
+            'elk.spacing.nodeNode': '45',
           },
           children,
           edges: elkEdges,
@@ -149,7 +154,7 @@ export default function Diagram() {
   }, [nodes, cons, multiEdges, edges, setLiveNodePositions]);
 
   return (
-    <div className='border-1 rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
+    <div className='border rounded-sm h-150 w-full bg-[#F9F9F9] overflow-hidden'>
       <svg width='100%' height='100%'>
         <defs>
           <marker
