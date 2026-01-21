@@ -2,10 +2,15 @@ import { prisma } from '@/lib/prisma'
 
 async function main() {
 
-  await prisma.schema.deleteMany({})
-  await prisma.node.deleteMany({})
-  await prisma.attribute.deleteMany({})
-  await prisma.edge.deleteMany({})
+  const deleteSchema = prisma.schema.deleteMany()
+  const deleteNode = prisma.node.deleteMany()
+  const deleteAtr = prisma.attribute.deleteMany()
+  const deleteEdge = prisma.edge.deleteMany()
+
+  await prisma.$transaction([deleteEdge, deleteAtr, deleteNode, deleteSchema])
+
+  const schemas = await prisma.schema.findMany()
+  console.log(schemas[1].title)
 
   const sale_schema = await prisma.schema.create({
     data:

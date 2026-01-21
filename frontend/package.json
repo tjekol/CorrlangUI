@@ -8,9 +8,9 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "prisma": "npx prisma migrate dev && npx prisma generate && npx prisma db seed",
+    "prisma": "npx prisma migrate dev && npx prisma generate",
     "db:wipe": "npx tsx src/lib/prisma-wipe.ts",
-    "db:seed": "npx tsx src/lib/prisma-seed.ts",
+    "db:seed": "npx tsx src/lib/prisma-test-seed.ts",
     "studio": "npx prisma studio --config ./prisma.config.ts",
     "grpc": "node src/lib/client/index.js && node src/lib/client/index2.js && node src/lib/client/index3.js"
   },

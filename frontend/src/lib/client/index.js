@@ -59,11 +59,7 @@ async function registerEndpoints() {
   await registerEndpoint(req);
   await registerEndpoint(req2);
   await registerEndpoint(req3);
-}
 
-registerEndpoints();
-
-async function main() {
   await prisma.schema.createMany({
     data: [
       { title: req.getName() },
@@ -73,7 +69,7 @@ async function main() {
   });
 }
 
-main()
+registerEndpoints()
   .then(async () => {
     await prisma.$disconnect();
   })

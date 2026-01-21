@@ -283,10 +283,12 @@ export default function Node({
             >
               {attribute.text}:{' '}
               {attribute.type === 0
-                ? 'Int'
+                ? 'ID'
                 : attribute.type === 1
-                ? 'String'
+                ? 'Int'
                 : attribute.type === 2
+                ? 'String'
+                : attribute.type === 3
                 ? '[]'
                 : ''}
             </text>
