@@ -1,11 +1,6 @@
-var messages = require('./client/core_pb.js');
-var ccp = require('./client/ccp_pb.js');
-var services = require('./client/core_grpc_pb.js');
-var grpc = require('@grpc/grpc-js');
-
-// npm run grcp
-// in /downloads/ ./bin/corrlang-service
-// Run each step by itself!!
+import messages from './client/core_pb.cjs';
+import services from './client/core_grpc_pb.cjs';
+import grpc from '@grpc/grpc-js';
 
 var client = new services.CoreServiceClient(
   'localhost:6969',
@@ -51,7 +46,7 @@ function callback3(error, ack) {
   if (error) {
     console.log(`Error ${error}`);
   } else {
-    console.log('Schema added');
+    console.log('Schema added:');
   }
 }
 client.registerEndpointSchema(req, callback3);

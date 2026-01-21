@@ -6,7 +6,8 @@ export interface IAttribute {
 }
 
 export enum AtrType {
-  number, // 0
-  string, // 1
-  array, // 2
+  id, // 0
+  number, // 1
+  string, // 2
+  array, // 3
 }
