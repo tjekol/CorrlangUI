@@ -12,6 +12,7 @@ import { usePositionCalculation } from '../hooks/usePositionCalculation';
 import { INode } from '../interface/INode';
 import { useAttributes } from '../hooks/useAttributes';
 import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useMultiCon } from '../hooks/useMultiCon';
 
 export default function Connection({
   pendingCon,
@@ -27,6 +28,7 @@ export default function Connection({
   // ) => void;
 }) {
   const conHook = useConnection();
+  const multiConHook = useMultiCon();
   const atrEdgeHook = useAttributeEdges();
   const cons = useAtomValue(nodeConAtom);
   const nodes = useAtomValue(nodeAtom);
@@ -208,7 +210,9 @@ export default function Connection({
                           onEdgeClick([srcNode.id, trgtNode.id]);
                           conHook.deleteCons(conID);
                         } else {
-                          alert('Click a node first.');
+                          alert(
+                            'Click a node first, then the circle to create a multi-connection.',
+                          );
                         }
                       }}
                     />
@@ -221,8 +225,8 @@ export default function Connection({
         return null;
       })}
 
-      {multiEdges.map((multiEdge) => {
-        const nodeIDs = multiEdge.nodes.map((n) => n.id);
+      {multiEdges.map((multiCon) => {
+        const nodeIDs = multiCon.nodes.map((n) => n.id);
         const nodePositions = nodeIDs
           .map((nodeID) => getNodePosition(nodeID))
           .filter((pos): pos is { x: number; y: number } => pos !== null);
@@ -232,7 +236,7 @@ export default function Connection({
           return nodePositions.map((position, index) => (
             <g key={index}>
               <path
-                key={`${multiEdge.id}-${index}`}
+                key={`${multiCon.id}-${index}`}
                 stroke='#818181'
                 strokeWidth={3}
                 d={getShortestPath(midpoint, position)}
@@ -243,7 +247,20 @@ export default function Connection({
                   L ${midpoint.x + 7} ${midpoint.y} 
                   L ${midpoint.x} ${midpoint.y + 12} 
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
-                // TODO: able to click diamond to add node to multiEdge
+                onClick={() => {
+                  if (pendingCon) {
+                    // console.log('multiEdge id', multiCon.id, multiCon.nodes);
+                    // multiConHook.updateMultiCon(pendingCon.nodeID);
+                  } else {
+                    if (
+                      confirm(
+                        'Delete multi connection? (To add node to multi connection click node first, then diamond).',
+                      )
+                    ) {
+                      multiConHook.deleteMultiCon(multiCon.id);
+                    }
+                  }
+                }}
               />
             </g>
           ));

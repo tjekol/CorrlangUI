@@ -17,7 +17,7 @@ export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F',
 
 // Edges
 export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
-export const multiEdgeAtom = atom<IMultiEdge[]>([]); // [ {nodes: [1,2,3]} ]
+export const multiEdgeAtom = atom<IMultiEdge[]>([]); // [ { id: 1,  nodes: [1,2,3] }, { id: 2,  nodes: [1,2,3] } ]
 
 // Connection
 export const nodeConAtom = atom<IConnection[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]

@@ -54,6 +54,23 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// // PUT - Update multi edge
+// export async function PUT(request: NextRequest) {
+//   try {
+//     const { nodeIDs } = await request.json();
+
+//     const edge = await prisma
+
+//     return NextResponse.json(edge, { status: 201 });
+//   } catch (error) {
+//     console.error('Error creating multi edge:', error);
+//     return NextResponse.json(
+//       { error: 'Failed to create multi edge' },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 // DELETE - Delete edges by ID
 export async function DELETE(request: NextRequest) {
   try {
