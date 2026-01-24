@@ -45,21 +45,21 @@ export const useMultiCon = () => {
     setMultiEdges(prev => [...prev, edgeData]);
   })
 
-  const updateMultiCon = (nodeID: number) => handleAsync(async () => {
+  const updateMultiCon = (id: number, nodeID: number) => handleAsync(async () => {
     const res = await fetch('/api/multi-con', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nodeID }),
+      body: JSON.stringify({ id, nodeID }),
     })
 
     if (!res.ok) {
-      console.log('Failed to create multi edge:', res);
+      console.log('Failed to update multi edge:', res);
       return;
     }
 
     const edgeData: IMultiEdge = await res.json();
-    console.log(`Updated multi connection ${edgeData.id} with nodes: ${multiEdges.find(c => c.id === edgeData.id)} ${nodeID}`);
-    setMultiEdges(prev => [...prev, edgeData]);
+    console.log(`Updated multi connection ${edgeData.id} with nodes: ${nodeID}`);
+    setMultiEdges(prev => prev.map(edge => edge.id === id ? edgeData : edge));
   })
 
   const deleteMultiCon = (id: number) => handleAsync(async () => {

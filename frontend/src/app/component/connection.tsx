@@ -18,10 +18,12 @@ export default function Connection({
   pendingCon,
   pendingAtrCon,
   onEdgeClick,
+  onMultiConClick,
 }: {
   pendingCon: IPendingCon | null;
   pendingAtrCon: IPendingAtrCon | null;
   onEdgeClick: (nodeIDs: number[]) => void;
+  onMultiConClick: (id: number, nodeID: number) => void;
   // onAttributeClick: (
   //   id: number,
   //   circlePosition: { x: number; y: number }
@@ -226,44 +228,47 @@ export default function Connection({
       })}
 
       {multiEdges.map((multiCon) => {
-        const nodeIDs = multiCon.nodes.map((n) => n.id);
-        const nodePositions = nodeIDs
-          .map((nodeID) => getNodePosition(nodeID))
-          .filter((pos): pos is { x: number; y: number } => pos !== null);
-        const midpoint = getMidpoint(nodePositions);
+        if (multiCon.nodes) {
+          const multiConID = multiCon.id;
+          const nodeIDs = multiCon.nodes.map((n) => n.id);
+          const nodePositions = nodeIDs
+            .map((nodeID) => getNodePosition(nodeID))
+            .filter((pos): pos is { x: number; y: number } => pos !== null);
+          const midpoint = getMidpoint(nodePositions);
 
-        if (midpoint && nodePositions.length > 0) {
-          return nodePositions.map((position, index) => (
-            <g key={index}>
-              <path
-                key={`${multiCon.id}-${index}`}
-                stroke='#818181'
-                strokeWidth={3}
-                d={getShortestPath(midpoint, position)}
-              />
-              {/* diamond */}
-              <path
-                d={`M ${midpoint.x} ${midpoint.y - 12} 
+          if (midpoint && nodePositions.length > 0) {
+            return nodePositions.map((position, index) => (
+              <g key={index}>
+                <path
+                  key={`${multiConID}-${index}`}
+                  stroke='#818181'
+                  strokeWidth={3}
+                  d={getShortestPath(midpoint, position)}
+                />
+                {/* diamond */}
+                <path
+                  d={`M ${midpoint.x} ${midpoint.y - 12} 
                   L ${midpoint.x + 7} ${midpoint.y} 
                   L ${midpoint.x} ${midpoint.y + 12} 
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
-                onClick={() => {
-                  if (pendingCon) {
-                    // console.log('multiEdge id', multiCon.id, multiCon.nodes);
-                    // multiConHook.updateMultiCon(pendingCon.nodeID);
-                  } else {
-                    if (
-                      confirm(
-                        'Delete multi connection? (To add node to multi connection click node first, then diamond).',
-                      )
-                    ) {
-                      multiConHook.deleteMultiCon(multiCon.id);
+                  onClick={() => {
+                    if (pendingCon) {
+                      // console.log('multiEdge id', multiCon.id, multiCon.nodes);
+                      onMultiConClick(multiConID, pendingCon.nodeID);
+                    } else {
+                      if (
+                        confirm(
+                          'Delete multi connection? (To add node to multi connection click node first, then diamond).',
+                        )
+                      ) {
+                        multiConHook.deleteMultiCon(multiConID);
+                      }
                     }
-                  }
-                }}
-              />
-            </g>
-          ));
+                  }}
+                />
+              </g>
+            ));
+          }
         }
         return null;
       })}

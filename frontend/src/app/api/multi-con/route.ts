@@ -54,22 +54,38 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// // PUT - Update multi edge
-// export async function PUT(request: NextRequest) {
-//   try {
-//     const { nodeIDs } = await request.json();
+// PUT - Update multi edge
+export async function PUT(request: NextRequest) {
+  try {
+    const { id, nodeID } = await request.json();
 
-//     const edge = await prisma
+    const edge = await prisma.multiEdge.update({
+      where: {
+        id: id
+      },
+      data: {
+        nodes: {
+          connect: { id: nodeID }
+        }
+      },
+      include: {
+        nodes: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
 
-//     return NextResponse.json(edge, { status: 201 });
-//   } catch (error) {
-//     console.error('Error creating multi edge:', error);
-//     return NextResponse.json(
-//       { error: 'Failed to create multi edge' },
-//       { status: 500 }
-//     );
-//   }
-// }
+    return NextResponse.json(edge, { status: 201 });
+  } catch (error) {
+    console.error('Error updating multi edge:', error);
+    return NextResponse.json(
+      { error: 'Failed to update multi edge' },
+      { status: 500 }
+    );
+  }
+}
 
 // DELETE - Delete edges by ID
 export async function DELETE(request: NextRequest) {
