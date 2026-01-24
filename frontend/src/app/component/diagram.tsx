@@ -4,18 +4,18 @@ import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useConnection } from '../hooks/useConnection';
-import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useAtrCon } from '../hooks/useAtrCon';
 import { useEffect, useState } from 'react';
 import { handleConnection } from '../handler/handleConnection';
 import { handleMultiConUpd } from '../handler/handleMultiConUpd';
-import { handleAttributeEdge } from '../handler/handleAtrEdge';
+import { handleAtrCon } from '../handler/handleAtrCon';
 import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
-import { handleMultiEdge } from '../handler/handleMultiEdge';
+import { handleMultiCon } from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
@@ -25,8 +25,8 @@ export default function Diagram() {
   const { nodes, loading } = useNodes();
   const { edges, edgeLoading } = useEdges();
   const { cons, createCon } = useConnection();
-  const { multiEdges, createMultiEdge, updateMultiCon } = useMultiCon();
-  const { attributeEdges, createAttributeEdge } = useAttributeEdges();
+  const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
+  const { atrCons, createAtrCon } = useAtrCon();
 
   // local state to store first click of node/attribute
   const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
@@ -45,8 +45,8 @@ export default function Diagram() {
     setPendingCon,
   );
 
-  const handleEdgeClick = handleMultiEdge(
-    createMultiEdge,
+  const handleEdgeClick = handleMultiCon(
+    createMultiCon,
     pendingCon,
     setPendingCon,
   );
@@ -57,9 +57,9 @@ export default function Diagram() {
     setPendingCon,
   );
 
-  const handleAttributeClick = handleAttributeEdge(
-    attributeEdges,
-    createAttributeEdge,
+  const handleAttributeClick = handleAtrCon(
+    atrCons,
+    createAtrCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
@@ -116,12 +116,12 @@ export default function Diagram() {
           });
         });
 
-        multiEdges.forEach((multiEdge) => {
-          const nodes = multiEdge.nodes;
+        multiCons.forEach((multiCon) => {
+          const nodes = multiCon.nodes;
           if (nodes) {
             nodes.map((node, index) => {
               elkEdges.push({
-                id: `edgeID-${multiEdge.id}${index}`,
+                id: `edgeID-${multiCon.id}${index}`,
                 sources: [node.id.toString()],
                 targets: [
                   index >= nodes.length - 1
@@ -160,7 +160,7 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, cons, edges, multiEdges, setLiveNodePositions]);
+  }, [nodes, cons, edges, multiCons, setLiveNodePositions]);
 
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-hidden'>

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { attrAtom } from '../GlobalValues';
+import { atrAtom } from '../GlobalValues';
 import { IAttribute } from '../interface/IAttribute';
 
 export const useAttributes = () => {
-  const [attributes, setAttributes] = useAtom(attrAtom)
+  const [attributes, setAttributes] = useAtom(atrAtom)
   const [loading, setLoading] = useState(true);
 
   const handleAsync = async (fn: () => Promise<void>) => {

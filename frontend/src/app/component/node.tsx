@@ -8,9 +8,9 @@ import {
   liveAtrPositionsAtom,
   nodeLengthAtom,
   edgeAtom,
-  attrConAtom,
+  atrConAtom,
   nodeAtom,
-  multiEdgeAtom,
+  multiConAtom,
 } from '../GlobalValues';
 
 interface NodeProps extends INode {
@@ -43,8 +43,8 @@ export default function Node({
 
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
-  const multiEdges = useAtomValue(multiEdgeAtom);
-  const attrEdges = useAtomValue(attrConAtom);
+  const multiCons = useAtomValue(multiConAtom);
+  const atrCons = useAtomValue(atrConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
@@ -71,9 +71,7 @@ export default function Node({
 
   const hasEdges =
     edges.some((edge) => edge.srcNodeID === id || edge.trgtNodeID === id) ||
-    multiEdges.some((multiEdge) =>
-      multiEdge.nodes.some((node) => node.id === id)
-    );
+    multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
@@ -215,7 +213,7 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isActive = attrEdges.some(
+        const isActive = atrCons.some(
           (atr) =>
             atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
         );

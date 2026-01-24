@@ -2,8 +2,8 @@ import { useAtomValue } from 'jotai';
 import { useConnection } from '../hooks/useConnection';
 import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import {
-  attrConAtom,
-  multiEdgeAtom,
+  atrConAtom,
+  multiConAtom,
   nodeAtom,
   nodeConAtom,
 } from '../GlobalValues';
@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { usePositionCalculation } from '../hooks/usePositionCalculation';
 import { INode } from '../interface/INode';
 import { useAttributes } from '../hooks/useAttributes';
-import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useAtrCon } from '../hooks/useAtrCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 
 export default function Connection({
@@ -31,13 +31,13 @@ export default function Connection({
 }) {
   const conHook = useConnection();
   const multiConHook = useMultiCon();
-  const atrEdgeHook = useAttributeEdges();
+  const atrConHook = useAtrCon();
   const cons = useAtomValue(nodeConAtom);
   const nodes = useAtomValue(nodeAtom);
   const { attributes } = useAttributes();
 
-  const attributeEdges = useAtomValue(attrConAtom);
-  const multiEdges = useAtomValue(multiEdgeAtom);
+  const atrConnection = useAtomValue(atrConAtom);
+  const multiConnection = useAtomValue(multiConAtom);
 
   // midpoints for circle on edges
   const [midCircles, setMidCircles] = useState<
@@ -79,11 +79,11 @@ export default function Connection({
   };
 
   const getAttributes = (
-    atrEdgeID: number,
+    atrConID: number,
   ): { srcAtrID: number; trgtAtrID: number } | undefined => {
-    const atrEdge = attributeEdges.find((atrEdge) => atrEdge.id === atrEdgeID);
-    if (atrEdge)
-      return { srcAtrID: atrEdge.srcAtrID, trgtAtrID: atrEdge.trgtAtrID };
+    const atrCon = atrConnection.find((con) => con.id === atrConID);
+    if (atrCon)
+      return { srcAtrID: atrCon.srcAtrID, trgtAtrID: atrCon.trgtAtrID };
   };
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -181,18 +181,18 @@ export default function Connection({
                       const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
 
                       // attribute edges between nodes
-                      const relevantAttrEdges = attributeEdges.filter(
-                        (atrEdge) =>
-                          (nodeAAtrIDs.has(atrEdge.srcAtrID) &&
-                            nodeBAtrIDs.has(atrEdge.trgtAtrID)) ||
-                          (nodeAAtrIDs.has(atrEdge.trgtAtrID) &&
-                            nodeBAtrIDs.has(atrEdge.srcAtrID)),
+                      const relevantAtrCons = atrConnection.filter(
+                        (atrCon) =>
+                          (nodeAAtrIDs.has(atrCon.srcAtrID) &&
+                            nodeBAtrIDs.has(atrCon.trgtAtrID)) ||
+                          (nodeAAtrIDs.has(atrCon.trgtAtrID) &&
+                            nodeBAtrIDs.has(atrCon.srcAtrID)),
                       );
 
                       // delete the node edge and all complete attribute connections
                       conHook.deleteCons(conID);
-                      relevantAttrEdges.forEach((atrEdge) => {
-                        atrEdgeHook.deleteAttributeEdges(atrEdge.id);
+                      relevantAtrCons.forEach((atrCon) => {
+                        atrConHook.deleteAtrCon(atrCon.id);
                       });
                     }}
                     className='hover:cursor-pointer'
@@ -227,7 +227,7 @@ export default function Connection({
         return null;
       })}
 
-      {multiEdges.map((multiCon) => {
+      {multiConnection.map((multiCon) => {
         if (multiCon.nodes) {
           const multiConID = multiCon.id;
           const nodeIDs = multiCon.nodes.map((n) => n.id);
@@ -253,7 +253,6 @@ export default function Connection({
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
                   onClick={() => {
                     if (pendingCon) {
-                      // console.log('multiEdge id', multiCon.id, multiCon.nodes);
                       onMultiConClick(multiConID, pendingCon.nodeID);
                     } else {
                       if (
@@ -273,9 +272,9 @@ export default function Connection({
         return null;
       })}
 
-      {attributeEdges.map((atrEdge) => {
-        const atrEdgeID = atrEdge.id;
-        const attrs = getAttributes(atrEdgeID);
+      {atrConnection.map((atrCon) => {
+        const atrConID = atrCon.id;
+        const attrs = getAttributes(atrConID);
         if (attrs && !conHook.loading) {
           const { srcAtrID, trgtAtrID } = attrs;
           const pos1 = getAttributePosition(srcAtrID);
@@ -284,13 +283,13 @@ export default function Connection({
           if (pos1 && pos2) {
             return (
               <path
-                key={atrEdgeID}
+                key={atrConID}
                 d={getPathData(pos1, pos2)}
                 stroke='#818181'
                 strokeWidth={3}
                 // strokeDasharray={'5,5'}
                 fill='none'
-                onClick={() => atrEdgeHook.deleteAttributeEdges(atrEdgeID)}
+                onClick={() => atrConHook.deleteAtrCon(atrConID)}
                 className='hover:cursor-pointer'
                 strokeOpacity={0.6}
               />

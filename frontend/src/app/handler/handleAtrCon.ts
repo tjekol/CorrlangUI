@@ -1,15 +1,15 @@
-import { IConnection } from '../interface/Connection/IAtrConnection';
+import { IAtrConnection } from '../interface/Connection/IAtrConnection';
 import { IPendingAtrCon } from '../interface/IStates';
 
-export const handleAttributeEdge = (
-  edges: IConnection[],
-  createAttributeEdge: (srcAtrID: number, trgtAtrID: number) => void,
-  pendingAtrEdge: IPendingAtrCon | null,
+export const handleAtrCon = (
+  cons: IAtrConnection[],
+  createAtrCon: (srcAtrID: number, trgtAtrID: number) => void,
+  pendingAtrCon: IPendingAtrCon | null,
   setPendingAtrEdge: (pendingEdge: IPendingAtrCon | null) => void
 ) => {
   return (id: number, circlePosition: { x: number; y: number }) => {
-    if (!pendingAtrEdge) {
-      const newattributeEdgeID = Math.max(0, ...edges.map((e) => e.id)) + 1;
+    if (!pendingAtrCon) {
+      const newattributeEdgeID = Math.max(0, ...cons.map((e) => e.id)) + 1;
 
       setPendingAtrEdge({
         attributeEdgeID: newattributeEdgeID,
@@ -23,16 +23,16 @@ export const handleAttributeEdge = (
         position: circlePosition,
       });
     } else {
-      if (pendingAtrEdge.attributeID !== id) {
+      if (pendingAtrCon.attributeID !== id) {
         console.log(
-          'Creating edge between attributes:',
-          pendingAtrEdge.attributeID,
+          'Creating connection between attributes:',
+          pendingAtrCon.attributeID,
           'and',
           id
         );
 
-        createAttributeEdge(
-          pendingAtrEdge.attributeID,
+        createAtrCon(
+          pendingAtrCon.attributeID,
           id
         );
         setPendingAtrEdge(null);

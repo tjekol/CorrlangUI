@@ -2,22 +2,22 @@ import { IPendingCon } from '../interface/IStates';
 
 export const handleMultiConUpd = (
   updateMultiCon: (id: number, nodeID: number) => void,
-  pendingEdge: IPendingCon | null,
-  setPendingEdge: (pendingEdge: IPendingCon | null) => void
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingEdge: IPendingCon | null) => void
 ) => {
   return (id: number, nodeID: number) => {
-    if (!pendingEdge) {
-      alert(`Click on node first to create a multiEdge`)
+    if (!pendingCon) {
+      alert(`Click on node first to add to multi connection.`)
     } else {
       console.log(`Updating multi connection ${id} with node: ${nodeID}`)
       try {
         updateMultiCon(id, nodeID);
-        setPendingEdge(null);
+        setPendingCon(null);
       }
       catch (err) {
         console.error(err)
-        console.log('Error, canceling multi edge update.');
-        setPendingEdge(null);
+        console.log('Error, canceling multi connection update.');
+        setPendingCon(null);
       }
     }
   }

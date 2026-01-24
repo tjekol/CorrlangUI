@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { attrConAtom } from '../GlobalValues';
+import { atrConAtom } from '../GlobalValues';
 import { IAtrConnection } from '../interface/Connection/IAtrConnection';
 
-export const useAttributeEdges = () => {
+export const useAtrCon = () => {
   const [loading, setLoading] = useState(true);
-  const [attributeEdges, setAttributeEdges] = useAtom(attrConAtom);
+  const [atrCons, setAtrCons] = useAtom(atrConAtom);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -20,17 +20,17 @@ export const useAttributeEdges = () => {
     }
   };
 
-  const fetchAttributeEdges = () => handleAsync(async () => {
-    const res = await fetch('/api/attributeEdges');
+  const fetchAtrCons = () => handleAsync(async () => {
+    const res = await fetch('/api/atrConnection');
     if (!res.ok) {
-      throw new Error('Failed to fetch edges');
+      throw new Error('Failed to fetch attribute connections.');
     }
-    const edgesData: IAtrConnection[] = await res.json();
-    setAttributeEdges(edgesData)
+    const conData: IAtrConnection[] = await res.json();
+    setAtrCons(conData)
   })
 
-  const createAttributeEdge = (srcAtrID: number, trgtAtrID: number) => handleAsync(async () => {
-    const res = await fetch('/api/attributeEdges', {
+  const createAtrCon = (srcAtrID: number, trgtAtrID: number) => handleAsync(async () => {
+    const res = await fetch('/api/atrConnection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ srcAtrID, trgtAtrID }),
@@ -42,11 +42,11 @@ export const useAttributeEdges = () => {
     }
     const edgeData: IAtrConnection = await res.json();
     console.log(`Added attribute edge: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
-    setAttributeEdges(prev => [...prev, edgeData]);
+    setAtrCons(prev => [...prev, edgeData]);
   })
 
-  const deleteAttributeEdges = (id: number) => handleAsync(async () => {
-    const res = await fetch('/api/attributeEdges', {
+  const deleteAtrCon = (id: number) => handleAsync(async () => {
+    const res = await fetch('/api/atrConnection', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
@@ -56,10 +56,10 @@ export const useAttributeEdges = () => {
       throw new Error('Failed to delete edges');
     }
     console.log(`Removed attribute edges with id: ${id}`);
-    setAttributeEdges(prev => prev.filter(atrEdge => atrEdge.id !== id));
+    setAtrCons(prev => prev.filter(atrCon => atrCon.id !== id));
   })
 
-  useEffect(() => { fetchAttributeEdges() }, [])
+  useEffect(() => { fetchAtrCons() }, [])
 
-  return { attributeEdges, loading, createAttributeEdge, deleteAttributeEdges };
+  return { atrCons, loading, createAtrCon, deleteAtrCon };
 };
