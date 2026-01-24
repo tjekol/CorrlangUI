@@ -65,7 +65,7 @@ export default function Connection({
   };
 
   const getNodes = (
-    conID: number
+    conID: number,
   ):
     | { srcNode: INode | undefined; trgtNode: INode | undefined }
     | undefined => {
@@ -79,7 +79,7 @@ export default function Connection({
   };
 
   const getAttributes = (
-    atrEdgeID: number
+    atrEdgeID: number,
   ): { srcAtrID: number; trgtAtrID: number } | undefined => {
     const atrEdge = attributeEdges.find((atrEdge) => atrEdge.id === atrEdgeID);
     if (atrEdge)
@@ -116,7 +116,7 @@ export default function Connection({
           key={pendingCon.connectID}
           d={getTempPathData(
             { x: pendingCon.positionX, y: pendingCon.positionY },
-            mousePosition
+            mousePosition,
           )}
           stroke='black'
           strokeWidth={3}
@@ -132,7 +132,7 @@ export default function Connection({
           key={pendingAtrCon.attributeEdgeID}
           d={getTempPathData(
             { x: pendingAtrCon.positionX, y: pendingAtrCon.positionY },
-            mousePosition
+            mousePosition,
           )}
           stroke='grey'
           strokeWidth={3}
@@ -161,7 +161,7 @@ export default function Connection({
                       if (pathElement) {
                         setTimeout(
                           () => calculateMidpoint(pathElement, c.id),
-                          0
+                          0,
                         );
                       }
                     }}
@@ -172,10 +172,10 @@ export default function Connection({
                     fill='none'
                     onClick={() => {
                       const nodeAAtr = attributes.filter(
-                        (attr) => attr.nodeID === srcNode.id
+                        (attr) => attr.nodeID === srcNode.id,
                       );
                       const nodeBAtr = attributes.filter(
-                        (attr) => attr.nodeID === trgtNode.id
+                        (attr) => attr.nodeID === trgtNode.id,
                       );
                       const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
                       const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
@@ -186,7 +186,7 @@ export default function Connection({
                           (nodeAAtrIDs.has(atrEdge.srcAtrID) &&
                             nodeBAtrIDs.has(atrEdge.trgtAtrID)) ||
                           (nodeAAtrIDs.has(atrEdge.trgtAtrID) &&
-                            nodeBAtrIDs.has(atrEdge.srcAtrID))
+                            nodeBAtrIDs.has(atrEdge.srcAtrID)),
                       );
 
                       // delete the node edge and all complete attribute connections

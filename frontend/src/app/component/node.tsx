@@ -18,7 +18,7 @@ interface NodeProps extends INode {
   onHeaderClick: (id: number, circlePosition: { x: number; y: number }) => void;
   onAttributeClick: (
     id: number,
-    circlePosition: { x: number; y: number }
+    circlePosition: { x: number; y: number },
   ) => void;
 }
 
@@ -84,7 +84,7 @@ export default function Node({
         return prev.map((pos) =>
           pos.nodeID === id
             ? { nodeID: id, positionX: newX, positionY: newY }
-            : pos
+            : pos,
         );
       } else {
         return [...prev, { nodeID: id, positionX: newX, positionY: newY }];
@@ -93,7 +93,7 @@ export default function Node({
 
     setLiveAtrPosition((prev) => {
       const filteredPrev = prev.filter(
-        (atr) => !attributes.some((attr) => attr.id === atr.attributeID)
+        (atr) => !attributes.some((attr) => attr.id === atr.attributeID),
       );
 
       const newAtrPositions = attributes
@@ -141,7 +141,8 @@ export default function Node({
         strokeWidth={1}
         rx={5}
         onMouseDown={(e) => (
-          setIsDragging(true), handleMouseDown(e.clientX, e.clientY)
+          setIsDragging(true),
+          handleMouseDown(e.clientX, e.clientY)
         )}
         onMouseMove={(e) => handleMouseMove(e.clientX, e.clientY)}
         onMouseUp={() => setIsDragging(false)}
@@ -216,7 +217,7 @@ export default function Node({
 
         const isActive = attrEdges.some(
           (atr) =>
-            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id
+            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
         );
 
         const alertMsg =
@@ -237,13 +238,13 @@ export default function Node({
               strokeWidth={1}
               onClick={() => {
                 if (hasEdges) {
-                  console.log(
+                  (console.log(
                     'Clicked on attribute: ',
                     attribute,
                     attribute.id,
-                    leftCirclePosition
+                    leftCirclePosition,
                   ),
-                    onAttributeClick(attribute.id, leftCirclePosition);
+                    onAttributeClick(attribute.id, leftCirclePosition));
                 } else {
                   alert(alertMsg);
                 }
@@ -262,13 +263,13 @@ export default function Node({
               strokeWidth={1}
               onClick={() => {
                 if (hasEdges) {
-                  console.log(
+                  (console.log(
                     'Clicked on attribute: ',
                     attribute,
                     attribute.id,
-                    leftCirclePosition
+                    leftCirclePosition,
                   ),
-                    onAttributeClick(attribute.id, rightCirclePosition);
+                    onAttributeClick(attribute.id, rightCirclePosition));
                 } else {
                   alert(alertMsg);
                 }
@@ -285,12 +286,12 @@ export default function Node({
               {attribute.type === 0
                 ? 'ID'
                 : attribute.type === 1
-                ? 'Int'
-                : attribute.type === 2
-                ? 'String'
-                : attribute.type === 3
-                ? '[]'
-                : ''}
+                  ? 'Int'
+                  : attribute.type === 2
+                    ? 'String'
+                    : attribute.type === 3
+                      ? '[]'
+                      : ''}
             </text>
           </g>
         );

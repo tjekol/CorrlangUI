@@ -31,10 +31,10 @@ export default function Diagram() {
   // local state to store first click of node/attribute
   const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
-    null
+    null,
   );
   const [liveNodePositions, setLiveNodePositions] = useAtom(
-    liveNodePositionsAtom
+    liveNodePositionsAtom,
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
 
@@ -42,7 +42,7 @@ export default function Diagram() {
     cons,
     createCon,
     pendingCon,
-    setPendingCon
+    setPendingCon,
   );
 
   const handleEdgeClick = handleMultiEdge(
@@ -61,7 +61,7 @@ export default function Diagram() {
     attributeEdges,
     createAttributeEdge,
     pendingAtrCon,
-    setPendingAtrCon
+    setPendingAtrCon,
   );
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function Diagram() {
           const labels = node.attributes.map((attr: IAttribute) => attr.text);
           const maxLength = Math.max(
             node.title.length,
-            ...labels.map((l: string) => l.length)
+            ...labels.map((l: string) => l.length),
           );
           return Math.max(maxLength * 15, 120);
         };
@@ -232,6 +232,7 @@ export default function Diagram() {
         <Edge />
         <Connection
           onEdgeClick={handleEdgeClick}
+          onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
         />
@@ -242,7 +243,7 @@ export default function Diagram() {
         ) : (
           nodes.map((n, i) => {
             const livePositions = liveNodePositions.find(
-              (pos) => pos.nodeID === n.id
+              (pos) => pos.nodeID === n.id,
             );
 
             const schemaIndex = schemas.findIndex((s) => s.id === n.schemaID);
