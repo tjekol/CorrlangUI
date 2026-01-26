@@ -13,7 +13,7 @@ export default function Edge() {
   const { getNodePosition, getArrowData } = usePositionCalculation();
 
   const getNodes = (
-    edgeID: number
+    edgeID: number,
   ):
     | { srcNode: INode | undefined; trgtNode: INode | undefined }
     | undefined => {
@@ -45,7 +45,7 @@ export default function Edge() {
                   pos1Comp,
                   pos2,
                   srcNode,
-                  trgtNode
+                  trgtNode,
                 );
                 const arrowData = getArrowData(pos1, pos2, srcNode, trgtNode);
                 const padding = 20;
@@ -66,11 +66,11 @@ export default function Edge() {
                         edge.type === EdgeType.assoc
                           ? 'url(#line)'
                           : edge.type === EdgeType.direct ||
-                            edge.type === EdgeType.comp
-                          ? 'url(#arrow-dir)'
-                          : edge.type === EdgeType.inherit
-                          ? 'url(#arrow-ih)'
-                          : ''
+                              edge.type === EdgeType.comp
+                            ? 'url(#arrow-dir)'
+                            : edge.type === EdgeType.inherit
+                              ? 'url(#arrow-ih)'
+                              : ''
                       }`}
                     />
 

@@ -12,7 +12,7 @@ export const handleConnection = (
       const newConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
 
       setPendingCon({
-        connectID: newConID,
+        conID: newConID,
         nodeID: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y
@@ -23,7 +23,7 @@ export const handleConnection = (
         position: circlePosition
       });
     } else {
-      // TODO: restrict one edge between two nodes
+      // TODO: restrict one connection between two nodes
       if (pendingCon.nodeID !== id) {
         console.log(`Creating connection between nodes: ${pendingCon.nodeID}-${id}`)
         createCon(

@@ -40,9 +40,9 @@ export const useAtrCon = () => {
       console.log('Failed to create attribute connections:', res);
       return;
     }
-    const edgeData: IAtrConnection = await res.json();
-    console.log(`Added attribute connection: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
-    setAtrCons(prev => [...prev, edgeData]);
+    const conData: IAtrConnection = await res.json();
+    console.log(`Added attribute connection: ${conData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
+    setAtrCons(prev => [...prev, conData]);
   })
 
   const deleteAtrCon = (id: number) => handleAsync(async () => {

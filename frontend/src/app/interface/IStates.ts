@@ -1,12 +1,12 @@
 export interface IPendingCon {
-  connectID: number;
+  conID: number;
   nodeID: number;
   positionX: number;
   positionY: number;
 }
 
 export interface IPendingAtrCon {
-  attributeEdgeID: number;
+  attributeConID: number;
   attributeID: number;
   positionX: number;
   positionY: number;

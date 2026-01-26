@@ -45,7 +45,7 @@ export default function Diagram() {
     setPendingCon,
   );
 
-  const handleEdgeClick = handleMultiCon(
+  const handleConClick = handleMultiCon(
     createMultiCon,
     pendingCon,
     setPendingCon,
@@ -231,7 +231,7 @@ export default function Diagram() {
         })}
         <Edge />
         <Connection
-          onEdgeClick={handleEdgeClick}
+          onConClick={handleConClick}
           onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}

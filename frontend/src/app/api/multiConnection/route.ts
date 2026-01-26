@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all multi edges
+// GET - Fetch all multi connections
 export async function GET() {
   try {
     const multiCon = await prisma.multiConnection.findMany({
@@ -24,7 +24,7 @@ export async function GET() {
   }
 }
 
-// POST - Create a new multi edge
+// POST - Create a new multi connection
 export async function POST(request: NextRequest) {
   try {
     const { nodeIDs } = await request.json();
@@ -93,7 +93,7 @@ export async function DELETE(request: NextRequest) {
     const { id } = await request.json().catch(() => ({}));
     let deletedCon;
     if (id) {
-      // Delete related edges
+      // Delete related connections
       deletedCon = await prisma.multiConnection.deleteMany({
         where: {
           id: id,

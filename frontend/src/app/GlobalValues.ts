@@ -24,6 +24,6 @@ export const nodeConAtom = atom<IConnection[]>([]); // [{ id: 1, srcNodeID: 1, t
 export const multiConAtom = atom<IMultiConnection[]>([]); // [ { id: 1,  nodes: [1,2,3] }, { id: 2,  nodes: [1,2,3] } ]
 export const atrConAtom = atom<IAtrConnection[]>([]); // [{ id: 1, srcAtrID: 1, trgtAtrID: 2 }]
 
-// Live positions for edge source and target
+// Live positions for nodes and attributes
 export const liveNodePositionsAtom = atom<LiveNodePosition[]>([]); // [ {nodeID: 1, positionX: 0, positionY: 0} ]
 export const liveAtrPositionsAtom = atom<LiveAtrPosition[]>([]);

@@ -14,7 +14,7 @@ export const useMultiCon = () => {
     try {
       await fn();
     } catch (error) {
-      console.error('Multi edge operation failed:', error);
+      console.error('Multi connection operation failed:', error);
     } finally {
       setLoading(false);
     }
@@ -37,12 +37,12 @@ export const useMultiCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to create multi edge:', res);
+      console.log('Failed to create multi connection:', res);
       return;
     }
-    const edgeData: IMultiConnection = await res.json();
-    console.log(`Added multi edge: ${edgeData.id} between nodes ${nodeIDs}`);
-    setMultiCons(prev => [...prev, edgeData]);
+    const conData: IMultiConnection = await res.json();
+    console.log(`Added multi connection: ${conData.id} between nodes ${nodeIDs}`);
+    setMultiCons(prev => [...prev, conData]);
   })
 
   const updateMultiCon = (id: number, nodeID: number) => handleAsync(async () => {
@@ -53,13 +53,13 @@ export const useMultiCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to update multi edge:', res);
+      console.log('Failed to update multi connection:', res);
       return;
     }
 
-    const edgeData: IMultiConnection = await res.json();
-    console.log(`Updated multi connection ${edgeData.id} with nodes: ${nodeID}`);
-    setMultiCons(prev => prev.map(edge => edge.id === id ? edgeData : edge));
+    const conData: IMultiConnection = await res.json();
+    console.log(`Updated multi connection ${conData.id} with nodes: ${nodeID}`);
+    setMultiCons(prev => prev.map(con => con.id === id ? conData : con));
   })
 
   const deleteMultiCon = (id: number) => handleAsync(async () => {
@@ -73,7 +73,7 @@ export const useMultiCon = () => {
       throw new Error('Failed to delete multi connection');
     }
     console.log(`Removed multi connection with id: ${id}`);
-    setMultiCons(prev => prev.filter(edge => edge.id !== id));
+    setMultiCons(prev => prev.filter(con => con.id !== id));
   })
 
   const deleteAllMultiCons = () => handleAsync(async () => {

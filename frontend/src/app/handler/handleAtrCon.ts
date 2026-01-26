@@ -5,14 +5,14 @@ export const handleAtrCon = (
   cons: IAtrConnection[],
   createAtrCon: (srcAtrID: number, trgtAtrID: number) => void,
   pendingAtrCon: IPendingAtrCon | null,
-  setPendingAtrEdge: (pendingEdge: IPendingAtrCon | null) => void
+  setPendingAtrCon: (pendingEdge: IPendingAtrCon | null) => void
 ) => {
   return (id: number, circlePosition: { x: number; y: number }) => {
     if (!pendingAtrCon) {
-      const newattributeEdgeID = Math.max(0, ...cons.map((e) => e.id)) + 1;
+      const newAtrConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
 
-      setPendingAtrEdge({
-        attributeEdgeID: newattributeEdgeID,
+      setPendingAtrCon({
+        attributeConID: newAtrConID,
         attributeID: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y,
@@ -35,10 +35,10 @@ export const handleAtrCon = (
           pendingAtrCon.attributeID,
           id
         );
-        setPendingAtrEdge(null);
+        setPendingAtrCon(null);
       } else {
-        console.log('Same node clicked, canceling edge creation');
-        setPendingAtrEdge(null);
+        console.log('Same node clicked, canceling attribute connection creation');
+        setPendingAtrCon(null);
       }
     }
   };

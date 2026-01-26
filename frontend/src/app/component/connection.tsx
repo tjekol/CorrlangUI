@@ -17,12 +17,12 @@ import { useMultiCon } from '../hooks/useMultiCon';
 export default function Connection({
   pendingCon,
   pendingAtrCon,
-  onEdgeClick,
+  onConClick,
   onMultiConClick,
 }: {
   pendingCon: IPendingCon | null;
   pendingAtrCon: IPendingAtrCon | null;
-  onEdgeClick: (nodeIDs: number[]) => void;
+  onConClick: (nodeIDs: number[]) => void;
   onMultiConClick: (id: number, nodeID: number) => void;
   // onAttributeClick: (
   //   id: number,
@@ -39,7 +39,7 @@ export default function Connection({
   const atrConnection = useAtomValue(atrConAtom);
   const multiConnection = useAtomValue(multiConAtom);
 
-  // midpoints for circle on edges
+  // midpoints for circle on connections
   const [midCircles, setMidCircles] = useState<
     Record<number, { x: number; y: number }>
   >({});
@@ -113,7 +113,7 @@ export default function Connection({
       {/* temporary */}
       {pendingCon && mousePosition.x !== 0 && mousePosition.y !== 0 && (
         <path
-          key={pendingCon.connectID}
+          key={pendingCon.conID}
           d={getTempPathData(
             { x: pendingCon.positionX, y: pendingCon.positionY },
             mousePosition,
@@ -129,7 +129,7 @@ export default function Connection({
 
       {pendingAtrCon && mousePosition.x !== 0 && mousePosition.y !== 0 && (
         <path
-          key={pendingAtrCon.attributeEdgeID}
+          key={pendingAtrCon.attributeConID}
           d={getTempPathData(
             { x: pendingAtrCon.positionX, y: pendingAtrCon.positionY },
             mousePosition,
@@ -180,7 +180,7 @@ export default function Connection({
                       const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
                       const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
 
-                      // attribute edges between nodes
+                      // attribute connections between nodes
                       const relevantAtrCons = atrConnection.filter(
                         (atrCon) =>
                           (nodeAAtrIDs.has(atrCon.srcAtrID) &&
@@ -189,7 +189,7 @@ export default function Connection({
                             nodeBAtrIDs.has(atrCon.srcAtrID)),
                       );
 
-                      // delete the node edge and all complete attribute connections
+                      // delete the node connection and all related attribute connections
                       conHook.deleteCon(conID);
                       relevantAtrCons.forEach((atrCon) => {
                         atrConHook.deleteAtrCon(atrCon.id);
@@ -198,7 +198,7 @@ export default function Connection({
                     className='hover:cursor-pointer'
                     strokeOpacity={0.6}
                   />
-                  {/* circle in the middle of edge */}
+                  {/* circle in the middle of connection */}
                   {midCircles[conID] && (
                     <circle
                       cx={midCircles[conID].x}
@@ -209,7 +209,7 @@ export default function Connection({
                       className='hover:opacity-100 opacity-70'
                       onClick={() => {
                         if (pendingCon) {
-                          onEdgeClick([srcNode.id, trgtNode.id]);
+                          onConClick([srcNode.id, trgtNode.id]);
                           conHook.deleteCon(conID);
                         } else {
                           alert(
