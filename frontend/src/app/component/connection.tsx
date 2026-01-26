@@ -171,29 +171,31 @@ export default function Connection({
                     // strokeDasharray={'10,10'}
                     fill='none'
                     onClick={() => {
-                      const nodeAAtr = attributes.filter(
-                        (attr) => attr.nodeID === srcNode.id,
-                      );
-                      const nodeBAtr = attributes.filter(
-                        (attr) => attr.nodeID === trgtNode.id,
-                      );
-                      const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
-                      const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
+                      if (confirm('Delete connection?')) {
+                        const nodeAAtr = attributes.filter(
+                          (attr) => attr.nodeID === srcNode.id,
+                        );
+                        const nodeBAtr = attributes.filter(
+                          (attr) => attr.nodeID === trgtNode.id,
+                        );
+                        const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
+                        const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
 
-                      // attribute connections between nodes
-                      const relevantAtrCons = atrConnection.filter(
-                        (atrCon) =>
-                          (nodeAAtrIDs.has(atrCon.srcAtrID) &&
-                            nodeBAtrIDs.has(atrCon.trgtAtrID)) ||
-                          (nodeAAtrIDs.has(atrCon.trgtAtrID) &&
-                            nodeBAtrIDs.has(atrCon.srcAtrID)),
-                      );
+                        // attribute connections between nodes
+                        const relevantAtrCons = atrConnection.filter(
+                          (atrCon) =>
+                            (nodeAAtrIDs.has(atrCon.srcAtrID) &&
+                              nodeBAtrIDs.has(atrCon.trgtAtrID)) ||
+                            (nodeAAtrIDs.has(atrCon.trgtAtrID) &&
+                              nodeBAtrIDs.has(atrCon.srcAtrID)),
+                        );
 
-                      // delete the node connection and all related attribute connections
-                      conHook.deleteCon(conID);
-                      relevantAtrCons.forEach((atrCon) => {
-                        atrConHook.deleteAtrCon(atrCon.id);
-                      });
+                        // delete the node connection and all related attribute connections
+                        conHook.deleteCon(conID);
+                        relevantAtrCons.forEach((atrCon) => {
+                          atrConHook.deleteAtrCon(atrCon.id);
+                        });
+                      }
                     }}
                     className='hover:cursor-pointer'
                     strokeOpacity={0.6}
