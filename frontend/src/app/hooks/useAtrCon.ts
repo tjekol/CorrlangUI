@@ -37,7 +37,7 @@ export const useAtrCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to create attribute edge:', res);
+      console.log('Failed to create attribute connections:', res);
       return;
     }
     const edgeData: IAtrConnection = await res.json();
@@ -53,13 +53,27 @@ export const useAtrCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete edges');
+      throw new Error('Failed to delete attribute connections');
     }
-    console.log(`Removed attribute edges with id: ${id}`);
+    console.log(`Removed attribute connections with id: ${id}`);
     setAtrCons(prev => prev.filter(atrCon => atrCon.id !== id));
+  })
+
+  const deleteAllAtrCons = () => handleAsync(async () => {
+    const res = await fetch('/api/atrConnection', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to delete connections');
+    }
+    console.log(`Removed all attribute connections`);
+    setAtrCons([]);
   })
 
   useEffect(() => { fetchAtrCons() }, [])
 
-  return { atrCons, loading, createAtrCon, deleteAtrCon };
+  return { atrCons, loading, createAtrCon, deleteAtrCon, deleteAllAtrCons };
 };

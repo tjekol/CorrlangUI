@@ -87,19 +87,22 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE - Delete connection by ID
+// DELETE - Delete connection by ID or all
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json();
-
-    // Delete related edges
-    const deletedEdge = await prisma.multiConnection.deleteMany({
-      where: {
-        id: id,
-      },
-    });
-
-    return NextResponse.json(deletedEdge);
+    const { id } = await request.json().catch(() => ({}));
+    let deletedCon;
+    if (id) {
+      // Delete related edges
+      deletedCon = await prisma.multiConnection.deleteMany({
+        where: {
+          id: id,
+        },
+      });
+    } else {
+      deletedCon = await prisma.multiConnection.deleteMany()
+    }
+    return NextResponse.json(deletedCon);
   } catch (error) {
     console.error('Error deleting multi connection:', error);
     return NextResponse.json(

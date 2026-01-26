@@ -70,13 +70,27 @@ export const useMultiCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete edges');
+      throw new Error('Failed to delete multi connection');
     }
-    console.log(`Removed edges with id: ${id}`);
+    console.log(`Removed multi connection with id: ${id}`);
     setMultiCons(prev => prev.filter(edge => edge.id !== id));
+  })
+
+  const deleteAllMultiCons = () => handleAsync(async () => {
+    const res = await fetch('/api/multiConnection', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to multi connections');
+    }
+    console.log(`Removed all multi connections`);
+    setMultiCons([]);
   })
 
   useEffect(() => { fetchMultiCons() }, [])
 
-  return { multiCons, loading, createMultiCon, updateMultiCon, deleteMultiCon };
+  return { multiCons, loading, createMultiCon, updateMultiCon, deleteMultiCon, deleteAllMultiCons };
 };

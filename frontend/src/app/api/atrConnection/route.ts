@@ -38,17 +38,22 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - Delete edges by ID
+// DELETE - Delete edges by ID or all
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json();
+    const { id } = await request.json().catch(() => ({}));
+    let deletedCon;
 
-    // Delete related edges
-    const deletedCon = await prisma.atrConnection.deleteMany({
-      where: {
-        id: id,
-      },
-    });
+    if (id) {
+      // Delete related edges
+      deletedCon = await prisma.atrConnection.deleteMany({
+        where: {
+          id: id,
+        },
+      });
+    } else {
+      deletedCon = await prisma.atrConnection.deleteMany()
+    }
 
     return NextResponse.json(deletedCon);
   } catch (error) {

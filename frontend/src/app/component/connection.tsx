@@ -190,7 +190,7 @@ export default function Connection({
                       );
 
                       // delete the node edge and all complete attribute connections
-                      conHook.deleteCons(conID);
+                      conHook.deleteCon(conID);
                       relevantAtrCons.forEach((atrCon) => {
                         atrConHook.deleteAtrCon(atrCon.id);
                       });
@@ -210,7 +210,7 @@ export default function Connection({
                       onClick={() => {
                         if (pendingCon) {
                           onEdgeClick([srcNode.id, trgtNode.id]);
-                          conHook.deleteCons(conID);
+                          conHook.deleteCon(conID);
                         } else {
                           alert(
                             'Click a node first, then the circle to create a multi-connection.',

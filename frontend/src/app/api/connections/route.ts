@@ -41,14 +41,19 @@ export async function POST(request: NextRequest) {
 // DELETE - Delete connections by ID
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json();
+    const { id } = await request.json().catch(() => ({}));
+    let deletedCon;
 
-    // Delete related connections
-    const deletedCon = await prisma.connection.deleteMany({
-      where: {
-        id: id,
-      },
-    });
+    if (id) {
+      // Delete related connections
+      deletedCon = await prisma.connection.deleteMany({
+        where: {
+          id: id,
+        },
+      });
+    } else {
+      deletedCon = await prisma.connection.deleteMany()
+    }
 
     return NextResponse.json(deletedCon);
   } catch (error) {
