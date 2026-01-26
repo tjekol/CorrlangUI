@@ -11,6 +11,7 @@ import {
   atrConAtom,
   nodeAtom,
   multiConAtom,
+  nodeConAtom,
 } from '../GlobalValues';
 
 interface NodeProps extends INode {
@@ -43,6 +44,7 @@ export default function Node({
 
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
+  const cons = useAtomValue(nodeConAtom);
   const multiCons = useAtomValue(multiConAtom);
   const atrCons = useAtomValue(atrConAtom);
   const height = 40;
@@ -69,8 +71,8 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasEdges =
-    edges.some((edge) => edge.srcNodeID === id || edge.trgtNodeID === id) ||
+  const hasConnection =
+    cons.some((con) => con.srcNodeID === id || con.trgtNodeID === id) ||
     multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
 
   const moveNode = (newX: number, newY: number) => {
@@ -149,7 +151,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges ? 'opacity-100' : 'opacity-40'
+          hasConnection ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -165,7 +167,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges ? 'opacity-100' : 'opacity-40'
+          hasConnection ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -226,7 +228,7 @@ export default function Node({
             {/* Left circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasEdges && 'hover:opacity-100'
+                hasConnection && 'hover:opacity-100'
               }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
@@ -235,7 +237,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasEdges) {
+                if (hasConnection) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,
@@ -251,7 +253,7 @@ export default function Node({
             {/* Right circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasEdges && 'hover:opacity-100'
+                hasConnection && 'hover:opacity-100'
               } ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
@@ -260,7 +262,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasEdges) {
+                if (hasConnection) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,

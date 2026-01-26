@@ -14,16 +14,15 @@ export const nodeAtom = atom<INode[]>([]);
 export const atrAtom = atom<IAttribute[]>([]);
 
 export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F', '#F78DA7']
+export const nodeLengthAtom = atom<number>(0); // [{ id: 1, length: 6 }]
 
 // Edges
 export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
-export const multiConAtom = atom<IMultiConnection[]>([]); // [ { id: 1,  nodes: [1,2,3] }, { id: 2,  nodes: [1,2,3] } ]
 
 // Connection
 export const nodeConAtom = atom<IConnection[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
+export const multiConAtom = atom<IMultiConnection[]>([]); // [ { id: 1,  nodes: [1,2,3] }, { id: 2,  nodes: [1,2,3] } ]
 export const atrConAtom = atom<IAtrConnection[]>([]); // [{ id: 1, srcAtrID: 1, trgtAtrID: 2 }]
-
-export const nodeLengthAtom = atom<number>(0); // [{ id: 1, length: 6 }]
 
 // Live positions for edge source and target
 export const liveNodePositionsAtom = atom<LiveNodePosition[]>([]); // [ {nodeID: 1, positionX: 0, positionY: 0} ]

@@ -41,7 +41,7 @@ export const useAtrCon = () => {
       return;
     }
     const edgeData: IAtrConnection = await res.json();
-    console.log(`Added attribute edge: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
+    console.log(`Added attribute connection: ${edgeData.id} between attributes ${srcAtrID}-${trgtAtrID}`);
     setAtrCons(prev => [...prev, edgeData]);
   })
 
