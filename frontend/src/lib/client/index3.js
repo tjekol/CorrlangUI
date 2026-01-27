@@ -6,7 +6,7 @@ import { prisma } from '../prisma.ts';
 
 var client = new services.CoreServiceClient(
   'localhost:6969',
-  grpc.credentials.createInsecure()
+  grpc.credentials.createInsecure(),
 );
 
 var msg = new messages.GetStatusRequest();
@@ -48,50 +48,52 @@ function registerNode(request) {
           where: { title: schema.getName() },
         });
 
+        /* Nodes */
         for (const e of elems) {
           let t = e.getElementtype();
           if (t === ccp.SchemaElementKind.OBJECT_TYPE) {
             let n = e.getFullyqualifiedname().getPartsList()[0];
-            console.log(`Element: ${n} `);
+            console.log(` Element: ${n} `);
             await prisma.node.create({
               data: { title: n, schemaID: s.id },
             });
           }
         }
-
+        /* Attributes */
         for (const e of elems) {
           let t = e.getElementtype();
-          if (t === ccp.SchemaElementKind.ATTRIBUTE) {
+          if (
+            t === ccp.SchemaElementKind.ATTRIBUTE ||
+            t === ccp.SchemaElementKind.REFERENCE
+          ) {
             let atr = e.getFullyqualifiedname().getPartsList()[1];
             console.log(`   Attribute: ${atr} `);
             let atrOwner = e.getFullyqualifiedname().getPartsList()[0];
             let node = await prisma.node.findFirst({
               where: { title: atrOwner, schemaID: s.id },
             });
-            // console.log(`   Owner: ${atrOwner} `);
 
-            const dataType = e
-              .getAttributetypedetails()
-              .getDatatypename()
-              .getPartsList()[0];
+            let dataType;
+            if (t === ccp.SchemaElementKind.ATTRIBUTE) {
+              dataType = e
+                .getAttributetypedetails()
+                .getDatatypename()
+                .getPartsList()[0];
+            } else if (t === ccp.SchemaElementKind.REFERENCE) {
+              dataType = e
+                .getReferencetypedetails()
+                .getTrgtypename()
+                .getPartsList()[0];
+            }
 
             await prisma.attribute.create({
               data: {
                 nodeID: node.id,
                 text: atr,
-                type:
-                  dataType === 'ID'
-                    ? 0
-                    : dataType === 'Int'
-                    ? 1
-                    : dataType === 'String'
-                    ? 2
-                    : 3,
+                type: dataType,
               },
             });
-            // console.log(
-            //   `Attribute: ${e.getAttributetypedetails().getDatatypename()}`
-            // );
+            console.log(`     AttributeType: ${dataType}`);
           }
         }
         resolve(schema);

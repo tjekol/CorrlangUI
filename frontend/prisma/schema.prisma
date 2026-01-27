@@ -48,7 +48,7 @@ model Attribute {
   id  Int   @id @default(autoincrement())
   nodeID Int
   text String
-  type Int @default(0)
+  type String?
   
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AtrConnection[] @relation(name: "source")

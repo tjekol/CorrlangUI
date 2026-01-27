@@ -282,16 +282,7 @@ export default function Node({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.text}:{' '}
-              {attribute.type === 0
-                ? 'ID'
-                : attribute.type === 1
-                  ? 'Int'
-                  : attribute.type === 2
-                    ? 'String'
-                    : attribute.type === 3
-                      ? '[]'
-                      : ''}
+              {attribute.text}: {attribute.type || ''}
             </text>
           </g>
         );
