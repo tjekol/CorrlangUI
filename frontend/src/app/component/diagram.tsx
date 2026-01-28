@@ -19,6 +19,7 @@ import { handleMultiCon } from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
+import { useCalculation } from '../hooks/useCalculation';
 
 export default function Diagram() {
   const { schemas } = useSchemas();
@@ -27,6 +28,7 @@ export default function Diagram() {
   const { cons, createCon } = useConnection();
   const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
+  const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
   const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
@@ -74,12 +76,8 @@ export default function Diagram() {
         const elk = new ELK();
 
         const calculateNodeWidth = (node: INode) => {
-          const labels = node.attributes.map((attr: IAttribute) => attr.text);
-          const maxLength = Math.max(
-            node.title.length,
-            ...labels.map((l: string) => l.length),
-          );
-          return Math.max(maxLength * 15, 120);
+          const width = calculateNodeLength(node.attributes, node.title);
+          return Math.max(width, 100);
         };
 
         const calculateNodeHeight = (node: INode) => {
@@ -137,7 +135,7 @@ export default function Diagram() {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '80',
+            'elk.spacing.nodeNode': '40',
           },
           children,
           edges: elkEdges,

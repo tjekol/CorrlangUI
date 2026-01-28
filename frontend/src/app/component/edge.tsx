@@ -2,7 +2,7 @@
 
 import { useAtomValue } from 'jotai';
 import { edgeAtom, nodeAtom } from '../GlobalValues';
-import { usePositionCalculation } from '../hooks/usePositionCalculation';
+import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
 import { EdgeType } from '../interface/IEdge';
 
@@ -10,7 +10,7 @@ export default function Edge() {
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
 
-  const { getNodePosition, getArrowData } = usePositionCalculation();
+  const { getNodePosition, getArrowData } = useCalculation();
 
   const getNodes = (
     edgeID: number,

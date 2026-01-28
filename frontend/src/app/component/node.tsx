@@ -13,6 +13,7 @@ import {
   multiConAtom,
   nodeConAtom,
 } from '../GlobalValues';
+import { useCalculation } from '../hooks/useCalculation';
 
 interface NodeProps extends INode {
   color: string;
@@ -40,8 +41,9 @@ export default function Node({
 
   const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
-  const [nodeLength, setNodeLength] = useAtom(nodeLengthAtom);
+  const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
 
+  const { calculateNodeLength } = useCalculation();
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
   const cons = useAtomValue(nodeConAtom);
@@ -50,20 +52,18 @@ export default function Node({
   const height = 40;
 
   useLayoutEffect(() => {
-    const labels = [
-      ...attributes.map((label) => label.text),
-      ...nodes.map((node) => node.title),
-    ];
-    const strLenghts = labels.map((str) => str.length);
-    const maxStringLength = Math.max(...strLenghts);
-    const width = maxStringLength * 12;
+    const width = calculateNodeLength(attributes, title);
 
-    if (!width || width < 5) {
-      setNodeLength(60 * 15);
-    } else {
-      setNodeLength(width);
-    }
-  }, []);
+    setNodeLengths((prevLengths) => {
+      const existing = prevLengths.find((item) => item.id === id);
+      if (existing) {
+        return prevLengths;
+      }
+      return [...prevLengths, { id: id, length: width }];
+    });
+  }, [id]);
+
+  const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
   const rightCirclePosition = {

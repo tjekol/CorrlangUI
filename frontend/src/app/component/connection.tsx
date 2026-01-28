@@ -8,7 +8,7 @@ import {
   nodeConAtom,
 } from '../GlobalValues';
 import { useEffect, useState } from 'react';
-import { usePositionCalculation } from '../hooks/usePositionCalculation';
+import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
 import { useAttributes } from '../hooks/useAttributes';
 import { useAtrCon } from '../hooks/useAtrCon';
@@ -47,10 +47,11 @@ export default function Connection({
     getNodePosition,
     getPathData,
     getTempPathData,
+    getNode,
     getAttributePosition,
     getMidpoint,
     getShortestPath,
-  } = usePositionCalculation();
+  } = useCalculation();
 
   // calculate midpoint for a path
   const calculateMidpoint = (pathElement: SVGPathElement, edgeID: number) => {
@@ -165,7 +166,7 @@ export default function Connection({
                         );
                       }
                     }}
-                    d={getPathData(pos1, pos2)}
+                    d={getPathData(srcNode.id, pos1, trgtNode.id, pos2)}
                     stroke='black'
                     strokeWidth={3.5}
                     // strokeDasharray={'10,10'}
@@ -245,7 +246,7 @@ export default function Connection({
                   key={`${multiConID}-${index}`}
                   stroke='#818181'
                   strokeWidth={3}
-                  d={getShortestPath(midpoint, position)}
+                  d={getShortestPath(midpoint, position, nodeIDs[index])}
                 />
                 {/* diamond */}
                 <path
@@ -282,11 +283,13 @@ export default function Connection({
           const pos1 = getAttributePosition(srcAtrID);
           const pos2 = getAttributePosition(trgtAtrID);
 
-          if (pos1 && pos2) {
+          const srcNode = getNode(srcAtrID);
+          const trgtNode = getNode(trgtAtrID);
+          if (pos1 && pos2 && srcNode && trgtNode) {
             return (
               <path
                 key={atrConID}
-                d={getPathData(pos1, pos2)}
+                d={getPathData(srcNode.id, pos1, trgtNode.id, pos2)}
                 stroke='#818181'
                 strokeWidth={3}
                 // strokeDasharray={'5,5'}

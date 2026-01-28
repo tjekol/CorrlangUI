@@ -14,7 +14,7 @@ export const nodeAtom = atom<INode[]>([]);
 export const atrAtom = atom<IAttribute[]>([]);
 
 export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F', '#F78DA7']
-export const nodeLengthAtom = atom<number>(0); // [{ id: 1, length: 6 }]
+export const nodeLengthAtom = atom<{ id: number, length: number }[]>([]); // [{ id: 1, length: 6 }]
 
 // Edges
 export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]

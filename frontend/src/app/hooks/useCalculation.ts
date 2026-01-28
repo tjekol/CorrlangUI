@@ -1,12 +1,24 @@
 import { useAtomValue } from 'jotai';
 import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
+import { IAttribute } from '../interface/IAttribute';
 
-export const usePositionCalculation = () => {
+export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
   const nodes = useAtomValue(nodeAtom);
-  const nodeLength = useAtomValue(nodeLengthAtom);
+  const nodeLengths = useAtomValue(nodeLengthAtom);
   const height = 40
+
+
+
+  const getNode = (attributeID: number): INode | null => {
+    const parentNode = nodes.find((node) =>
+      node.attributes.some((attr) => attr.id === attributeID)
+    );
+    if (!parentNode) return null;
+
+    return parentNode;
+  };
 
   const getNodePosition = (nodeID: number) => {
     const livePos = livePositions.find((pos) => pos.nodeID === nodeID);
@@ -24,14 +36,27 @@ export const usePositionCalculation = () => {
         x: position.x,
         y: position.y,
       };
+    } else {
+      return {
+        x: 0,
+        y: 0,
+      };
     }
-    return null;
   };
 
-  const getAttributePosition = (attributeID: number) => {
-    const parentNode = nodes.find((node) =>
-      node.attributes.some((attr) => attr.id === attributeID)
+  const calculateNodeLength = (attributes: IAttribute[], title: string) => {
+    const labels = [...attributes.map((label) => label.text)];
+    const strLenghts = labels.map((str) =>
+      str.length > 5 ? str.length * 1.8 : str.length,
     );
+    const maxStringLength = Math.max(...strLenghts, title.length);
+    const width = maxStringLength * 12;
+
+    return width
+  }
+
+  const getAttributePosition = (attributeID: number) => {
+    const parentNode = getNode(attributeID)
     if (!parentNode) return null;
     const attributeIndex = parentNode.attributes.findIndex(
       (attr) => attr.id === attributeID
@@ -51,23 +76,28 @@ export const usePositionCalculation = () => {
   };
 
   const getPathData = (
+    srcNodeID: number,
     pos1: { x: number; y: number },
+    trgtNodeID: number,
     pos2: { x: number; y: number }
   ): string => {
+    const srcNodeLength = nodeLengths.find((l) => l.id === srcNodeID)?.length || 0
+    const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNodeID)?.length || 0
+
     const pos1Y = pos1.y + height / 2
     const pos2Y = pos2.y + height / 2
 
     // connect to left or rigth circle closest to pos2
     const diff1X = pos2.x - pos1.x;
-    const diff1XWidth = pos2.x - (pos1.x + nodeLength);
+    const diff1XWidth = pos2.x - (pos1.x + srcNodeLength);
     const pos1X =
-      Math.abs(diff1X) < Math.abs(diff1XWidth) ? pos1.x : pos1.x + nodeLength;
+      Math.abs(diff1X) < Math.abs(diff1XWidth) ? pos1.x : pos1.x + srcNodeLength;
 
     // conntect to left or rigth circle closest to pos1
     const diff2X = pos1X - pos2.x;
-    const diff2XWidth = pos1X - (pos2.x + nodeLength);
+    const diff2XWidth = pos1X - (pos2.x + trgtNodeLength);
     const pos2X =
-      Math.abs(diff2X) < Math.abs(diff2XWidth) ? pos2.x : pos2.x + nodeLength;
+      Math.abs(diff2X) < Math.abs(diff2XWidth) ? pos2.x : pos2.x + trgtNodeLength;
 
     const actualDiffY = pos1Y - pos2Y;
     if (actualDiffY < 1 && actualDiffY > -1) {
@@ -99,7 +129,15 @@ export const usePositionCalculation = () => {
     };
   }
 
-  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }) => {
+  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number) => {
+    let nodeLength = 0;
+    if (nodeID) {
+      nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
+    } else {
+      const livePos = livePositions.find(pos => pos.positionX === position.x && pos.positionY === position.y);
+      nodeLength = nodeLengths.find(l => l.id === livePos?.nodeID)?.length || 0;
+    }
+
     const diffX = midpoint.x - position.x;
     const diffXWidth = midpoint.x - (position.x + nodeLength);
     const positionX =
@@ -118,13 +156,13 @@ export const usePositionCalculation = () => {
   const getArrowData = (pos1: { x: number; y: number }, pos2: { x: number; y: number }, srcNode: INode, trgtNode: INode) => {
     // height of node + attributes
     const srcHeaderHeight = pos1.y + height
-    const srcNodeLength = srcNode.attributes.length
+    const srcNodeWidth = srcNode.attributes.length
     const trgtHeaderHeight = pos2.y + height
-    const trgtNodeLength = trgtNode.attributes.length
+    const trgtNodeWidth = trgtNode.attributes.length
 
-    const trgtNodeHeight = trgtNodeLength <= 0 ? trgtHeaderHeight : trgtNodeLength === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtNodeLength) / 1.4;
+    const trgtNodeHeight = trgtNodeWidth <= 0 ? trgtHeaderHeight : trgtNodeWidth === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtNodeWidth) / 1.4;
 
-    const pos1Y = srcNodeLength <= 0 ? srcHeaderHeight : srcNodeLength === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcNodeLength) / 1.4;
+    const pos1Y = srcNodeWidth <= 0 ? srcHeaderHeight : srcNodeWidth === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcNodeWidth) / 1.4;
 
     // connect to top/bottom of node closest to other node
     const diff2Y = pos1Y - pos2.y;
@@ -132,11 +170,14 @@ export const usePositionCalculation = () => {
     const pos2Y =
       Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeHeight;
 
-    const pos1X = pos1.x + nodeLength / 2;
-    const pos2X = pos2.x + nodeLength / 2;
+    const srcNodeLength = nodeLengths.find((l) => l.id === srcNode.id)?.length || 100
+    const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNode.id)?.length || 100
+
+    const pos1X = pos1.x + srcNodeLength / 2;
+    const pos2X = pos2.x + trgtNodeLength / 2;
 
     return { pos1X, pos1Y, pos2X, pos2Y }
   }
 
-  return { getNodePosition, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
+  return { getNode, getNodePosition, calculateNodeLength, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
 }
