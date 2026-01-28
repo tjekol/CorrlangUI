@@ -49,6 +49,7 @@ model Attribute {
   nodeID Int
   text String
   type String?
+  isArray Boolean @default(false)
   
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AtrConnection[] @relation(name: "source")

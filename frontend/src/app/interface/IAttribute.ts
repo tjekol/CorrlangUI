@@ -3,4 +3,5 @@ export interface IAttribute {
   nodeID: number;
   text: string;
   type: string;
+  isArray: boolean;
 }

@@ -74,6 +74,7 @@ function registerNode(request) {
             });
 
             let dataType;
+            let isArray = false;
             if (t === ccp.SchemaElementKind.ATTRIBUTE) {
               dataType = e
                 .getAttributetypedetails()
@@ -84,6 +85,11 @@ function registerNode(request) {
                 .getReferencetypedetails()
                 .getTrgtypename()
                 .getPartsList()[0];
+
+              isArray = e
+                .getReferencetypedetails()
+                .getMultiplicity()
+                .getIsordered();
             }
 
             await prisma.attribute.create({
@@ -91,6 +97,7 @@ function registerNode(request) {
                 nodeID: node.id,
                 text: atr,
                 type: dataType,
+                isArray: isArray,
               },
             });
             console.log(`     AttributeType: ${dataType}`);
