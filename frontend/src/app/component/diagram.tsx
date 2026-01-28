@@ -66,6 +66,11 @@ export default function Diagram() {
     setPendingAtrCon,
   );
 
+  const [diagramDimensions, setDiagramDimensions] = useState({
+    width: 800,
+    height: 600,
+  });
+
   useEffect(() => {
     if (!nodes || nodes.length === 0) return;
 
@@ -149,6 +154,29 @@ export default function Diagram() {
             positionY: (child.y || 0) + 20,
           }));
           setLiveNodePositions(newPositions);
+
+          // dynamic dimensions based on node positions and sizes
+          if (newPositions.length > 0) {
+            const maxX = Math.max(
+              ...newPositions.map((pos, index) => {
+                const node = nodes.find((n) => n.id === pos.nodeID);
+                return pos.positionX + (node ? calculateNodeWidth(node) : 120);
+              }),
+            );
+            const maxY = Math.max(
+              ...newPositions.map((pos, index) => {
+                const node = nodes.find((n) => n.id === pos.nodeID);
+                return pos.positionY + (node ? calculateNodeHeight(node) : 80);
+              }),
+            );
+
+            const minWidth = 800;
+            const minHeight = 600;
+            setDiagramDimensions({
+              width: Math.max(maxX + 100, minWidth), // 100px padding
+              height: Math.max(maxY + 100, minHeight), // 100px padding
+            });
+          }
         }
       } catch (error) {
         console.error('Failed to load ELK:', error);
@@ -161,8 +189,13 @@ export default function Diagram() {
   }, [nodes, cons, edges, multiCons, setLiveNodePositions]);
 
   return (
-    <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-hidden'>
-      <svg width='100%' height='100%'>
+    <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
+      <svg
+        width={diagramDimensions.width}
+        height={diagramDimensions.height}
+        overflow='visible'
+        className='min-w-full'
+      >
         <defs>
           <marker
             id='line'
