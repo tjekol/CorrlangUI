@@ -1,6 +1,6 @@
 import { INode } from '../INode';
 
-export interface IMultiEdge {
+export interface IMultiConnection {
   id: number;
   nodes: INode[];
 }

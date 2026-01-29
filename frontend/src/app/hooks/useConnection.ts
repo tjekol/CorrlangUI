@@ -51,7 +51,7 @@ export const useConnection = () => {
     )
   })
 
-  const deleteCons = (id: number) => handleAsync(async () => {
+  const deleteCon = (id: number) => handleAsync(async () => {
     const res = await fetch('/api/connections', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -65,7 +65,21 @@ export const useConnection = () => {
     setCon(prev => prev.filter(con => con.id !== id));
   })
 
+  const deleteAllCons = () => handleAsync(async () => {
+    const res = await fetch('/api/connections', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to delete all connections');
+    }
+    console.log(`Removed all connections`);
+    setCon([]);
+  })
+
   useEffect(() => { fetchCons(); }, [])
 
-  return { cons, loading, createCon, deleteCons };
+  return { cons, loading, createCon, deleteCon, deleteAllCons };
 };

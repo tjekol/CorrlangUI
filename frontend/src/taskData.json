@@ -1,11 +1,6 @@
 [
   {
-    "taskText": "Connect client and customer together.",
-    "classes": {
-      "Sales": ["Store", "Address", "Customer", "Purchase", "PurchaseItem"],
-      "Invoices": ["Address", "Client", "PaymentDetails"],
-      "HR": ["Department", "Employee", "BankDetails"]
-    }
+    "taskText": "Connect the client node and the customer node together."
   },
   {
     "taskText": "Connect employee and customer together."

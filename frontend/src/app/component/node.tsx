@@ -8,17 +8,19 @@ import {
   liveAtrPositionsAtom,
   nodeLengthAtom,
   edgeAtom,
-  attrConAtom,
+  atrConAtom,
   nodeAtom,
-  multiEdgeAtom,
+  multiConAtom,
+  nodeConAtom,
 } from '../GlobalValues';
+import { useCalculation } from '../hooks/useCalculation';
 
 interface NodeProps extends INode {
   color: string;
   onHeaderClick: (id: number, circlePosition: { x: number; y: number }) => void;
   onAttributeClick: (
     id: number,
-    circlePosition: { x: number; y: number }
+    circlePosition: { x: number; y: number },
   ) => void;
 }
 
@@ -39,29 +41,29 @@ export default function Node({
 
   const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
-  const [nodeLength, setNodeLength] = useAtom(nodeLengthAtom);
+  const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
 
+  const { calculateNodeLength } = useCalculation();
   const nodes = useAtomValue(nodeAtom);
   const edges = useAtomValue(edgeAtom);
-  const multiEdges = useAtomValue(multiEdgeAtom);
-  const attrEdges = useAtomValue(attrConAtom);
+  const cons = useAtomValue(nodeConAtom);
+  const multiCons = useAtomValue(multiConAtom);
+  const atrCons = useAtomValue(atrConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
-    const labels = [
-      ...attributes.map((label) => label.text),
-      ...nodes.map((node) => node.title),
-    ];
-    const strLenghts = labels.map((str) => str.length);
-    const maxStringLength = Math.max(...strLenghts);
-    const width = maxStringLength * 12;
+    const width = calculateNodeLength(attributes, title);
 
-    if (!width || width < 5) {
-      setNodeLength(60 * 15);
-    } else {
-      setNodeLength(width);
-    }
-  }, []);
+    setNodeLengths((prevLengths) => {
+      const existing = prevLengths.find((item) => item.id === id);
+      if (existing) {
+        return prevLengths;
+      }
+      return [...prevLengths, { id: id, length: width }];
+    });
+  }, [id]);
+
+  const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
   const rightCirclePosition = {
@@ -69,11 +71,9 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasEdges =
-    edges.some((edge) => edge.srcNodeID === id || edge.trgtNodeID === id) ||
-    multiEdges.some((multiEdge) =>
-      multiEdge.nodes.some((node) => node.id === id)
-    );
+  const hasConnection =
+    cons.some((con) => con.srcNodeID === id || con.trgtNodeID === id) ||
+    multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
@@ -84,7 +84,7 @@ export default function Node({
         return prev.map((pos) =>
           pos.nodeID === id
             ? { nodeID: id, positionX: newX, positionY: newY }
-            : pos
+            : pos,
         );
       } else {
         return [...prev, { nodeID: id, positionX: newX, positionY: newY }];
@@ -93,7 +93,7 @@ export default function Node({
 
     setLiveAtrPosition((prev) => {
       const filteredPrev = prev.filter(
-        (atr) => !attributes.some((attr) => attr.id === atr.attributeID)
+        (atr) => !attributes.some((attr) => attr.id === atr.attributeID),
       );
 
       const newAtrPositions = attributes
@@ -141,7 +141,8 @@ export default function Node({
         strokeWidth={1}
         rx={5}
         onMouseDown={(e) => (
-          setIsDragging(true), handleMouseDown(e.clientX, e.clientY)
+          setIsDragging(true),
+          handleMouseDown(e.clientX, e.clientY)
         )}
         onMouseMove={(e) => handleMouseMove(e.clientX, e.clientY)}
         onMouseUp={() => setIsDragging(false)}
@@ -150,7 +151,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges ? 'opacity-100' : 'opacity-40'
+          hasConnection ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -166,7 +167,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasEdges ? 'opacity-100' : 'opacity-40'
+          hasConnection ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -214,9 +215,9 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isActive = attrEdges.some(
+        const isActive = atrCons.some(
           (atr) =>
-            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id
+            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
         );
 
         const alertMsg =
@@ -227,7 +228,7 @@ export default function Node({
             {/* Left circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasEdges && 'hover:opacity-100'
+                hasConnection && 'hover:opacity-100'
               }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
@@ -236,14 +237,14 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasEdges) {
-                  console.log(
+                if (hasConnection) {
+                  (console.log(
                     'Clicked on attribute: ',
                     attribute,
                     attribute.id,
-                    leftCirclePosition
+                    leftCirclePosition,
                   ),
-                    onAttributeClick(attribute.id, leftCirclePosition);
+                    onAttributeClick(attribute.id, leftCirclePosition));
                 } else {
                   alert(alertMsg);
                 }
@@ -252,7 +253,7 @@ export default function Node({
             {/* Right circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasEdges && 'hover:opacity-100'
+                hasConnection && 'hover:opacity-100'
               } ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
@@ -261,14 +262,14 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasEdges) {
-                  console.log(
+                if (hasConnection) {
+                  (console.log(
                     'Clicked on attribute: ',
                     attribute,
                     attribute.id,
-                    leftCirclePosition
+                    leftCirclePosition,
                   ),
-                    onAttributeClick(attribute.id, rightCirclePosition);
+                    onAttributeClick(attribute.id, rightCirclePosition));
                 } else {
                   alert(alertMsg);
                 }
@@ -282,15 +283,9 @@ export default function Node({
               pointerEvents='none'
             >
               {attribute.text}:{' '}
-              {attribute.type === 0
-                ? 'ID'
-                : attribute.type === 1
-                ? 'Int'
-                : attribute.type === 2
-                ? 'String'
-                : attribute.type === 3
-                ? '[]'
-                : ''}
+              {attribute.isArray
+                ? `[${attribute.type || ''}]`
+                : `${attribute.type || ''}`}
             </text>
           </g>
         );

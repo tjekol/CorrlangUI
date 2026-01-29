@@ -1,22 +1,25 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
 import tasks from '@/taskData.json';
 import Link from 'next/link';
 import Diagram from '@/app/component/diagram';
+import { useConnection } from '@/app/hooks/useConnection';
+import { useMultiCon } from '@/app/hooks/useMultiCon';
+import { useAtrCon } from '@/app/hooks/useAtrCon';
 
 export default function Task() {
   const params = useParams();
   const slug = params.slug;
   const currentTask = tasks.find((t, i) => i + 1 === Number(slug));
-  const classes = currentTask?.classes;
+  const { deleteAllCons } = useConnection();
+  const { deleteAllMultiCons } = useMultiCon();
+  const { deleteAllAtrCons } = useAtrCon();
 
-  const [text, setText] = useState<string>('');
-  const [output, setOutput] = useState<string>('');
-
-  const compileOutput = (text: string) => {
-    setOutput(text);
+  const reset = () => {
+    deleteAllCons();
+    deleteAllMultiCons();
+    deleteAllAtrCons();
   };
 
   return (
@@ -33,22 +36,12 @@ export default function Task() {
         <div className='flex justify-between'>
           <p className='self-end'>Input</p>
           <button
-            onClick={() => compileOutput(text)}
+            onClick={() => reset()}
             className='border-1 rounded-full px-4 py-1'
           >
-            Compile
+            Reset
           </button>
         </div>
-
-        {/* <textarea
-          className='bg-gray border-1 p-5 rounded-sm'
-          rows={10}
-          cols={10}
-          onChange={(e) => setText(e.target.value)}
-          defaultValue={Object.entries(classes ?? {})
-            .map(([k, v]) => `${k}: ${v.join(', ')} \n`)
-            .join('')}
-        /> */}
         <Diagram />
         {/* <p className='self-end'>Output</p>
         <p className='bg-gray min-h-100 p-5 rounded-sm border-1 whitespace-pre-wrap'>

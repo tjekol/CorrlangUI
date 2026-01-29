@@ -4,36 +4,39 @@ import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useConnection } from '../hooks/useConnection';
-import { useAttributeEdges } from '../hooks/useAttributeEdges';
+import { useAtrCon } from '../hooks/useAtrCon';
 import { useEffect, useState } from 'react';
 import { handleConnection } from '../handler/handleConnection';
-import { handleAttributeEdge } from '../handler/handleAtrEdge';
+import { handleMultiConUpd } from '../handler/handleMultiConUpd';
+import { handleAtrCon } from '../handler/handleAtrCon';
 import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
-import { handleMultiEdge } from '../handler/handleMultiEdge';
-import { useMultiEdges } from '../hooks/useMultiEdges';
+import { handleMultiCon } from '../handler/handleMultiCon';
+import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
+import { useCalculation } from '../hooks/useCalculation';
 
 export default function Diagram() {
   const { schemas } = useSchemas();
   const { nodes, loading } = useNodes();
   const { edges, edgeLoading } = useEdges();
   const { cons, createCon } = useConnection();
-  const { multiEdges, createMultiEdge } = useMultiEdges();
-  const { attributeEdges, createAttributeEdge } = useAttributeEdges();
+  const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
+  const { atrCons, createAtrCon } = useAtrCon();
+  const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
   const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
-    null
+    null,
   );
   const [liveNodePositions, setLiveNodePositions] = useAtom(
-    liveNodePositionsAtom
+    liveNodePositionsAtom,
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
 
@@ -41,24 +44,35 @@ export default function Diagram() {
     cons,
     createCon,
     pendingCon,
-    setPendingCon
+    setPendingCon,
   );
 
-  const handleEdgeClick = handleMultiEdge(
-    createMultiEdge,
+  const handleConClick = handleMultiCon(
+    createMultiCon,
     pendingCon,
-    setPendingCon
+    setPendingCon,
   );
 
-  const handleAttributeClick = handleAttributeEdge(
-    attributeEdges,
-    createAttributeEdge,
-    pendingAtrCon,
-    setPendingAtrCon
+  const handleMultiClick = handleMultiConUpd(
+    updateMultiCon,
+    pendingCon,
+    setPendingCon,
   );
+
+  const handleAttributeClick = handleAtrCon(
+    atrCons,
+    createAtrCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
+
+  const [diagramDimensions, setDiagramDimensions] = useState({
+    width: 800,
+    height: 600,
+  });
 
   useEffect(() => {
-    if (nodes.length === 0) return;
+    if (!nodes || nodes.length === 0) return;
 
     const loadELK = async () => {
       setLayoutLoading(true);
@@ -67,12 +81,8 @@ export default function Diagram() {
         const elk = new ELK();
 
         const calculateNodeWidth = (node: INode) => {
-          const labels = node.attributes.map((attr: IAttribute) => attr.text);
-          const maxLength = Math.max(
-            node.title.length,
-            ...labels.map((l: string) => l.length)
-          );
-          return Math.max(maxLength * 15, 120);
+          const width = calculateNodeLength(node.attributes, node.title);
+          return Math.max(width, 100);
         };
 
         const calculateNodeHeight = (node: INode) => {
@@ -109,26 +119,28 @@ export default function Diagram() {
           });
         });
 
-        multiEdges.forEach((multiEdge) => {
-          const nodes = multiEdge.nodes;
-          nodes.map((node, index) => {
-            elkEdges.push({
-              id: `edgeID-${multiEdge.id}${index}`,
-              sources: [node.id.toString()],
-              targets: [
-                index >= nodes.length - 1
-                  ? nodes[0].id.toString()
-                  : nodes[index + 1].id.toString(),
-              ],
+        multiCons.forEach((multiCon) => {
+          const nodes = multiCon.nodes;
+          if (nodes) {
+            nodes.map((node, index) => {
+              elkEdges.push({
+                id: `edgeID-${multiCon.id}${index}`,
+                sources: [node.id.toString()],
+                targets: [
+                  index >= nodes.length - 1
+                    ? nodes[0].id.toString()
+                    : nodes[index + 1].id.toString(),
+                ],
+              });
             });
-          });
+          }
         });
 
         const graph = {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '60',
+            'elk.spacing.nodeNode': '40',
           },
           children,
           edges: elkEdges,
@@ -142,6 +154,29 @@ export default function Diagram() {
             positionY: (child.y || 0) + 20,
           }));
           setLiveNodePositions(newPositions);
+
+          // dynamic dimensions based on node positions and sizes
+          if (newPositions.length > 0) {
+            const maxX = Math.max(
+              ...newPositions.map((pos, index) => {
+                const node = nodes.find((n) => n.id === pos.nodeID);
+                return pos.positionX + (node ? calculateNodeWidth(node) : 120);
+              }),
+            );
+            const maxY = Math.max(
+              ...newPositions.map((pos, index) => {
+                const node = nodes.find((n) => n.id === pos.nodeID);
+                return pos.positionY + (node ? calculateNodeHeight(node) : 80);
+              }),
+            );
+
+            const minWidth = 800;
+            const minHeight = 600;
+            setDiagramDimensions({
+              width: Math.max(maxX + 100, minWidth), // 100px padding
+              height: Math.max(maxY + 100, minHeight), // 100px padding
+            });
+          }
         }
       } catch (error) {
         console.error('Failed to load ELK:', error);
@@ -151,11 +186,16 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, cons, multiEdges, edges, setLiveNodePositions]);
+  }, [nodes, cons, edges, multiCons, setLiveNodePositions]);
 
   return (
-    <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-hidden'>
-      <svg width='100%' height='100%'>
+    <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
+      <svg
+        width={diagramDimensions.width}
+        height={diagramDimensions.height}
+        overflow='visible'
+        className='min-w-full'
+      >
         <defs>
           <marker
             id='line'
@@ -222,7 +262,8 @@ export default function Diagram() {
         })}
         <Edge />
         <Connection
-          onEdgeClick={handleEdgeClick}
+          onConClick={handleConClick}
+          onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
         />
@@ -233,7 +274,7 @@ export default function Diagram() {
         ) : (
           nodes.map((n, i) => {
             const livePositions = liveNodePositions.find(
-              (pos) => pos.nodeID === n.id
+              (pos) => pos.nodeID === n.id,
             );
 
             const schemaIndex = schemas.findIndex((s) => s.id === n.schemaID);

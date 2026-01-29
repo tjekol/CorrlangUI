@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all attribute edges
+// GET - Fetch all attribute connections
 export async function GET() {
   try {
     const cons = await prisma.atrConnection.findMany();
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating attribute edge:', error);
+    console.error('Error creating attribute connection:', error);
     return NextResponse.json(
       { error: 'Failed to create connection' },
       { status: 500 }
@@ -38,17 +38,22 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - Delete edges by ID
+// DELETE - Delete connections by ID or all
 export async function DELETE(request: NextRequest) {
   try {
-    const { id } = await request.json();
+    const { id } = await request.json().catch(() => ({}));
+    let deletedCon;
 
-    // Delete related edges
-    const deletedCon = await prisma.atrConnection.deleteMany({
-      where: {
-        id: id,
-      },
-    });
+    if (id) {
+      // Delete related connections
+      deletedCon = await prisma.atrConnection.deleteMany({
+        where: {
+          id: id,
+        },
+      });
+    } else {
+      deletedCon = await prisma.atrConnection.deleteMany()
+    }
 
     return NextResponse.json(deletedCon);
   } catch (error) {
