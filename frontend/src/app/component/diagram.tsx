@@ -111,31 +111,6 @@ export default function Diagram() {
           });
         });
 
-        cons.forEach((con) => {
-          elkEdges.push({
-            id: `edgeID-0${con.id}`,
-            sources: [con.srcNodeID.toString()],
-            targets: [con.trgtNodeID.toString()],
-          });
-        });
-
-        multiCons.forEach((multiCon) => {
-          const nodes = multiCon.nodes;
-          if (nodes) {
-            nodes.map((node, index) => {
-              elkEdges.push({
-                id: `edgeID-${multiCon.id}${index}`,
-                sources: [node.id.toString()],
-                targets: [
-                  index >= nodes.length - 1
-                    ? nodes[0].id.toString()
-                    : nodes[index + 1].id.toString(),
-                ],
-              });
-            });
-          }
-        });
-
         const graph = {
           id: 'root',
           layoutOptions: {
@@ -186,7 +161,7 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, cons, edges, multiCons, setLiveNodePositions]);
+  }, [nodes, edges, setLiveNodePositions]);
 
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>

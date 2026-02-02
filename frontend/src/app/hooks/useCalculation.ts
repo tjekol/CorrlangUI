@@ -47,7 +47,7 @@ export const useCalculation = () => {
   const calculateNodeLength = (attributes: IAttribute[], title: string) => {
     const labels = [...attributes.map((label) => label.text)];
     const strLenghts = labels.map((str) =>
-      str.length > 5 ? str.length * 1.8 : str.length,
+      str.length > 5 ? str.length * 1.4 : str.length * 2.5,
     );
     const maxStringLength = Math.max(...strLenghts, title.length);
     const width = maxStringLength * 12;
