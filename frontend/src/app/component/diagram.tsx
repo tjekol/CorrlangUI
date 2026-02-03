@@ -5,7 +5,7 @@ import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useConnection } from '../hooks/useConnection';
 import { useAtrCon } from '../hooks/useAtrCon';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { handleConnection } from '../handler/handleConnection';
 import { handleMultiConUpd } from '../handler/handleMultiConUpd';
 import { handleAtrCon } from '../handler/handleAtrCon';
@@ -13,18 +13,19 @@ import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
-import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
 import { handleMultiCon } from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
+import { useAttributes } from '../hooks/useAttributes';
 
 export default function Diagram() {
-  const { schemas } = useSchemas();
-  const { nodes, loading } = useNodes();
-  const { edges, edgeLoading } = useEdges();
+  const { schemas, refetchSchemas } = useSchemas();
+  const { nodes, loading, refetchNodes } = useNodes();
+  const { attributes, atrLoading, refetchAttributes } = useAttributes();
+  const { edges, edgeLoading, refetchEdges } = useEdges();
   const { cons, createCon } = useConnection();
   const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
@@ -72,7 +73,31 @@ export default function Diagram() {
   });
 
   useEffect(() => {
-    if (!nodes || nodes.length === 0) return;
+    const fetchSequentially = async () => {
+      console.log('🔄 Starting sequential fetch...');
+      await refetchSchemas();
+      console.log('✅ Schemas done');
+      await refetchNodes();
+      console.log('✅ Nodes done');
+      await refetchAttributes();
+      console.log('✅ Attributes done');
+      await refetchEdges();
+      console.log('✅ Edges done');
+    };
+
+    fetchSequentially();
+  }, []);
+
+  const nodesWithAttributes = useMemo(() => {
+    if (!nodes || !attributes) return [];
+    return nodes.map((node) => ({
+      ...node,
+      attributes: attributes.filter((attr) => attr.nodeID === node.id),
+    }));
+  }, [nodes, attributes]);
+
+  useEffect(() => {
+    if (!nodes || nodes.length === 0 || atrLoading || !attributes) return;
 
     const loadELK = async () => {
       setLayoutLoading(true);
@@ -94,7 +119,7 @@ export default function Diagram() {
           return headerHeight + attributeHeight;
         };
 
-        const children = nodes.map((n) => ({
+        const children = nodesWithAttributes.map((n) => ({
           id: n.id.toString(),
           width: calculateNodeWidth(n),
           height: calculateNodeHeight(n),
@@ -134,13 +159,17 @@ export default function Diagram() {
           if (newPositions.length > 0) {
             const maxX = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodes.find((n) => n.id === pos.nodeID);
+                const node = nodesWithAttributes.find(
+                  (n) => n.id === pos.nodeID,
+                );
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodes.find((n) => n.id === pos.nodeID);
+                const node = nodesWithAttributes.find(
+                  (n) => n.id === pos.nodeID,
+                );
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),
             );
@@ -161,7 +190,7 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, edges, setLiveNodePositions]);
+  }, [schemas, nodes, edges, attributes, setLiveNodePositions, atrLoading]);
 
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
@@ -242,12 +271,12 @@ export default function Diagram() {
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
         />
-        {loading || edgeLoading || layoutLoading ? (
+        {loading || edgeLoading || layoutLoading || atrLoading ? (
           <text x={50} y={50}>
-            {loading ? 'Loading...' : 'Calculating layout...'}
+            {loading || atrLoading ? 'Loading...' : 'Calculating layout...'}
           </text>
         ) : (
-          nodes.map((n, i) => {
+          nodesWithAttributes.map((n, i) => {
             const livePositions = liveNodePositions.find(
               (pos) => pos.nodeID === n.id,
             );

@@ -29,7 +29,7 @@ export const useSchemas = () => {
     setSchemas(schemasData);
   })
 
-  useEffect(() => { fetchSchemas(); }, []);
+  // useEffect(() => { fetchSchemas(); }, []);
 
-  return { schemas, loading }
+  return { schemas, loading, refetchSchemas: fetchSchemas }
 }

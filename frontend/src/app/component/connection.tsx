@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai';
 import { useConnection } from '../hooks/useConnection';
 import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import {
+  atrAtom,
   atrConAtom,
   multiConAtom,
   nodeAtom,
@@ -10,7 +11,6 @@ import {
 import { useEffect, useState } from 'react';
 import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
-import { useAttributes } from '../hooks/useAttributes';
 import { useAtrCon } from '../hooks/useAtrCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 
@@ -34,7 +34,7 @@ export default function Connection({
   const atrConHook = useAtrCon();
   const cons = useAtomValue(nodeConAtom);
   const nodes = useAtomValue(nodeAtom);
-  const { attributes } = useAttributes();
+  const attributes = useAtomValue(atrAtom);
 
   const atrConnection = useAtomValue(atrConAtom);
   const multiConnection = useAtomValue(multiConAtom);
