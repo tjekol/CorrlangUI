@@ -8,12 +8,12 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "prisma": "npx prisma migrate dev && npx prisma generate",
-    "db:wipe": "npx tsx src/lib/prisma-wipe.ts",
-    "db:seed": "npx tsx src/lib/prisma-test-seed.ts",
     "studio": "npx prisma studio --config ./prisma.config.ts",
-    "grpc": "node src/lib/client/index.js && node src/lib/client/index2.js && node src/lib/client/index3.js",
-    "setup": "npm run prisma && npm run grpc"
+    "restart": "npm run db:wipe && npm run dev",
+    "db:wipe": "npx tsx src/lib/prisma-wipe.ts",
+    "db:up": "npx prisma migrate dev && npx prisma generate",
+    "grpc": "node src/lib/client/script.js",
+    "setup": "npm run db:up && npm run grpc"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.2",

@@ -15,7 +15,7 @@ Graphic Interface for Corrlang – a lightweight semantic intergration tool.
 ##### 3. In another terminal from the `/frontend` folder
 
 - Install dependencies `npm install`.
-- Run `npm run db:up` to set up database file, generate client files and add data to server.
+- Run `npm run setup` to set up database file, generate client files and add data to server.
 
 ##### 4. Run frontend
 
