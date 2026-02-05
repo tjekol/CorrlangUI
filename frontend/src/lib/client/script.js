@@ -103,32 +103,3 @@ async function injectServer() {
 }
 
 injectServer();
-
-/* Get schema and its elements */
-// var req = new messages.GetSchemaRequest();
-// req.setEndpointid(1);
-
-// var req2 = new messages.GetSchemaRequest();
-// req2.setEndpointid(2);
-
-// var req3 = new messages.GetSchemaRequest();
-// req3.setEndpointid(3);
-// function callback4(error, schema) {
-//   if (error) {
-//     console.log(`Error ${error}`);
-//   } else {
-//     let elems = schema.getElementsList();
-//     console.log(`--------------------`);
-//     elems.map((e) => {
-//       let n = e.getFullyqualifiedname().getPartsList()[0];
-//       let t = e.getElementtype();
-//       if (t === ccp.SchemaElementKind.OBJECT_TYPE) {
-//         console.log(`Element: ${n} `);
-//       }
-//     });
-//   }
-// }
-
-// client.getSchema(req, callback4);
-// client.getSchema(req2, callback4);
-// client.getSchema(req3, callback4);
