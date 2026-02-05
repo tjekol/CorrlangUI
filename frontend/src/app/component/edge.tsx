@@ -1,15 +1,13 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
-import { edgeAtom, nodeAtom } from '../GlobalValues';
+import { nodeAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
-import { EdgeType } from '../interface/IEdge';
+import { EdgeType, IEdge } from '../interface/IEdge';
 
-export default function Edge() {
+export default function Edge({ edges }: { edges: IEdge[] }) {
   const nodes = useAtomValue(nodeAtom);
-  const edges = useAtomValue(edgeAtom);
-
   const { getNodePosition, getArrowData } = useCalculation();
 
   const getNodes = (
