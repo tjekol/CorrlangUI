@@ -36,8 +36,9 @@ model Edge {
   id  Int   @id @default(autoincrement())
   srcNodeID Int
   trgtNodeID Int
-  srcMul String?
-  trgtMul String?
+  lowerBound Int?
+  upperBound Int?
+  isOrdered Boolean @default(false)
   type Int @default(0)
 
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
@@ -49,7 +50,6 @@ model Attribute {
   nodeID Int
   text String
   type String?
-  isArray Boolean @default(false)
   
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AtrConnection[] @relation(name: "source")

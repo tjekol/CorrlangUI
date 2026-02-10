@@ -156,25 +156,34 @@ export const useCalculation = () => {
   const getArrowData = (pos1: { x: number; y: number }, pos2: { x: number; y: number }, srcNode: INode, trgtNode: INode) => {
     // height of node + attributes
     const srcHeaderHeight = pos1.y + height
-    const srcNodeWidth = srcNode.attributes.length
+    const srcAtrLen = srcNode.attributes.length
     const trgtHeaderHeight = pos2.y + height
-    const trgtNodeWidth = trgtNode.attributes.length
+    const trgtAtrLen = trgtNode.attributes.length
 
-    const trgtNodeHeight = trgtNodeWidth <= 0 ? trgtHeaderHeight : trgtNodeWidth === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtNodeWidth) / 1.4;
-
-    const pos1Y = srcNodeWidth <= 0 ? srcHeaderHeight : srcNodeWidth === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcNodeWidth) / 1.4;
+    const trgtNodeBottom = trgtAtrLen <= 0 ? trgtHeaderHeight : trgtAtrLen === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtAtrLen) / 1.4;
+    const srcNodeBottom = srcAtrLen <= 0 ? srcHeaderHeight : srcAtrLen === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcAtrLen) / 1.4;
 
     // connect to top/bottom of node closest to other node
+    const diff1Y = trgtHeaderHeight - pos1.y;
+    const diff1YHeight = trgtHeaderHeight - (srcNodeBottom);
+    const pos1Y =
+      Math.abs(diff1Y) < Math.abs(diff1YHeight) ? pos1.y : srcNodeBottom;
+
     const diff2Y = pos1Y - pos2.y;
-    const diff2YHeight = pos1Y - (trgtNodeHeight);
+    const diff2YHeight = pos1Y - (trgtNodeBottom);
     const pos2Y =
-      Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeHeight;
+      Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeBottom;
 
     const srcNodeLength = nodeLengths.find((l) => l.id === srcNode.id)?.length || 100
     const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNode.id)?.length || 100
 
-    const pos1X = pos1.x + srcNodeLength / 2;
-    const pos2X = pos2.x + trgtNodeLength / 2;
+    const srcRightSide = pos1.x + srcNodeLength
+    const srcMiddle = pos1.x + srcNodeLength / 2
+    const trgtRightSide = pos2.x + trgtNodeLength
+    const trgtMiddle = pos2.x + trgtNodeLength / 2
+
+    const pos1X = pos1.x <= trgtRightSide && srcRightSide >= pos2.x ? srcMiddle : srcRightSide < pos2.x ? srcRightSide : pos1.x;
+    const pos2X = pos2.x <= srcRightSide && trgtRightSide >= pos1.x ? trgtMiddle : trgtRightSide < pos1.x ? trgtRightSide : pos2.x;
 
     return { pos1X, pos1Y, pos2X, pos2Y }
   }

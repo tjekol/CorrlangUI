@@ -69,6 +69,21 @@ function getEdges(id: number) {
                   .getTrgtypename()
                   .getPartsList()[0];
 
+                let lowerbound = e
+                  .getReferencetypedetails()
+                  .getMultiplicity()
+                  .getLowerbound();
+
+                let upperbound = e
+                  .getReferencetypedetails()
+                  .getMultiplicity()
+                  .getUpperbound();
+
+                let isOrdered = e
+                  .getReferencetypedetails()
+                  .getMultiplicity()
+                  .getIsordered();
+
                 let srcNode = await prisma.node.findFirst({
                   where: { title: srcName, schemaID: s.id },
                 });
@@ -84,7 +99,7 @@ function getEdges(id: number) {
 
                   if (!edge)
                     await prisma.edge.create({
-                      data: { srcNodeID: srcNode.id, trgtNodeID: trgtNode.id },
+                      data: { srcNodeID: srcNode.id, trgtNodeID: trgtNode.id, lowerBound: lowerbound, upperBound: upperbound, isOrdered: isOrdered },
                     });
                 }
               }

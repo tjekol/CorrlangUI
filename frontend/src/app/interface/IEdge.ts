@@ -2,8 +2,9 @@ export interface IEdge {
   id: number;
   srcNodeID: number;
   trgtNodeID: number;
-  srcMul: string; // source multiplicity
-  trgtMul: string;
+  lowerBound: number;
+  upperBound: number;
+  isOrdered: boolean;
   type: EdgeType;
 }
 

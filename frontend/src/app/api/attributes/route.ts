@@ -68,7 +68,6 @@ async function getAttributes(id: number) {
 
                 if (node) {
                   let dataType;
-                  let isArray = false;
 
                   dataType = e
                     .getAttributetypedetails()
@@ -79,8 +78,7 @@ async function getAttributes(id: number) {
                     where: {
                       nodeID: node.id,
                       text: atr,
-                      type: dataType,
-                      isArray: isArray,
+                      type: dataType
                     },
                   });
 
@@ -89,8 +87,7 @@ async function getAttributes(id: number) {
                       data: {
                         nodeID: node.id,
                         text: atr,
-                        type: dataType,
-                        isArray: isArray,
+                        type: dataType
                       },
                     });
                   console.log(`     AttributeType: ${dataType}`);

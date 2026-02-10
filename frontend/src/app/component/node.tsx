@@ -277,10 +277,7 @@ export default function Node({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.text}:{' '}
-              {attribute.isArray
-                ? `[${attribute.type || ''}]`
-                : `${attribute.type || ''}`}
+              {attribute.text}: {attribute.type}
             </text>
           </g>
         );
