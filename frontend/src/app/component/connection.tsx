@@ -34,10 +34,10 @@ export default function Connection({
   const conHook = useConnection();
   const multiConHook = useMultiCon();
   const atrConHook = useAtrCon();
-  const cons = useAtomValue(nodeConAtom);
   const nodes = useAtomValue(nodeAtom);
   const attributes = useAtomValue(atrAtom);
 
+  const cons = useAtomValue(nodeConAtom);
   const atrConnection = useAtomValue(atrConAtom);
   const multiConnection = useAtomValue(multiConAtom);
 
@@ -157,6 +157,25 @@ export default function Connection({
             const pos1 = getNodePosition(srcNode.id);
             const pos2 = getNodePosition(trgtNode.id);
             if (pos1 && pos2) {
+              // attributes of nodes
+              const nodeAAtr = attributes.filter(
+                (attr) => attr.nodeID === srcNode.id,
+              );
+              const nodeBAtr = attributes.filter(
+                (attr) => attr.nodeID === trgtNode.id,
+              );
+              const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
+              const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
+
+              // attribute connections between nodes
+              const relevantAtrCons = atrConnection.filter(
+                (atrCon) =>
+                  (nodeAAtrIDs.has(atrCon.srcAtrID) &&
+                    nodeBAtrIDs.has(atrCon.trgtAtrID)) ||
+                  (nodeAAtrIDs.has(atrCon.trgtAtrID) &&
+                    nodeBAtrIDs.has(atrCon.srcAtrID)),
+              );
+
               return (
                 <g key={conID}>
                   <path
@@ -175,24 +194,6 @@ export default function Connection({
                     fill='none'
                     onClick={() => {
                       if (confirm('Delete connection?')) {
-                        const nodeAAtr = attributes.filter(
-                          (attr) => attr.nodeID === srcNode.id,
-                        );
-                        const nodeBAtr = attributes.filter(
-                          (attr) => attr.nodeID === trgtNode.id,
-                        );
-                        const nodeAAtrIDs = new Set(nodeAAtr.map((a) => a.id));
-                        const nodeBAtrIDs = new Set(nodeBAtr.map((a) => a.id));
-
-                        // attribute connections between nodes
-                        const relevantAtrCons = atrConnection.filter(
-                          (atrCon) =>
-                            (nodeAAtrIDs.has(atrCon.srcAtrID) &&
-                              nodeBAtrIDs.has(atrCon.trgtAtrID)) ||
-                            (nodeAAtrIDs.has(atrCon.trgtAtrID) &&
-                              nodeBAtrIDs.has(atrCon.srcAtrID)),
-                        );
-
                         // delete the node connection and all related attribute connections
                         conHook.deleteCon(conID);
                         relevantAtrCons.forEach((atrCon) => {
@@ -216,6 +217,9 @@ export default function Connection({
                         if (pendingCon) {
                           onConClick([srcNode.id, trgtNode.id]);
                           conHook.deleteCon(conID);
+                          relevantAtrCons.forEach((atrCon) => {
+                            atrConHook.deleteAtrCon(atrCon.id);
+                          });
                         } else {
                           alert(
                             'Click a node first, then the circle to create a multi-connection.',

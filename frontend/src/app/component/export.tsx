@@ -1,14 +1,15 @@
 'use client';
 
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import {
   atrAtom,
   atrConAtom,
+  multiConAtom,
   nodeAtom,
   nodeConAtom,
   schemaAtom,
 } from '../GlobalValues';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Export() {
   const schemas = useAtomValue(schemaAtom);
@@ -16,6 +17,7 @@ export default function Export() {
   const attributes = useAtomValue(atrAtom);
   const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
+  const multiCons = useAtomValue(multiConAtom);
 
   const [exportResult, setExportResult] = useState<string[]>([]);
 
@@ -58,7 +60,31 @@ export default function Export() {
         }
       }
     });
-  }, [nodeCons, atrCons]);
+
+    multiCons.map((mc) => {
+      const nodeIDs = mc.nodes.map((n) => n.id);
+      const multiConNodes = nodes.filter((node) => nodeIDs.includes(node.id));
+
+      const multiRes: { schemaTitle: string; nodeTitle: string }[] = [];
+
+      for (const node of multiConNodes) {
+        const schema = schemas.find((s) => s.id === node.schemaID);
+        if (schema)
+          multiRes.push({ schemaTitle: schema?.title, nodeTitle: node.title });
+      }
+
+      const firstNode = multiRes[0];
+      const restOfNodes = multiRes
+        .splice(1)
+        .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle);
+
+      if (firstNode && restOfNodes)
+        setExportResult((prev) => [
+          ...prev,
+          `identify (${firstNode.schemaTitle}.${firstNode.nodeTitle},${restOfNodes}) as ${firstNode.nodeTitle}; \n `,
+        ]);
+    });
+  }, [nodeCons, atrCons, multiCons]);
 
   return (
     <p className='bg-[#F9F9F9] m-auto h-full p-5 rounded-sm border whitespace-pre-wrap'>
