@@ -67,7 +67,7 @@ export const useCalculation = () => {
     if (!nodePos) return null;
 
     const attributeY =
-      nodePos.y + height * (attributeIndex + 1);
+      nodePos.y + height + (height / 2) * (attributeIndex);
 
     return {
       x: nodePos.x,

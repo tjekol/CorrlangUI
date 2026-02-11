@@ -55,7 +55,6 @@ function getEdges(id: number) {
           });
 
           if (s) {
-            console.log(s.title)
             for (const e of elems) {
               let t = e.getElementtype();
               if (t === ccp.SchemaElementKind.REFERENCE) {

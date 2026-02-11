@@ -38,7 +38,9 @@ export default function Home() {
           {!corres || (
             <>
               <button
-                onClick={() => resetCorres()}
+                onClick={() => {
+                  (resetCorres(), reset());
+                }}
                 className='border bg-blue-50 rounded-md px-4 py-1'
               >
                 Pick correspondence
