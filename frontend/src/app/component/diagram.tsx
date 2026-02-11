@@ -218,7 +218,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   }, [
     filteredSchemas,
     nodesWithAttributes,
-    edges,
+    filteredEdges,
     attributes,
     setLiveNodePositions,
     atrLoading,

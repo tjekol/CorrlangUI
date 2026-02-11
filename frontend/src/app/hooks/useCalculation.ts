@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 
@@ -7,14 +7,14 @@ export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
   const nodes = useAtomValue(nodeAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
+  const attributes = useAtomValue(atrAtom);
   const height = 40
 
-
-
   const getNode = (attributeID: number): INode | null => {
-    const parentNode = nodes.find((node) =>
-      node.attributes.some((attr) => attr.id === attributeID)
-    );
+    const atr = attributes.find((a) => a.id === attributeID);
+    if (!atr) return null;
+
+    const parentNode = nodes.find((n) => n.id === atr.nodeID);
     if (!parentNode) return null;
 
     return parentNode;
@@ -58,8 +58,10 @@ export const useCalculation = () => {
   const getAttributePosition = (attributeID: number) => {
     const parentNode = getNode(attributeID)
     if (!parentNode) return null;
-    const attributeIndex = parentNode.attributes.findIndex(
-      (attr) => attr.id === attributeID
+
+    const nodeAttributes = attributes.filter((atr) => atr.nodeID === parentNode.id);
+    const attributeIndex = nodeAttributes.findIndex(
+      (atr) => atr.id === attributeID
     );
     if (attributeIndex === -1) return null;
 

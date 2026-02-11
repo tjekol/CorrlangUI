@@ -1,3 +1,5 @@
+'use client';
+
 import { useAtomValue } from 'jotai';
 import { useConnection } from '../hooks/useConnection';
 import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
@@ -278,13 +280,14 @@ export default function Connection({
       {atrConnection.map((atrCon) => {
         const atrConID = atrCon.id;
         const attrs = getAttributes(atrConID);
-        if (attrs && !conHook.loading) {
+        if (attrs) {
           const { srcAtrID, trgtAtrID } = attrs;
           const pos1 = getAttributePosition(srcAtrID);
           const pos2 = getAttributePosition(trgtAtrID);
 
           const srcNode = getNode(srcAtrID);
           const trgtNode = getNode(trgtAtrID);
+
           if (pos1 && pos2 && srcNode && trgtNode) {
             return (
               <path
