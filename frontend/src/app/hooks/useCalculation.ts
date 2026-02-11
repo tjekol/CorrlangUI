@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 
@@ -7,14 +7,14 @@ export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
   const nodes = useAtomValue(nodeAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
+  const attributes = useAtomValue(atrAtom);
   const height = 40
 
-
-
   const getNode = (attributeID: number): INode | null => {
-    const parentNode = nodes.find((node) =>
-      node.attributes.some((attr) => attr.id === attributeID)
-    );
+    const atr = attributes.find((a) => a.id === attributeID);
+    if (!atr) return null;
+
+    const parentNode = nodes.find((n) => n.id === atr.nodeID);
     if (!parentNode) return null;
 
     return parentNode;
@@ -47,7 +47,7 @@ export const useCalculation = () => {
   const calculateNodeLength = (attributes: IAttribute[], title: string) => {
     const labels = [...attributes.map((label) => label.text)];
     const strLenghts = labels.map((str) =>
-      str.length > 5 ? str.length * 1.8 : str.length,
+      str.length > 5 ? str.length * 1.4 : str.length * 2.5,
     );
     const maxStringLength = Math.max(...strLenghts, title.length);
     const width = maxStringLength * 12;
@@ -58,8 +58,10 @@ export const useCalculation = () => {
   const getAttributePosition = (attributeID: number) => {
     const parentNode = getNode(attributeID)
     if (!parentNode) return null;
-    const attributeIndex = parentNode.attributes.findIndex(
-      (attr) => attr.id === attributeID
+
+    const nodeAttributes = attributes.filter((atr) => atr.nodeID === parentNode.id);
+    const attributeIndex = nodeAttributes.findIndex(
+      (atr) => atr.id === attributeID
     );
     if (attributeIndex === -1) return null;
 
@@ -67,7 +69,7 @@ export const useCalculation = () => {
     if (!nodePos) return null;
 
     const attributeY =
-      nodePos.y + height * (attributeIndex + 1);
+      nodePos.y + height + (height / 2) * (attributeIndex);
 
     return {
       x: nodePos.x,
@@ -156,25 +158,34 @@ export const useCalculation = () => {
   const getArrowData = (pos1: { x: number; y: number }, pos2: { x: number; y: number }, srcNode: INode, trgtNode: INode) => {
     // height of node + attributes
     const srcHeaderHeight = pos1.y + height
-    const srcNodeWidth = srcNode.attributes.length
+    const srcAtrLen = srcNode.attributes.length
     const trgtHeaderHeight = pos2.y + height
-    const trgtNodeWidth = trgtNode.attributes.length
+    const trgtAtrLen = trgtNode.attributes.length
 
-    const trgtNodeHeight = trgtNodeWidth <= 0 ? trgtHeaderHeight : trgtNodeWidth === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtNodeWidth) / 1.4;
-
-    const pos1Y = srcNodeWidth <= 0 ? srcHeaderHeight : srcNodeWidth === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcNodeWidth) / 1.4;
+    const trgtNodeBottom = trgtAtrLen <= 0 ? trgtHeaderHeight : trgtAtrLen === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtAtrLen) / 1.4;
+    const srcNodeBottom = srcAtrLen <= 0 ? srcHeaderHeight : srcAtrLen === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcAtrLen) / 1.4;
 
     // connect to top/bottom of node closest to other node
+    const diff1Y = trgtHeaderHeight - pos1.y;
+    const diff1YHeight = trgtHeaderHeight - (srcNodeBottom);
+    const pos1Y =
+      Math.abs(diff1Y) < Math.abs(diff1YHeight) ? pos1.y : srcNodeBottom;
+
     const diff2Y = pos1Y - pos2.y;
-    const diff2YHeight = pos1Y - (trgtNodeHeight);
+    const diff2YHeight = pos1Y - (trgtNodeBottom);
     const pos2Y =
-      Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeHeight;
+      Math.abs(diff2Y) < Math.abs(diff2YHeight) ? pos2.y : trgtNodeBottom;
 
     const srcNodeLength = nodeLengths.find((l) => l.id === srcNode.id)?.length || 100
     const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNode.id)?.length || 100
 
-    const pos1X = pos1.x + srcNodeLength / 2;
-    const pos2X = pos2.x + trgtNodeLength / 2;
+    const srcRightSide = pos1.x + srcNodeLength
+    const srcMiddle = pos1.x + srcNodeLength / 2
+    const trgtRightSide = pos2.x + trgtNodeLength
+    const trgtMiddle = pos2.x + trgtNodeLength / 2
+
+    const pos1X = pos1.x <= trgtRightSide && srcRightSide >= pos2.x ? srcMiddle : srcRightSide < pos2.x ? srcRightSide : pos1.x;
+    const pos2X = pos2.x <= srcRightSide && trgtRightSide >= pos1.x ? trgtMiddle : trgtRightSide < pos1.x ? trgtRightSide : pos2.x;
 
     return { pos1X, pos1Y, pos2X, pos2Y }
   }

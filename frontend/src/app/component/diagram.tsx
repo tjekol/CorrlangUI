@@ -5,7 +5,7 @@ import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useConnection } from '../hooks/useConnection';
 import { useAtrCon } from '../hooks/useAtrCon';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { handleConnection } from '../handler/handleConnection';
 import { handleMultiConUpd } from '../handler/handleMultiConUpd';
 import { handleAtrCon } from '../handler/handleAtrCon';
@@ -13,18 +13,20 @@ import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
-import { IAttribute } from '../interface/IAttribute';
 import { useSchemas } from '../hooks/useSchemas';
 import { handleMultiCon } from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
+import { useAttributes } from '../hooks/useAttributes';
+import { ICorrespondence } from '../interface/ICorrespondence';
 
-export default function Diagram() {
-  const { schemas } = useSchemas();
-  const { nodes, loading } = useNodes();
-  const { edges, edgeLoading } = useEdges();
+export default function Diagram({ cor }: { cor: ICorrespondence }) {
+  const { schemas, refetchSchemas } = useSchemas();
+  const { nodes, loading, refetchNodes } = useNodes();
+  const { attributes, atrLoading, refetchAttributes } = useAttributes();
+  const { edges, edgeLoading, refetchEdges } = useEdges();
   const { cons, createCon } = useConnection();
   const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
@@ -72,7 +74,55 @@ export default function Diagram() {
   });
 
   useEffect(() => {
-    if (!nodes || nodes.length === 0) return;
+    const fetchSequentially = async () => {
+      console.log('🔄 Starting sequential fetch...');
+      await refetchSchemas();
+      console.log('✅ Schemas done');
+      await refetchNodes();
+      console.log('✅ Nodes done');
+      await refetchAttributes();
+      console.log('✅ Attributes done');
+      await refetchEdges();
+      console.log('✅ Edges done');
+    };
+
+    fetchSequentially();
+  }, []);
+
+  // Creates layout with chosen correspondences only
+  const filteredSchemas = useMemo(() => {
+    if (!schemas) return [];
+    return schemas.filter((s) => cor.schemaIDs.includes(s.id));
+  }, [schemas]);
+
+  const nodesWithAttributes = useMemo(() => {
+    if (!nodes || !attributes) return [];
+    const filteredNodes = nodes.filter((n) =>
+      filteredSchemas.map((s) => s.id).includes(n.schemaID),
+    );
+    return filteredNodes.map((node) => ({
+      ...node,
+      attributes: attributes.filter((attr) => attr.nodeID === node.id),
+    }));
+  }, [nodes, attributes]);
+
+  const filteredEdges = useMemo(() => {
+    if (!edges) return [];
+    return edges.filter((e) =>
+      nodesWithAttributes.some(
+        (n) => n.id === e.srcNodeID || n.id === e.trgtNodeID,
+      ),
+    );
+  }, [edges]);
+
+  useEffect(() => {
+    if (
+      !nodesWithAttributes ||
+      nodesWithAttributes.length === 0 ||
+      atrLoading ||
+      !attributes
+    )
+      return;
 
     const loadELK = async () => {
       setLayoutLoading(true);
@@ -94,7 +144,7 @@ export default function Diagram() {
           return headerHeight + attributeHeight;
         };
 
-        const children = nodes.map((n) => ({
+        const children = nodesWithAttributes.map((n) => ({
           id: n.id.toString(),
           width: calculateNodeWidth(n),
           height: calculateNodeHeight(n),
@@ -103,37 +153,12 @@ export default function Diagram() {
         const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
           [];
 
-        edges.forEach((edge) => {
+        filteredEdges.forEach((edge) => {
           elkEdges.push({
             id: `edgeID-${edge.id}`,
             sources: [edge.srcNodeID.toString()],
             targets: [edge.trgtNodeID.toString()],
           });
-        });
-
-        cons.forEach((con) => {
-          elkEdges.push({
-            id: `edgeID-0${con.id}`,
-            sources: [con.srcNodeID.toString()],
-            targets: [con.trgtNodeID.toString()],
-          });
-        });
-
-        multiCons.forEach((multiCon) => {
-          const nodes = multiCon.nodes;
-          if (nodes) {
-            nodes.map((node, index) => {
-              elkEdges.push({
-                id: `edgeID-${multiCon.id}${index}`,
-                sources: [node.id.toString()],
-                targets: [
-                  index >= nodes.length - 1
-                    ? nodes[0].id.toString()
-                    : nodes[index + 1].id.toString(),
-                ],
-              });
-            });
-          }
         });
 
         const graph = {
@@ -159,13 +184,17 @@ export default function Diagram() {
           if (newPositions.length > 0) {
             const maxX = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodes.find((n) => n.id === pos.nodeID);
+                const node = nodesWithAttributes.find(
+                  (n) => n.id === pos.nodeID,
+                );
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodes.find((n) => n.id === pos.nodeID);
+                const node = nodesWithAttributes.find(
+                  (n) => n.id === pos.nodeID,
+                );
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),
             );
@@ -186,7 +215,14 @@ export default function Diagram() {
     };
 
     loadELK();
-  }, [nodes, cons, edges, multiCons, setLiveNodePositions]);
+  }, [
+    filteredSchemas,
+    nodesWithAttributes,
+    filteredEdges,
+    attributes,
+    setLiveNodePositions,
+    atrLoading,
+  ]);
 
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
@@ -197,6 +233,7 @@ export default function Diagram() {
         className='min-w-full'
       >
         <defs>
+          {/* Arrows for edges */}
           <marker
             id='line'
             viewBox='0 0 10 10'
@@ -233,6 +270,7 @@ export default function Diagram() {
             <path stroke='black' fill='white' d='M 0 0 L 10 5 L 0 10 z' />
           </marker>
 
+          {/* Diamond for multi connections */}
           <marker
             id='diamond'
             viewBox='0 0 20 20'
@@ -252,7 +290,7 @@ export default function Diagram() {
         <text x={10} y={20}>
           Schemas:
         </text>
-        {schemas.map((s, i) => {
+        {filteredSchemas.map((s, i) => {
           const color = i < nodeColor.length ? nodeColor[i] : nodeColor[0];
           return (
             <text x={100 + i * 80} y={20} key={i} fill={color}>
@@ -260,24 +298,26 @@ export default function Diagram() {
             </text>
           );
         })}
-        <Edge />
+        <Edge edges={filteredEdges} />
         <Connection
           onConClick={handleConClick}
           onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
         />
-        {loading || edgeLoading || layoutLoading ? (
+        {loading || edgeLoading || layoutLoading || atrLoading ? (
           <text x={50} y={50}>
-            {loading ? 'Loading...' : 'Calculating layout...'}
+            {loading || atrLoading ? 'Loading...' : 'Calculating layout...'}
           </text>
         ) : (
-          nodes.map((n, i) => {
+          nodesWithAttributes.map((n, i) => {
             const livePositions = liveNodePositions.find(
               (pos) => pos.nodeID === n.id,
             );
 
-            const schemaIndex = schemas.findIndex((s) => s.id === n.schemaID);
+            const schemaIndex = filteredSchemas.findIndex(
+              (s) => s.id === n.schemaID,
+            );
             // default color if schemaIndex fails
             const color =
               schemaIndex >= 0 && schemaIndex < nodeColor.length

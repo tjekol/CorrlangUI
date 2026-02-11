@@ -23,13 +23,13 @@ export const useSchemas = () => {
   const fetchSchemas = () => handleAsync(async () => {
     const res = await fetch('/api/schemas');
     if (!res.ok) {
-      throw new Error('Failed to fetch nodes');
+      throw new Error('Failed to fetch schemas');
     }
     const schemasData: ISchema[] = await res.json();
     setSchemas(schemasData);
   })
 
-  useEffect(() => { fetchSchemas(); }, []);
+  // useEffect(() => { fetchSchemas(); }, []);
 
-  return { schemas, loading }
+  return { schemas, loading, refetchSchemas: fetchSchemas }
 }

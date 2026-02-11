@@ -29,7 +29,7 @@ export const useAttributes = () => {
     setAttributes(attrData);
   })
 
-  useEffect(() => { fetchAttributes(); }, []);
+  // useEffect(() => { fetchAttributes(); }, []);
 
-  return { attributes, loading }
+  return { attributes, atrLoading: loading, refetchAttributes: fetchAttributes }
 }

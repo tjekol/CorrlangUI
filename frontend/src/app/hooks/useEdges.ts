@@ -29,7 +29,7 @@ export const useEdges = () => {
     setEdges(edgesData);
   })
 
-  useEffect(() => { fetchEdges(); }, []);
+  // useEffect(() => { fetchEdges(); }, []);
 
-  return { edges, edgeLoading: loading }
+  return { edges, edgeLoading: loading, refetchEdges: fetchEdges }
 }

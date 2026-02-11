@@ -3,7 +3,7 @@
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var client_core_pb = require('./core_pb.cjs');
-var client_ccp_pb = require('./ccp_pb.cjs');
+var client_ccp_pb = require('../client/ccp_pb.cjs');
 
 function serialize_CorrLangServiceStatus(arg) {
   if (!(arg instanceof client_core_pb.CorrLangServiceStatus)) {
@@ -14,33 +14,72 @@ function serialize_CorrLangServiceStatus(arg) {
 
 function deserialize_CorrLangServiceStatus(buffer_arg) {
   return client_core_pb.CorrLangServiceStatus.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
-function serialize_GetRegisteredEndpointsRequest(arg) {
-  if (!(arg instanceof client_core_pb.GetRegisteredEndpointsRequest)) {
-    throw new Error('Expected argument of type GetRegisteredEndpointsRequest');
+function serialize_DeregisterObjectRequest(arg) {
+  if (!(arg instanceof client_core_pb.DeregisterObjectRequest)) {
+    throw new Error('Expected argument of type DeregisterObjectRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetRegisteredEndpointsRequest(buffer_arg) {
-  return client_core_pb.GetRegisteredEndpointsRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+function deserialize_DeregisterObjectRequest(buffer_arg) {
+  return client_core_pb.DeregisterObjectRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
-function serialize_GetRegisteredEndpointsResponse(arg) {
-  if (!(arg instanceof client_core_pb.GetRegisteredEndpointsResponse)) {
-    throw new Error('Expected argument of type GetRegisteredEndpointsResponse');
+function serialize_GetCorrespondenceRequest(arg) {
+  if (!(arg instanceof client_core_pb.GetCorrespondenceRequest)) {
+    throw new Error('Expected argument of type GetCorrespondenceRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetRegisteredEndpointsResponse(buffer_arg) {
-  return client_core_pb.GetRegisteredEndpointsResponse.deserializeBinary(
-    new Uint8Array(buffer_arg)
+function deserialize_GetCorrespondenceRequest(buffer_arg) {
+  return client_core_pb.GetCorrespondenceRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_GetEndpointRequest(arg) {
+  if (!(arg instanceof client_core_pb.GetEndpointRequest)) {
+    throw new Error('Expected argument of type GetEndpointRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetEndpointRequest(buffer_arg) {
+  return client_core_pb.GetEndpointRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_GetObjectsRequest(arg) {
+  if (!(arg instanceof client_core_pb.GetObjectsRequest)) {
+    throw new Error('Expected argument of type GetObjectsRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetObjectsRequest(buffer_arg) {
+  return client_core_pb.GetObjectsRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_GetObjectsResponse(arg) {
+  if (!(arg instanceof client_core_pb.GetObjectsResponse)) {
+    throw new Error('Expected argument of type GetObjectsResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetObjectsResponse(buffer_arg) {
+  return client_core_pb.GetObjectsResponse.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -53,14 +92,14 @@ function serialize_GetRegisteredTechSpacesRequest(arg) {
 
 function deserialize_GetRegisteredTechSpacesRequest(buffer_arg) {
   return client_core_pb.GetRegisteredTechSpacesRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
 function serialize_GetRegisteredTechSpacesResponse(arg) {
   if (!(arg instanceof client_core_pb.GetRegisteredTechSpacesResponse)) {
     throw new Error(
-      'Expected argument of type GetRegisteredTechSpacesResponse'
+      'Expected argument of type GetRegisteredTechSpacesResponse',
     );
   }
   return Buffer.from(arg.serializeBinary());
@@ -68,7 +107,7 @@ function serialize_GetRegisteredTechSpacesResponse(arg) {
 
 function deserialize_GetRegisteredTechSpacesResponse(buffer_arg) {
   return client_core_pb.GetRegisteredTechSpacesResponse.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -81,7 +120,7 @@ function serialize_GetSchemaRequest(arg) {
 
 function deserialize_GetSchemaRequest(buffer_arg) {
   return client_core_pb.GetSchemaRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -94,22 +133,72 @@ function serialize_GetStatusRequest(arg) {
 
 function deserialize_GetStatusRequest(buffer_arg) {
   return client_core_pb.GetStatusRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
-function serialize_RegisterEndpointDatasetLocationRequest(arg) {
-  if (!(arg instanceof client_core_pb.RegisterEndpointDatasetLocationRequest)) {
-    throw new Error(
-      'Expected argument of type RegisterEndpointDatasetLocationRequest'
-    );
+function serialize_GetViewRequest(arg) {
+  if (!(arg instanceof client_core_pb.GetViewRequest)) {
+    throw new Error('Expected argument of type GetViewRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_RegisterEndpointDatasetLocationRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointDatasetLocationRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+function deserialize_GetViewRequest(buffer_arg) {
+  return client_core_pb.GetViewRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_MergeCorrSpecRequest(arg) {
+  if (!(arg instanceof client_core_pb.MergeCorrSpecRequest)) {
+    throw new Error('Expected argument of type MergeCorrSpecRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_MergeCorrSpecRequest(buffer_arg) {
+  return client_core_pb.MergeCorrSpecRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_RegisterCommonalityRequest(arg) {
+  if (!(arg instanceof client_core_pb.RegisterCommonalityRequest)) {
+    throw new Error('Expected argument of type RegisterCommonalityRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_RegisterCommonalityRequest(buffer_arg) {
+  return client_core_pb.RegisterCommonalityRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_RegisterCorrespondenceRequest(arg) {
+  if (!(arg instanceof client_core_pb.RegisterCorrespondenceRequest)) {
+    throw new Error('Expected argument of type RegisterCorrespondenceRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_RegisterCorrespondenceRequest(buffer_arg) {
+  return client_core_pb.RegisterCorrespondenceRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_RegisterEndpointDatasetRequest(arg) {
+  if (!(arg instanceof client_core_pb.RegisterEndpointDatasetRequest)) {
+    throw new Error('Expected argument of type RegisterEndpointDatasetRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_RegisterEndpointDatasetRequest(buffer_arg) {
+  return client_core_pb.RegisterEndpointDatasetRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -122,7 +211,7 @@ function serialize_RegisterEndpointRequest(arg) {
 
 function deserialize_RegisterEndpointRequest(buffer_arg) {
   return client_core_pb.RegisterEndpointRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -135,37 +224,22 @@ function serialize_RegisterEndpointSchemaRequest(arg) {
 
 function deserialize_RegisterEndpointSchemaRequest(buffer_arg) {
   return client_core_pb.RegisterEndpointSchemaRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
-function serialize_RegisterEndpointServiceSocketRequest(arg) {
-  if (!(arg instanceof client_core_pb.RegisterEndpointServiceSocketRequest)) {
+function serialize_RegisterEndpointServiceAddressRequest(arg) {
+  if (!(arg instanceof client_core_pb.RegisterEndpointServiceAddressRequest)) {
     throw new Error(
-      'Expected argument of type RegisterEndpointServiceSocketRequest'
+      'Expected argument of type RegisterEndpointServiceAddressRequest',
     );
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_RegisterEndpointServiceSocketRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointServiceSocketRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
-  );
-}
-
-function serialize_RegisterEndpointServiceURLRequest(arg) {
-  if (!(arg instanceof client_core_pb.RegisterEndpointServiceURLRequest)) {
-    throw new Error(
-      'Expected argument of type RegisterEndpointServiceURLRequest'
-    );
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_RegisterEndpointServiceURLRequest(buffer_arg) {
-  return client_core_pb.RegisterEndpointServiceURLRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+function deserialize_RegisterEndpointServiceAddressRequest(buffer_arg) {
+  return client_core_pb.RegisterEndpointServiceAddressRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -178,7 +252,20 @@ function serialize_RegisterTechSpaceRequest(arg) {
 
 function deserialize_RegisterTechSpaceRequest(buffer_arg) {
   return client_core_pb.RegisterTechSpaceRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_RegisterViewRequest(arg) {
+  if (!(arg instanceof client_core_pb.RegisterViewRequest)) {
+    throw new Error('Expected argument of type RegisterViewRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_RegisterViewRequest(buffer_arg) {
+  return client_core_pb.RegisterViewRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -191,7 +278,7 @@ function serialize_ShutdownAcknowledged(arg) {
 
 function deserialize_ShutdownAcknowledged(buffer_arg) {
   return client_core_pb.ShutdownAcknowledged.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -204,7 +291,20 @@ function serialize_ShutdownRequest(arg) {
 
 function deserialize_ShutdownRequest(buffer_arg) {
   return client_core_pb.ShutdownRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_StartProxyRequest(arg) {
+  if (!(arg instanceof client_core_pb.StartProxyRequest)) {
+    throw new Error('Expected argument of type StartProxyRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_StartProxyRequest(buffer_arg) {
+  return client_core_pb.StartProxyRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -217,7 +317,20 @@ function serialize_TechSpaceRegistered(arg) {
 
 function deserialize_TechSpaceRegistered(buffer_arg) {
   return client_core_pb.TechSpaceRegistered.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_WriteDatasetRequest(arg) {
+  if (!(arg instanceof client_core_pb.WriteDatasetRequest)) {
+    throw new Error('Expected argument of type WriteDatasetRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_WriteDatasetRequest(buffer_arg) {
+  return client_core_pb.WriteDatasetRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -230,7 +343,7 @@ function serialize_WriteSchemaRequest(arg) {
 
 function deserialize_WriteSchemaRequest(buffer_arg) {
   return client_core_pb.WriteSchemaRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
@@ -243,6 +356,43 @@ function serialize_ccp_Ack(arg) {
 
 function deserialize_ccp_Ack(buffer_arg) {
   return client_ccp_pb.Ack.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_ccp_Commonality(arg) {
+  if (!(arg instanceof client_ccp_pb.Commonality)) {
+    throw new Error('Expected argument of type ccp.Commonality');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ccp_Commonality(buffer_arg) {
+  return client_ccp_pb.Commonality.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_ccp_Correspondence(arg) {
+  if (!(arg instanceof client_ccp_pb.Correspondence)) {
+    throw new Error('Expected argument of type ccp.Correspondence');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ccp_Correspondence(buffer_arg) {
+  return client_ccp_pb.Correspondence.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_ccp_Dataset(arg) {
+  if (!(arg instanceof client_ccp_pb.Dataset)) {
+    throw new Error('Expected argument of type ccp.Dataset');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ccp_Dataset(buffer_arg) {
+  return client_ccp_pb.Dataset.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_ccp_Endpoint(arg) {
@@ -278,12 +428,23 @@ function deserialize_ccp_TreeData(buffer_arg) {
   return client_ccp_pb.TreeData.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_ccp_View(arg) {
+  if (!(arg instanceof client_ccp_pb.View)) {
+    throw new Error('Expected argument of type ccp.View');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ccp_View(buffer_arg) {
+  return client_ccp_pb.View.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 // *
 // This is the service offered by the CorrLang engine.
 // It can both be used by TechSpace plugins (to register themselves)
 // or language clients (language server etc.) to interact with CorrLang.
 var CoreServiceService = (exports.CoreServiceService = {
-  // General meta-information about the core-service process.
+  // General meta-information about the core-service process and health-check.
   getStatus: {
     path: '/CoreService/GetStatus',
     requestStream: false,
@@ -307,6 +468,18 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_TechSpaceRegistered,
     responseDeserialize: deserialize_TechSpaceRegistered,
   },
+  // Instruct CorrLang to parse a _corr-spec_ file and merge it into the context.
+  mergeCorrSpec: {
+    path: '/CoreService/MergeCorrSpec',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.MergeCorrSpecRequest,
+    responseType: client_ccp_pb.Ack,
+    requestSerialize: serialize_MergeCorrSpecRequest,
+    requestDeserialize: deserialize_MergeCorrSpecRequest,
+    responseSerialize: serialize_ccp_Ack,
+    responseDeserialize: deserialize_ccp_Ack,
+  },
   // Lists the registered TechSpace plugins.
   getRegisteredTechSpaces: {
     path: '/CoreService/GetRegisteredTechSpaces',
@@ -318,6 +491,18 @@ var CoreServiceService = (exports.CoreServiceService = {
     requestDeserialize: deserialize_GetRegisteredTechSpacesRequest,
     responseSerialize: serialize_GetRegisteredTechSpacesResponse,
     responseDeserialize: deserialize_GetRegisteredTechSpacesResponse,
+  },
+  // Lists all registered objects, i.e. endpoints, correspondences, views.
+  getObjects: {
+    path: '/CoreService/GetObjects',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.GetObjectsRequest,
+    responseType: client_core_pb.GetObjectsResponse,
+    requestSerialize: serialize_GetObjectsRequest,
+    requestDeserialize: deserialize_GetObjectsRequest,
+    responseSerialize: serialize_GetObjectsResponse,
+    responseDeserialize: deserialize_GetObjectsResponse,
   },
   // Retrieves the formal schema presentation for a given endpoint (identified by id).
   getSchema: {
@@ -331,31 +516,7 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_ccp_Schema,
     responseDeserialize: deserialize_ccp_Schema,
   },
-  // Retrieves the endpoints that are currently registered.
-  getRegisteredEndpoints: {
-    path: '/CoreService/GetRegisteredEndpoints',
-    requestStream: false,
-    responseStream: false,
-    requestType: client_core_pb.GetRegisteredEndpointsRequest,
-    responseType: client_core_pb.GetRegisteredEndpointsResponse,
-    requestSerialize: serialize_GetRegisteredEndpointsRequest,
-    requestDeserialize: deserialize_GetRegisteredEndpointsRequest,
-    responseSerialize: serialize_GetRegisteredEndpointsResponse,
-    responseDeserialize: deserialize_GetRegisteredEndpointsResponse,
-  },
-  // Can be used by SOURCE-endpoints or SERVICE-endpoints that offer a subscribe() method
-  // to notify about 'new' data.
-  pushData: {
-    path: '/CoreService/PushData',
-    requestStream: true,
-    responseStream: false,
-    requestType: client_ccp_pb.TreeData,
-    responseType: client_ccp_pb.Ack,
-    requestSerialize: serialize_ccp_TreeData,
-    requestDeserialize: deserialize_ccp_TreeData,
-    responseSerialize: serialize_ccp_Ack,
-    responseDeserialize: deserialize_ccp_Ack,
-  },
+  // Asks the service to shutdown
   requestShutdown: {
     path: '/CoreService/RequestShutdown',
     requestStream: false,
@@ -367,8 +528,7 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_ShutdownAcknowledged,
     responseDeserialize: deserialize_ShutdownAcknowledged,
   },
-  // DANGER ZONE: the following methods are most likely going to change a bit
-  //
+  // Registers a new endpoint within the context.
   registerEndpoint: {
     path: '/CoreService/RegisterEndpoint',
     requestStream: false,
@@ -380,6 +540,7 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_ccp_Endpoint,
     responseDeserialize: deserialize_ccp_Endpoint,
   },
+  // Adds a schema to a registered endpoint.
   registerEndpointSchema: {
     path: '/CoreService/RegisterEndpointSchema',
     requestStream: false,
@@ -391,39 +552,67 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_ccp_Ack,
     responseDeserialize: deserialize_ccp_Ack,
   },
-  registerEndpointDatasetLocation: {
-    path: '/CoreService/RegisterEndpointDatasetLocation',
+  // Adds a dataset to a registered endpoint.
+  registerEndpointDataset: {
+    path: '/CoreService/RegisterEndpointDataset',
     requestStream: false,
     responseStream: false,
-    requestType: client_core_pb.RegisterEndpointDatasetLocationRequest,
+    requestType: client_core_pb.RegisterEndpointDatasetRequest,
+    responseType: client_ccp_pb.Dataset,
+    requestSerialize: serialize_RegisterEndpointDatasetRequest,
+    requestDeserialize: deserialize_RegisterEndpointDatasetRequest,
+    responseSerialize: serialize_ccp_Dataset,
+    responseDeserialize: deserialize_ccp_Dataset,
+  },
+  // Adds a service address (URL or socket) to a registered endpoint.
+  registerEndpointServiceAddress: {
+    path: '/CoreService/RegisterEndpointServiceAddress',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.RegisterEndpointServiceAddressRequest,
     responseType: client_ccp_pb.Ack,
-    requestSerialize: serialize_RegisterEndpointDatasetLocationRequest,
-    requestDeserialize: deserialize_RegisterEndpointDatasetLocationRequest,
+    requestSerialize: serialize_RegisterEndpointServiceAddressRequest,
+    requestDeserialize: deserialize_RegisterEndpointServiceAddressRequest,
     responseSerialize: serialize_ccp_Ack,
     responseDeserialize: deserialize_ccp_Ack,
   },
-  registerEndpointServiceURL: {
-    path: '/CoreService/RegisterEndpointServiceURL',
+  // Registers a new correspondence within the context.
+  registerCorrespondence: {
+    path: '/CoreService/RegisterCorrespondence',
     requestStream: false,
     responseStream: false,
-    requestType: client_core_pb.RegisterEndpointServiceURLRequest,
-    responseType: client_ccp_pb.Ack,
-    requestSerialize: serialize_RegisterEndpointServiceURLRequest,
-    requestDeserialize: deserialize_RegisterEndpointServiceURLRequest,
-    responseSerialize: serialize_ccp_Ack,
-    responseDeserialize: deserialize_ccp_Ack,
+    requestType: client_core_pb.RegisterCorrespondenceRequest,
+    responseType: client_ccp_pb.Correspondence,
+    requestSerialize: serialize_RegisterCorrespondenceRequest,
+    requestDeserialize: deserialize_RegisterCorrespondenceRequest,
+    responseSerialize: serialize_ccp_Correspondence,
+    responseDeserialize: deserialize_ccp_Correspondence,
   },
-  registerEndpointServiceSocket: {
-    path: '/CoreService/RegisterEndpointServiceSocket',
+  // Registers a new commonality within the context of a correspondence.
+  registerCommonality: {
+    path: '/CoreService/RegisterCommonality',
     requestStream: false,
     responseStream: false,
-    requestType: client_core_pb.RegisterEndpointServiceSocketRequest,
-    responseType: client_ccp_pb.Ack,
-    requestSerialize: serialize_RegisterEndpointServiceSocketRequest,
-    requestDeserialize: deserialize_RegisterEndpointServiceSocketRequest,
-    responseSerialize: serialize_ccp_Ack,
-    responseDeserialize: deserialize_ccp_Ack,
+    requestType: client_core_pb.RegisterCommonalityRequest,
+    responseType: client_ccp_pb.Commonality,
+    requestSerialize: serialize_RegisterCommonalityRequest,
+    requestDeserialize: deserialize_RegisterCommonalityRequest,
+    responseSerialize: serialize_ccp_Commonality,
+    responseDeserialize: deserialize_ccp_Commonality,
   },
+  // Registers a new view within the context.
+  registerView: {
+    path: '/CoreService/RegisterView',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.RegisterViewRequest,
+    responseType: client_ccp_pb.View,
+    requestSerialize: serialize_RegisterViewRequest,
+    requestDeserialize: deserialize_RegisterViewRequest,
+    responseSerialize: serialize_ccp_View,
+    responseDeserialize: deserialize_ccp_View,
+  },
+  // Asks CorrLang to export the schema of an endpoint to a file using a specified TechSpace.
   writeSchema: {
     path: '/CoreService/WriteSchema',
     requestStream: false,
@@ -435,9 +624,93 @@ var CoreServiceService = (exports.CoreServiceService = {
     responseSerialize: serialize_ccp_Ack,
     responseDeserialize: deserialize_ccp_Ack,
   },
+  // Asks CorrLang to export the dataset to a file using a specified TechSpace.
+  writeDataset: {
+    path: '/CoreService/WriteDataset',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.WriteDatasetRequest,
+    responseType: client_ccp_pb.Ack,
+    requestSerialize: serialize_WriteDatasetRequest,
+    requestDeserialize: deserialize_WriteDatasetRequest,
+    responseSerialize: serialize_ccp_Ack,
+    responseDeserialize: deserialize_ccp_Ack,
+  },
+  // Instructs CorrLang to start a proxy for a view on a specified port using a specified TechSpace.
+  startProxy: {
+    path: '/CoreService/StartProxy',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.StartProxyRequest,
+    responseType: client_ccp_pb.Ack,
+    requestSerialize: serialize_StartProxyRequest,
+    requestDeserialize: deserialize_StartProxyRequest,
+    responseSerialize: serialize_ccp_Ack,
+    responseDeserialize: deserialize_ccp_Ack,
+  },
+  // Can be used by SOURCE-endpoints or SERVICE-endpoints that offer a subscribe() method to notify about 'new' data.
+  pushData: {
+    path: '/CoreService/PushData',
+    requestStream: true,
+    responseStream: false,
+    requestType: client_ccp_pb.TreeData,
+    responseType: client_ccp_pb.Ack,
+    requestSerialize: serialize_ccp_TreeData,
+    requestDeserialize: deserialize_ccp_TreeData,
+    responseSerialize: serialize_ccp_Ack,
+    responseDeserialize: deserialize_ccp_Ack,
+  },
+  // Retrieve information about a registered endpoint.
+  getEndpoint: {
+    path: '/CoreService/GetEndpoint',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.GetEndpointRequest,
+    responseType: client_ccp_pb.Endpoint,
+    requestSerialize: serialize_GetEndpointRequest,
+    requestDeserialize: deserialize_GetEndpointRequest,
+    responseSerialize: serialize_ccp_Endpoint,
+    responseDeserialize: deserialize_ccp_Endpoint,
+  },
+  // Retrieve information about a registered correspondence.
+  getCorrespondence: {
+    path: '/CoreService/GetCorrespondence',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.GetCorrespondenceRequest,
+    responseType: client_ccp_pb.Correspondence,
+    requestSerialize: serialize_GetCorrespondenceRequest,
+    requestDeserialize: deserialize_GetCorrespondenceRequest,
+    responseSerialize: serialize_ccp_Correspondence,
+    responseDeserialize: deserialize_ccp_Correspondence,
+  },
+  // Retrieve information about a registered view.
+  getView: {
+    path: '/CoreService/GetView',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.GetViewRequest,
+    responseType: client_ccp_pb.View,
+    requestSerialize: serialize_GetViewRequest,
+    requestDeserialize: deserialize_GetViewRequest,
+    responseSerialize: serialize_ccp_View,
+    responseDeserialize: deserialize_ccp_View,
+  },
+  // Deregisters an object (endpoint, correspondence, view) from the CorrLang system.
+  deregisterObject: {
+    path: '/CoreService/DeregisterObject',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.DeregisterObjectRequest,
+    responseType: client_ccp_pb.Ack,
+    requestSerialize: serialize_DeregisterObjectRequest,
+    requestDeserialize: deserialize_DeregisterObjectRequest,
+    responseSerialize: serialize_ccp_Ack,
+    responseDeserialize: deserialize_ccp_Ack,
+  },
 });
 
 exports.CoreServiceClient = grpc.makeGenericClientConstructor(
   CoreServiceService,
-  'CoreService'
+  'CoreService',
 );

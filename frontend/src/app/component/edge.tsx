@@ -1,15 +1,13 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
-import { edgeAtom, nodeAtom } from '../GlobalValues';
+import { nodeAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
-import { EdgeType } from '../interface/IEdge';
+import { EdgeType, IEdge } from '../interface/IEdge';
 
-export default function Edge() {
+export default function Edge({ edges }: { edges: IEdge[] }) {
   const nodes = useAtomValue(nodeAtom);
-  const edges = useAtomValue(edgeAtom);
-
   const { getNodePosition, getArrowData } = useCalculation();
 
   const getNodes = (
@@ -79,28 +77,21 @@ export default function Edge() {
                       x={
                         edge.type === EdgeType.comp
                           ? compData.pos1X + padding
-                          : arrowData.pos1X + padding
+                          : arrowData.pos1X < pos2.x
+                            ? arrowData.pos1X + padding
+                            : arrowData.pos1X - padding
                       }
-                      y={arrowData.pos1Y + padding}
-                      textAnchor='middle'
-                      dominantBaseline='middle'
-                      pointerEvents='none'
-                    >
-                      {edge.srcMul}
-                    </text>
-                    {/* TODO: Fix Y value accuracy */}
-                    <text
-                      x={arrowData.pos2X + padding}
                       y={
-                        arrowData.pos1Y < arrowData.pos2Y
-                          ? arrowData.pos2Y - padding
-                          : arrowData.pos2Y + padding
+                        arrowData.pos1Y > pos1.y
+                          ? arrowData.pos1Y + padding
+                          : arrowData.pos1Y - padding
                       }
                       textAnchor='middle'
                       dominantBaseline='middle'
                       pointerEvents='none'
                     >
-                      {edge.trgtMul}
+                      {edge.lowerBound}...
+                      {edge.upperBound === 0 ? '*' : edge.upperBound}
                     </text>
                   </g>
                 );

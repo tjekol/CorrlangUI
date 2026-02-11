@@ -47,4 +47,5 @@ h3 {
 
 button:hover {
   cursor: pointer;
+  border-width: 2;
 }

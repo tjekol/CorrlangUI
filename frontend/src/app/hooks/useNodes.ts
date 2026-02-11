@@ -29,7 +29,7 @@ export const useNodes = () => {
     setNodes(nodesData);
   })
 
-  useEffect(() => { fetchNodes(); }, []);
+  // useEffect(() => { fetchNodes(); }, []);
 
-  return { nodes, loading }
+  return { nodes, loading, refetchNodes: fetchNodes }
 }

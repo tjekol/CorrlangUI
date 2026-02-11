@@ -2,11 +2,12 @@ import messages from './client/core_pb.cjs';
 import ccp from './client/ccp_pb.cjs';
 import services from './client/core_grpc_pb.cjs';
 import grpc from '@grpc/grpc-js';
-import { prisma } from '../prisma.ts';
+
+// node ./src/lib/client/script.js
 
 var client = new services.CoreServiceClient(
   'localhost:6969',
-  grpc.credentials.createInsecure()
+  grpc.credentials.createInsecure(),
 );
 
 var msg = new messages.GetStatusRequest();
@@ -55,26 +56,50 @@ function registerEndpoint(request) {
   });
 }
 
-async function registerEndpoints() {
+/* Request for "parsing the schema itself" (needs to be done only once) */
+var req_sales = new messages.RegisterEndpointSchemaRequest();
+req_sales.setEndpointid(1);
+req_sales.setTechspace('GRAPH_QL');
+req_sales.setFilelocation(
+  '/Users/theakolnes/repositories/CorrlangUI/corrlang/sales.graphql',
+);
+
+var req_invoices = new messages.RegisterEndpointSchemaRequest();
+req_invoices.setEndpointid(2);
+req_invoices.setTechspace('GRAPH_QL');
+req_invoices.setFilelocation(
+  '/Users/theakolnes/repositories/CorrlangUI/corrlang/invoices.graphql',
+);
+
+var req_hr = new messages.RegisterEndpointSchemaRequest();
+req_hr.setEndpointid(3);
+req_hr.setTechspace('GRAPH_QL');
+req_hr.setFilelocation(
+  '/Users/theakolnes/repositories/CorrlangUI/corrlang/hr.graphql',
+);
+
+function addSchema(request) {
+  return new Promise((resolve, reject) => {
+    client.registerEndpointSchema(request, (error, ack) => {
+      if (error) {
+        console.log(`Error ${error}`);
+        reject(error);
+      } else {
+        console.log('Schema added endpoint with id', request.getEndpointid());
+        resolve(ack);
+      }
+    });
+  });
+}
+
+async function injectServer() {
   await registerEndpoint(req);
   await registerEndpoint(req2);
   await registerEndpoint(req3);
 
-  await prisma.schema.createMany({
-    data: [
-      { title: req.getName() },
-      { title: req2.getName() },
-      { title: req3.getName() },
-    ],
-  });
+  await addSchema(req_sales);
+  await addSchema(req_invoices);
+  await addSchema(req_hr);
 }
 
-registerEndpoints()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+injectServer();

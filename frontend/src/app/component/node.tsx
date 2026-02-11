@@ -7,9 +7,7 @@ import {
   liveNodePositionsAtom,
   liveAtrPositionsAtom,
   nodeLengthAtom,
-  edgeAtom,
   atrConAtom,
-  nodeAtom,
   multiConAtom,
   nodeConAtom,
 } from '../GlobalValues';
@@ -39,13 +37,10 @@ export default function Node({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
+  const { calculateNodeLength } = useCalculation();
   const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
   const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
-
-  const { calculateNodeLength } = useCalculation();
-  const nodes = useAtomValue(nodeAtom);
-  const edges = useAtomValue(edgeAtom);
   const cons = useAtomValue(nodeConAtom);
   const multiCons = useAtomValue(multiConAtom);
   const atrCons = useAtomValue(atrConAtom);
@@ -282,10 +277,7 @@ export default function Node({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.text}:{' '}
-              {attribute.isArray
-                ? `[${attribute.type || ''}]`
-                : `${attribute.type || ''}`}
+              {attribute.text}: {attribute.type}
             </text>
           </g>
         );
