@@ -1,15 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface Correspondence {
-  id: number,
-  title: string,
-}
+import { ICorrespondence } from '../interface/ICorrespondence';
 
 export const useCorres = () => {
   const [loading, setLoading] = useState(true);
-  const [corres, setCorres] = useState<Correspondence[]>([]);
+  const [corres, setCorres] = useState<ICorrespondence[]>([]);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -27,7 +23,7 @@ export const useCorres = () => {
     if (!res.ok) {
       throw new Error('Failed to fetch correspondence connections.');
     }
-    const corresData: Correspondence[] = await res.json();
+    const corresData: ICorrespondence[] = await res.json();
     setCorres(corresData)
   })
 

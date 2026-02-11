@@ -25,7 +25,7 @@ export async function GET() {
   }
 }
 
-async function getSchemas() {
+function getSchemas() {
   const client = new services.CoreServiceClient(
     'localhost:6969',
     grpc.credentials.createInsecure()
@@ -41,21 +41,23 @@ async function getSchemas() {
         try {
           const objs = object.getObjectsList()
           for (const o of objs) {
-            console.log(o.getId(), o.getName())
-            const schema = await prisma.schema.findFirst({
-              where: { id: o.getId(), title: o.getName() }
-            })
-
-            if (!schema)
-              await prisma.schema.create({
-                data: { id: o.getId(), title: o.getName() }
+            //  Object === ENDPOINT
+            if (o.getObjecttype() === 0) {
+              console.log(o.getId(), o.getName())
+              const schema = await prisma.schema.findFirst({
+                where: { id: o.getId(), title: o.getName() }
               })
+              if (!schema)
+                await prisma.schema.create({
+                  data: { id: o.getId(), title: o.getName() }
+                })
+            }
           }
-          resolve("Schema injection complete");
+          resolve('Schemas injection completed!');
         } catch (dbError) {
           reject(dbError);
         }
       }
     });
-  });
+  })
 }

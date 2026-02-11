@@ -20,8 +20,9 @@ import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
+import { ICorrespondence } from '../interface/ICorrespondence';
 
-export default function Diagram({ pickedCorres }: { pickedCorres: string[] }) {
+export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
   const { nodes, loading, refetchNodes } = useNodes();
   const { attributes, atrLoading, refetchAttributes } = useAttributes();
@@ -91,7 +92,7 @@ export default function Diagram({ pickedCorres }: { pickedCorres: string[] }) {
   // Creates layout with chosen correspondences only
   const filteredSchemas = useMemo(() => {
     if (!schemas) return [];
-    return schemas.filter((s) => pickedCorres.includes(s.title));
+    return schemas.filter((s) => cor.schemaIDs.includes(s.id));
   }, [schemas]);
 
   const nodesWithAttributes = useMemo(() => {
