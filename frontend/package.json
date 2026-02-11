@@ -11,9 +11,7 @@
     "studio": "npx prisma studio --config ./prisma.config.ts",
     "restart": "npm run db:wipe && npm run dev",
     "db:wipe": "npx tsx src/lib/prisma-wipe.ts",
-    "db:up": "npx prisma migrate dev && npx prisma generate",
-    "grpc": "node src/lib/client/script.js",
-    "setup": "npm run db:up && npm run grpc"
+    "db:setup": "npx prisma migrate dev && npx prisma generate"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.2",
