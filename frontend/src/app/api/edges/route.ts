@@ -68,6 +68,8 @@ function getEdges(id: number) {
                   .getTrgtypename()
                   .getPartsList()[0];
 
+                let refName = e.getFullyqualifiedname().getPartsList()[1];
+
                 let lowerbound = e
                   .getReferencetypedetails()
                   .getMultiplicity()
@@ -91,14 +93,14 @@ function getEdges(id: number) {
                   where: { title: trgtName, schemaID: s.id },
                 });
 
-                if (srcNode && trgtNode) {
+                if (srcNode && trgtNode && refName) {
                   const edge = await prisma.edge.findFirst({
                     where: { srcNodeID: srcNode.id, trgtNodeID: trgtNode.id },
                   });
 
                   if (!edge)
                     await prisma.edge.create({
-                      data: { srcNodeID: srcNode.id, trgtNodeID: trgtNode.id, lowerBound: lowerbound, upperBound: upperbound, isOrdered: isOrdered },
+                      data: { srcNodeID: srcNode.id, trgtNodeID: trgtNode.id, refName: refName, lowerBound: lowerbound, upperBound: upperbound, isOrdered: isOrdered },
                     });
                 }
               }

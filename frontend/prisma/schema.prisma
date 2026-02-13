@@ -36,6 +36,7 @@ model Edge {
   id  Int   @id @default(autoincrement())
   srcNodeID Int
   trgtNodeID Int
+  refName String
   lowerBound Int?
   upperBound Int?
   isOrdered Boolean @default(false)

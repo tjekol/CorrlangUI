@@ -233,44 +233,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         className='min-w-full'
       >
         <defs>
-          {/* Arrows for edges */}
-          <marker
-            id='line'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='6'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path d='M 0 0 L 10 5 L 0 10 z' />
-          </marker>
-
-          <marker
-            id='arrow-dir'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='8'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path stroke='black' fill='none' d='M 0 0 L 10 5 L 0 10' />
-          </marker>
-
-          <marker
-            id='arrow-ih'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='6'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path stroke='black' fill='white' d='M 0 0 L 10 5 L 0 10 z' />
-          </marker>
-
-          {/* Diamond for multi connections */}
+          {/* Diamond */}
           <marker
             id='diamond'
             viewBox='0 0 20 20'

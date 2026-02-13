@@ -46,9 +46,56 @@ export default function Edge({ edges }: { edges: IEdge[] }) {
                   trgtNode,
                 );
                 const arrowData = getArrowData(pos1, pos2, srcNode, trgtNode);
-                const padding = 20;
+                const refPadding = 30;
+                const mulPadding = 20;
                 return (
                   <g key={edgeID}>
+                    <defs>
+                      {/* Arrows for edges */}
+                      <marker
+                        id='line'
+                        viewBox='0 0 10 10'
+                        refX='10'
+                        refY='5'
+                        markerWidth='6'
+                        markerHeight='6'
+                        orient='auto'
+                      >
+                        <path d='M 0 0 L 10 5 L 0 10 z' />
+                      </marker>
+
+                      <marker
+                        id='arrow-dir'
+                        viewBox='0 0 10 10'
+                        refX='10'
+                        refY='5'
+                        markerWidth='8'
+                        markerHeight='6'
+                        orient='auto'
+                      >
+                        <path
+                          stroke='black'
+                          fill='none'
+                          d='M 0 0 L 10 5 L 0 10'
+                        />
+                      </marker>
+
+                      <marker
+                        id='arrow-ih'
+                        viewBox='0 0 10 10'
+                        refX='10'
+                        refY='5'
+                        markerWidth='6'
+                        markerHeight='6'
+                        orient='auto'
+                      >
+                        <path
+                          stroke='black'
+                          fill='white'
+                          d='M 0 0 L 10 5 L 0 10 z'
+                        />
+                      </marker>
+                    </defs>
                     <path
                       d={
                         edge.type === EdgeType.comp
@@ -72,19 +119,37 @@ export default function Edge({ edges }: { edges: IEdge[] }) {
                       }`}
                     />
 
+                    {/* Reference name */}
+                    <text
+                      x={
+                        arrowData.pos1X < arrowData.pos2X
+                          ? (arrowData.pos1X + arrowData.pos2X) / 2 - refPadding
+                          : (arrowData.pos1X + arrowData.pos2X) / 2 + refPadding
+                      }
+                      y={
+                        arrowData.pos1Y < arrowData.pos2Y
+                          ? (arrowData.pos1Y + arrowData.pos2Y) / 2 - refPadding
+                          : (arrowData.pos1Y + arrowData.pos2Y) / 2 + refPadding
+                      }
+                      textAnchor='middle'
+                      dominantBaseline='middle'
+                    >
+                      {edge.refName}
+                    </text>
+
                     {/* multiplicities */}
                     <text
                       x={
                         edge.type === EdgeType.comp
-                          ? compData.pos1X + padding
+                          ? compData.pos1X + mulPadding
                           : arrowData.pos1X < pos2.x
-                            ? arrowData.pos1X + padding
-                            : arrowData.pos1X - padding
+                            ? arrowData.pos1X + mulPadding
+                            : arrowData.pos1X - mulPadding
                       }
                       y={
                         arrowData.pos1Y > pos1.y
-                          ? arrowData.pos1Y + padding
-                          : arrowData.pos1Y - padding
+                          ? arrowData.pos1Y + mulPadding
+                          : arrowData.pos1Y - mulPadding
                       }
                       textAnchor='middle'
                       dominantBaseline='middle'
