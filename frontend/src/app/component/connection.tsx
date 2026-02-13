@@ -2,10 +2,17 @@
 
 import { useAtomValue } from 'jotai';
 import { useConnection } from '../hooks/useConnection';
-import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
+import {
+  IPendingAtrCon,
+  IPendingCon,
+  IPendingEdgeCon,
+} from '../interface/IStates';
 import {
   atrAtom,
   atrConAtom,
+  edgeConAtom,
+  midCircleAtom,
+  midEdgeAtom,
   multiConAtom,
   nodeAtom,
   nodeConAtom,
@@ -15,15 +22,18 @@ import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
 import { useAtrCon } from '../hooks/useAtrCon';
 import { useMultiCon } from '../hooks/useMultiCon';
+import { useEdgeCon } from '../hooks/useEdgeCon';
 
 export default function Connection({
   pendingCon,
   pendingAtrCon,
+  pendingEdgeCon,
   onConClick,
   onMultiConClick,
 }: {
   pendingCon: IPendingCon | null;
   pendingAtrCon: IPendingAtrCon | null;
+  pendingEdgeCon: IPendingEdgeCon | null;
   onConClick: (nodeIDs: number[]) => void;
   onMultiConClick: (id: number, nodeID: number) => void;
   // onAttributeClick: (
@@ -34,17 +44,17 @@ export default function Connection({
   const conHook = useConnection();
   const multiConHook = useMultiCon();
   const atrConHook = useAtrCon();
+  const edgeConHook = useEdgeCon();
   const nodes = useAtomValue(nodeAtom);
   const attributes = useAtomValue(atrAtom);
 
+  const midCircles = useAtomValue(midCircleAtom);
+  const midEdge = useAtomValue(midEdgeAtom);
   const cons = useAtomValue(nodeConAtom);
-  const atrConnection = useAtomValue(atrConAtom);
   const multiConnection = useAtomValue(multiConAtom);
+  const atrConnection = useAtomValue(atrConAtom);
+  const edgeConnection = useAtomValue(edgeConAtom);
 
-  // midpoints for circle on connections
-  const [midCircles, setMidCircles] = useState<
-    Record<number, { x: number; y: number }>
-  >({});
   const {
     getNodePosition,
     getPathData,
@@ -53,19 +63,8 @@ export default function Connection({
     getAttributePosition,
     getMidpoint,
     getShortestPath,
+    calculateMidpoint,
   } = useCalculation();
-
-  // calculate midpoint for a path
-  const calculateMidpoint = (pathElement: SVGPathElement, edgeID: number) => {
-    const totalLength = pathElement.getTotalLength();
-    if (!isFinite(totalLength) || totalLength === 0) return;
-
-    const pt = pathElement.getPointAtLength(totalLength / 2);
-    setMidCircles((prev) => ({
-      ...prev,
-      [edgeID]: { x: pt.x, y: pt.y },
-    }));
-  };
 
   const getNodes = (
     conID: number,
@@ -81,12 +80,20 @@ export default function Connection({
     }
   };
 
-  const getAttributes = (
+  const getAtrIDs = (
     atrConID: number,
   ): { srcAtrID: number; trgtAtrID: number } | undefined => {
     const atrCon = atrConnection.find((con) => con.id === atrConID);
     if (atrCon)
       return { srcAtrID: atrCon.srcAtrID, trgtAtrID: atrCon.trgtAtrID };
+  };
+
+  const getEdgeIDs = (
+    edgeConID: number,
+  ): { srcEdgeID: number; trgtEdgeID: number } | undefined => {
+    const edgeCon = edgeConnection.find((con) => con.id === edgeConID);
+    if (edgeCon)
+      return { srcEdgeID: edgeCon.srcEdgeID, trgtEdgeID: edgeCon.trgtEdgeID };
   };
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -103,18 +110,20 @@ export default function Connection({
       }
     };
 
-    if (pendingCon || pendingAtrCon) {
+    if (pendingCon || pendingAtrCon || pendingEdgeCon) {
       document.addEventListener('mousemove', handleMouseMove);
     }
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [pendingCon, pendingAtrCon]);
+  }, [pendingCon, pendingAtrCon, pendingEdgeCon]);
+
+  let hasMousePosition = mousePosition.x !== 0 && mousePosition.y !== 0;
 
   return (
     <>
       {/* temporary */}
-      {pendingCon && mousePosition.x !== 0 && mousePosition.y !== 0 && (
+      {pendingCon && hasMousePosition && (
         <path
           key={pendingCon.conID}
           d={getTempPathData(
@@ -130,11 +139,27 @@ export default function Connection({
         />
       )}
 
-      {pendingAtrCon && mousePosition.x !== 0 && mousePosition.y !== 0 && (
+      {pendingAtrCon && hasMousePosition && (
         <path
-          key={pendingAtrCon.attributeConID}
+          key={pendingAtrCon.atrConID}
           d={getTempPathData(
             { x: pendingAtrCon.positionX, y: pendingAtrCon.positionY },
+            mousePosition,
+          )}
+          stroke='grey'
+          strokeWidth={3}
+          strokeDasharray={'5,5'}
+          fill='none'
+          className='hover:cursor-pointer'
+          strokeOpacity={0.6}
+        />
+      )}
+
+      {pendingEdgeCon && hasMousePosition && (
+        <path
+          key={pendingEdgeCon.edgeConID}
+          d={getTempPathData(
+            { x: pendingEdgeCon.positionX, y: pendingEdgeCon.positionY },
             mousePosition,
           )}
           stroke='grey'
@@ -187,7 +212,7 @@ export default function Connection({
                         );
                       }
                     }}
-                    d={getPathData(srcNode.id, pos1, trgtNode.id, pos2)}
+                    d={getPathData(pos1, pos2, srcNode.id, trgtNode.id)}
                     stroke='black'
                     strokeWidth={3.5}
                     // strokeDasharray={'10,10'}
@@ -283,9 +308,9 @@ export default function Connection({
 
       {atrConnection.map((atrCon) => {
         const atrConID = atrCon.id;
-        const attrs = getAttributes(atrConID);
-        if (attrs) {
-          const { srcAtrID, trgtAtrID } = attrs;
+        const atrIDs = getAtrIDs(atrConID);
+        if (atrIDs) {
+          const { srcAtrID, trgtAtrID } = atrIDs;
           const pos1 = getAttributePosition(srcAtrID);
           const pos2 = getAttributePosition(trgtAtrID);
 
@@ -296,12 +321,46 @@ export default function Connection({
             return (
               <path
                 key={atrConID}
-                d={getPathData(srcNode.id, pos1, trgtNode.id, pos2)}
+                d={getPathData(pos1, pos2, srcNode.id, trgtNode.id)}
                 stroke='#818181'
                 strokeWidth={3}
                 // strokeDasharray={'5,5'}
                 fill='none'
                 onClick={() => atrConHook.deleteAtrCon(atrConID)}
+                className='hover:cursor-pointer'
+                strokeOpacity={0.6}
+              />
+            );
+          }
+        }
+        return null;
+      })}
+
+      {edgeConnection.map((edgeCon) => {
+        const edgeConID = edgeCon.id;
+        const edgeIDs = getEdgeIDs(edgeConID);
+        if (edgeIDs) {
+          const { srcEdgeID, trgtEdgeID } = edgeIDs;
+          const pos1 = midEdge[srcEdgeID];
+          const pos2 = midEdge[trgtEdgeID];
+
+          if (pos1 && pos2) {
+            return (
+              <path
+                key={edgeConID}
+                d={getPathData(pos1, pos2)}
+                stroke='#818181'
+                strokeWidth={3}
+                fill='none'
+                onClick={() => {
+                  if (
+                    confirm(
+                      `Delete edge connection from edge ${srcEdgeID} to edge ${trgtEdgeID}`,
+                    )
+                  ) {
+                    edgeConHook.deleteEdgeCon(edgeConID);
+                  }
+                }}
                 className='hover:cursor-pointer'
                 strokeOpacity={0.6}
               />

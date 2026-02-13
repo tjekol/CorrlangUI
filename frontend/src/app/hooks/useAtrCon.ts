@@ -14,7 +14,7 @@ export const useAtrCon = () => {
     try {
       await fn();
     } catch (error) {
-      console.error('Node operation failed:', error);
+      console.error('Attribute connection operation failed:', error);
     } finally {
       setLoading(false);
     }

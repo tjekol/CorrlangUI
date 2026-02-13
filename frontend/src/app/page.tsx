@@ -8,16 +8,19 @@ import { useAtrCon } from './hooks/useAtrCon';
 import { useConnection } from './hooks/useConnection';
 import { useMultiCon } from './hooks/useMultiCon';
 import { ICorrespondence } from './interface/ICorrespondence';
+import { useEdgeCon } from './hooks/useEdgeCon';
 
 export default function Home() {
   const { deleteAllCons } = useConnection();
   const { deleteAllMultiCons } = useMultiCon();
   const { deleteAllAtrCons } = useAtrCon();
+  const { deleteAllEdgeCons } = useEdgeCon();
 
   const reset = () => {
     deleteAllCons();
     deleteAllMultiCons();
     deleteAllAtrCons();
+    deleteAllEdgeCons();
   };
 
   const [exportIsOpen, setExportIsOpen] = useState<boolean>(false);

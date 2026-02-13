@@ -66,7 +66,7 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasConnection =
+  const isConnected =
     cons.some((con) => con.srcNodeID === id || con.trgtNodeID === id) ||
     multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
 
@@ -146,7 +146,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasConnection ? 'opacity-100' : 'opacity-40'
+          isConnected ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -162,7 +162,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasConnection ? 'opacity-100' : 'opacity-40'
+          isConnected ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -223,7 +223,7 @@ export default function Node({
             {/* Left circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasConnection && 'hover:opacity-100'
+                isConnected && 'hover:opacity-100'
               }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
@@ -232,7 +232,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasConnection) {
+                if (isConnected) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,
@@ -248,7 +248,7 @@ export default function Node({
             {/* Right circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasConnection && 'hover:opacity-100'
+                isConnected && 'hover:opacity-100'
               } ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
@@ -257,7 +257,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasConnection) {
+                if (isConnected) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,

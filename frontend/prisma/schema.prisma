@@ -44,6 +44,9 @@ model Edge {
 
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
+
+  srcCons EdgeConnection[] @relation(name: "source")
+  trgtCons EdgeConnection[] @relation(name: "target")
 }
 
 model Attribute {
@@ -78,4 +81,13 @@ model AtrConnection {
 
   srcAtr Attribute @relation(name: "source", fields: [srcAtrID], references: [id])
   trgtAtr Attribute @relation(name: "target", fields: [trgtAtrID], references: [id])
+}
+
+model EdgeConnection {
+  id  Int   @id @default(autoincrement())
+  srcEdgeID Int
+  trgtEdgeID Int
+
+  srcEdge Edge @relation(name: "source", fields: [srcEdgeID], references: [id])
+  trgtEdge Edge @relation(name: "target", fields: [trgtEdgeID], references: [id])
 }

@@ -6,8 +6,15 @@ export interface IPendingCon {
 }
 
 export interface IPendingAtrCon {
-  attributeConID: number;
+  atrConID: number;
   attributeID: number;
+  positionX: number;
+  positionY: number;
+}
+
+export interface IPendingEdgeCon {
+  edgeConID: number;
+  edgeID: number;
   positionX: number;
   positionY: number;
 }

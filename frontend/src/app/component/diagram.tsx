@@ -9,7 +9,11 @@ import { useEffect, useState, useMemo } from 'react';
 import { handleConnection } from '../handler/handleConnection';
 import { handleMultiConUpd } from '../handler/handleMultiConUpd';
 import { handleAtrCon } from '../handler/handleAtrCon';
-import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
+import {
+  IPendingAtrCon,
+  IPendingCon,
+  IPendingEdgeCon,
+} from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
@@ -21,6 +25,8 @@ import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
+import { useEdgeCon } from '../hooks/useEdgeCon';
+import { handleEdgeCon } from '../handler/handleEdgeCon';
 
 export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
@@ -30,6 +36,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { cons, createCon } = useConnection();
   const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
+  const { edgeCons, createEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
@@ -37,6 +44,10 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
     null,
   );
+  const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingEdgeCon | null>(
+    null,
+  );
+
   const [liveNodePositions, setLiveNodePositions] = useAtom(
     liveNodePositionsAtom,
   );
@@ -47,6 +58,13 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     createCon,
     pendingCon,
     setPendingCon,
+  );
+
+  const handleEdgeClick = handleEdgeCon(
+    edgeCons,
+    createEdgeCon,
+    pendingEdgeCon,
+    setPendingEdgeCon,
   );
 
   const handleConClick = handleMultiCon(
@@ -261,13 +279,14 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
             </text>
           );
         })}
-        <Edge edges={filteredEdges} />
         <Connection
           onConClick={handleConClick}
           onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
+          pendingEdgeCon={pendingEdgeCon}
         />
+        <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />
         {loading || edgeLoading || layoutLoading || atrLoading ? (
           <text x={50} y={50}>
             {loading || atrLoading ? 'Loading...' : 'Calculating layout...'}

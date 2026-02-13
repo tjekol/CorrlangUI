@@ -12,7 +12,7 @@ export const handleAtrCon = (
       const newAtrConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
 
       setPendingAtrCon({
-        attributeConID: newAtrConID,
+        atrConID: newAtrConID,
         attributeID: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y,

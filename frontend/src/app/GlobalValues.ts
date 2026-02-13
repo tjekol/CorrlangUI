@@ -7,6 +7,7 @@ import { ISchema } from './interface/ISchema';
 import { IMultiConnection } from './interface/Connection/IMultiConnection';
 import { IConnection } from './interface/Connection/IConnection';
 import { LiveAtrPosition, LiveNodePosition } from './interface/IStates';
+import { IEdgeConnection } from './interface/Connection/IEdgeConnection';
 
 // Node/attribute
 export const schemaAtom = atom<ISchema[]>([]);
@@ -16,6 +17,10 @@ export const atrAtom = atom<IAttribute[]>([]);
 export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F', '#F78DA7']
 export const nodeLengthAtom = atom<{ id: number, length: number }[]>([]); // [{ id: 1, length: 6 }]
 
+// Midpoints paths (edge/connections)
+export const midCircleAtom = atom<Record<number, { x: number; y: number }>>({});
+export const midEdgeAtom = atom<Record<number, { x: number; y: number }>>({});
+
 // Edges
 export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
 
@@ -23,6 +28,7 @@ export const edgeAtom = atom<IEdge[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID
 export const nodeConAtom = atom<IConnection[]>([]); // [{ id: 1, srcNodeID: 1, trgtNodeID: 2 }]
 export const multiConAtom = atom<IMultiConnection[]>([]); // [ { id: 1,  nodes: [1,2,3] }, { id: 2,  nodes: [1,2,3] } ]
 export const atrConAtom = atom<IAtrConnection[]>([]); // [{ id: 1, srcAtrID: 1, trgtAtrID: 2 }]
+export const edgeConAtom = atom<IEdgeConnection[]>([]); // [{ id: 1, srcEdgeID: 1, trgtEdgeID: 2 }]
 
 // Live positions for nodes and attributes
 export const liveNodePositionsAtom = atom<LiveNodePosition[]>([]); // [ {nodeID: 1, positionX: 0, positionY: 0} ]
