@@ -42,9 +42,7 @@ export default function Home() {
         {!corres || (
           <div className='flex justify-between'>
             <button
-              onClick={() => {
-                resetCorres();
-              }}
+              onClick={() => (resetCorres(), setExportIsOpen(false))}
               className='border bg-blue-50 rounded-md px-4 py-1'
             >
               Pick correspondence
