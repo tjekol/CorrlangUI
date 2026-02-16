@@ -29,7 +29,7 @@ model Node {
   srcCons Connection[] @relation(name: "source")
   trgtCons Connection[] @relation(name: "target")
   schema Schema @relation(fields: [schemaID], references: [id])
-  multiConnection MultiConnection[]
+  multiCons MultiConnection[]
 }
 
 model Edge {
@@ -58,6 +58,7 @@ model Attribute {
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AtrConnection[] @relation(name: "source")
   trgtAtrs AtrConnection[] @relation(name: "target")
+  atrMultiCons AtrMultiConnection[]
 }
 
 model Connection {
@@ -81,6 +82,11 @@ model AtrConnection {
 
   srcAtr Attribute @relation(name: "source", fields: [srcAtrID], references: [id])
   trgtAtr Attribute @relation(name: "target", fields: [trgtAtrID], references: [id])
+}
+
+model AtrMultiConnection {
+  id  Int   @id @default(autoincrement())
+  attributes Attribute[]
 }
 
 model EdgeConnection {

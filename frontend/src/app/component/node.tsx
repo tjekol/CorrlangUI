@@ -10,6 +10,7 @@ import {
   atrConAtom,
   multiConAtom,
   nodeConAtom,
+  atrMultiConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
@@ -44,6 +45,7 @@ export default function Node({
   const cons = useAtomValue(nodeConAtom);
   const multiCons = useAtomValue(multiConAtom);
   const atrCons = useAtomValue(atrConAtom);
+  const atrMultiCons = useAtomValue(atrMultiConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
@@ -97,7 +99,7 @@ export default function Node({
             attributeID: attribute.id,
             nodeID: id,
             positionX: newX,
-            positionY: newY + height + (height / 2) * (i + 1),
+            positionY: newY + height + (height / 2) * i,
           };
 
           return [leftPos];
@@ -210,13 +212,16 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isActive = atrCons.some(
-          (atr) =>
-            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
-        );
+        const isActive =
+          atrCons.some(
+            (atr) =>
+              atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
+          ) ||
+          atrMultiCons.some((multiCon) =>
+            multiCon.attributes.some((atr) => atr.id === attribute.id),
+          );
 
-        const alertMsg =
-          'Node needs to be connected to node before connecting attributes.';
+        const alertMsg = 'Connect nodes before connecting attributes.';
 
         return (
           <g key={i}>

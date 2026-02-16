@@ -3,7 +3,7 @@ import { IPendingCon } from '../interface/IStates';
 export const handleMultiCon = (
   createMultiCon: (nodeIDs: number[]) => void,
   pendingCon: IPendingCon | null,
-  setPendingCon: (pendingEdge: IPendingCon | null) => void
+  setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
   return (nodeIDs: number[]) => {
     if (!pendingCon) {

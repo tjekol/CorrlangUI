@@ -1,14 +1,15 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midCircleAtom, midEdgeAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midConAtom, midEdgeAtom, liveAtrPositionsAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 
 export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
+  const liveAtrPositions = useAtomValue(liveAtrPositionsAtom);
   const nodes = useAtomValue(nodeAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
   const attributes = useAtomValue(atrAtom);
-  const setMidCircles = useSetAtom(midCircleAtom)
+  const setMidCon = useSetAtom(midConAtom)
   const setMidEdge = useSetAtom(midEdgeAtom)
 
   const height = 40
@@ -59,6 +60,14 @@ export const useCalculation = () => {
   }
 
   const getAttributePosition = (attributeID: number) => {
+    const livePos = liveAtrPositions.find((pos) => pos.attributeID === attributeID);
+    if (livePos) {
+      return {
+        x: livePos.positionX,
+        y: livePos.positionY,
+      };
+    }
+
     const parentNode = getNode(attributeID)
     if (!parentNode) return null;
 
@@ -86,7 +95,7 @@ export const useCalculation = () => {
     if (!isFinite(totalLength) || totalLength === 0) return;
 
     const pt = pathElement.getPointAtLength(totalLength / 2);
-    setMidCircles((prev) => ({
+    setMidCon((prev) => ({
       ...prev,
       [conID]: { x: pt.x, y: pt.y },
     }));
@@ -178,10 +187,14 @@ export const useCalculation = () => {
     };
   }
 
-  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number) => {
+  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number, atrID?: number) => {
     let nodeLength = 0;
+
     if (nodeID) {
       nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
+    } else if (atrID) {
+      let node = getNode(atrID)
+      nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
     } else {
       const livePos = livePositions.find(pos => pos.positionX === position.x && pos.positionY === position.y);
       nodeLength = nodeLengths.find(l => l.id === livePos?.nodeID)?.length || 0;

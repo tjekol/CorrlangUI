@@ -27,6 +27,11 @@ import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
 import { useEdgeCon } from '../hooks/useEdgeCon';
 import { handleEdgeCon } from '../handler/handleEdgeCon';
+import {
+  handleAtrMultiConCreate,
+  handleAtrMultiConUpdate,
+} from '../handler/handleAtrMultiCon';
+import { useAtrMultiCon } from '../hooks/useAtrMultiCon';
 
 export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
@@ -34,8 +39,9 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { attributes, atrLoading, refetchAttributes } = useAttributes();
   const { edges, edgeLoading, refetchEdges } = useEdges();
   const { cons, createCon } = useConnection();
-  const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
+  const { createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
+  const { createAtrMultiCon, updateAtrMultiCon } = useAtrMultiCon();
   const { edgeCons, createEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
 
@@ -73,7 +79,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     setPendingCon,
   );
 
-  const handleMultiClick = handleMultiConUpd(
+  const handleMultiClick = handleMultiConUpdate(
     updateMultiCon,
     pendingCon,
     setPendingCon,
@@ -82,6 +88,18 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const handleAttributeClick = handleAtrCon(
     atrCons,
     createAtrCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
+
+  const handleAtrConClick = handleAtrMultiConCreate(
+    createAtrMultiCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
+
+  const onAtrMultiConClick = handleAtrMultiConUpdate(
+    updateAtrMultiCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
@@ -281,6 +299,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         })}
         <Connection
           onConClick={handleConClick}
+          onAtrConClick={handleAtrConClick}
           onMultiConClick={handleMultiClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}

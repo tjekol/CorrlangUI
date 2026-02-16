@@ -1,4 +1,4 @@
-import { IConnection } from '../interface/Connection/IConnection';
+import { IConnection } from '../interface/IConnections';
 import { IPendingCon } from '../interface/IStates';
 
 export const handleConnection = (

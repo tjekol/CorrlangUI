@@ -10,8 +10,10 @@ import {
 import {
   atrAtom,
   atrConAtom,
+  atrMultiConAtom,
   edgeConAtom,
-  midCircleAtom,
+  midAtrConAtom,
+  midConAtom,
   midEdgeAtom,
   multiConAtom,
   nodeAtom,
@@ -23,6 +25,7 @@ import { INode } from '../interface/INode';
 import { useAtrCon } from '../hooks/useAtrCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdgeCon } from '../hooks/useEdgeCon';
+import { useAtrMultiCon } from '../hooks/useAtrMultiCon';
 
 export default function Connection({
   pendingCon,
@@ -30,29 +33,32 @@ export default function Connection({
   pendingEdgeCon,
   onConClick,
   onMultiConClick,
+  onAtrConClick,
+  onAtrMultiConClick,
 }: {
   pendingCon: IPendingCon | null;
   pendingAtrCon: IPendingAtrCon | null;
   pendingEdgeCon: IPendingEdgeCon | null;
   onConClick: (nodeIDs: number[]) => void;
   onMultiConClick: (id: number, nodeID: number) => void;
-  // onAttributeClick: (
-  //   id: number,
-  //   circlePosition: { x: number; y: number }
-  // ) => void;
+  onAtrConClick: (atrIDs: number[]) => boolean | void;
+  onAtrMultiConClick: (id: number, atrID: number) => boolean | void;
 }) {
   const conHook = useConnection();
   const multiConHook = useMultiCon();
   const atrConHook = useAtrCon();
+  const atrMultiConHook = useAtrMultiCon();
   const edgeConHook = useEdgeCon();
   const nodes = useAtomValue(nodeAtom);
   const attributes = useAtomValue(atrAtom);
 
-  const midCircles = useAtomValue(midCircleAtom);
+  const midCon = useAtomValue(midConAtom);
+  const midAtrCon = useAtomValue(midAtrConAtom);
   const midEdge = useAtomValue(midEdgeAtom);
   const cons = useAtomValue(nodeConAtom);
   const multiConnection = useAtomValue(multiConAtom);
   const atrConnection = useAtomValue(atrConAtom);
+  const atrMultiCon = useAtomValue(atrMultiConAtom);
   const edgeConnection = useAtomValue(edgeConAtom);
 
   const {
@@ -171,7 +177,9 @@ export default function Connection({
         />
       )}
 
-      {/* connections */}
+      {/* CONNECTIONS */}
+
+      {/* Node connections */}
       {cons.map((c) => {
         const conID = c.id;
         const nodes = getNodes(conID);
@@ -230,10 +238,10 @@ export default function Connection({
                     strokeOpacity={0.6}
                   />
                   {/* circle in the middle of connection */}
-                  {midCircles[conID] && (
+                  {midCon[conID] && (
                     <circle
-                      cx={midCircles[conID].x}
-                      cy={midCircles[conID].y}
+                      cx={midCon[conID].x}
+                      cy={midCon[conID].y}
                       r={6}
                       fill='white'
                       stroke='black'
@@ -261,6 +269,7 @@ export default function Connection({
         return null;
       })}
 
+      {/* Multi node connections */}
       {multiConnection.map((multiCon) => {
         if (multiCon.nodes) {
           const multiConID = multiCon.id;
@@ -271,6 +280,15 @@ export default function Connection({
           const midpoint = getMidpoint(nodePositions);
 
           if (midpoint && nodePositions.length > 0) {
+            // related atrCons + atrMultiCons
+            const relatedAtrMultiCon = atrMultiCon.filter((con) =>
+              con.attributes.every((a) => nodeIDs.includes(a.nodeID)),
+            );
+            const relatedAtrCon = atrConnection.filter(
+              (con) =>
+                nodeIDs.includes(getNode(con.srcAtrID)?.id || 0) &&
+                nodeIDs.includes(getNode(con.trgtAtrID)?.id || 0),
+            );
             return nodePositions.map((position, index) => (
               <g key={index}>
                 <path
@@ -295,6 +313,12 @@ export default function Connection({
                         )
                       ) {
                         multiConHook.deleteMultiCon(multiConID);
+                        relatedAtrMultiCon.map((con) =>
+                          atrMultiConHook.deleteAtrMultiCon(con.id),
+                        );
+                        relatedAtrCon.map((atrCon) =>
+                          atrConHook.deleteAtrCon(atrCon.id),
+                        );
                       }
                     }
                   }}
@@ -306,6 +330,7 @@ export default function Connection({
         return null;
       })}
 
+      {/* Attribute connections */}
       {atrConnection.map((atrCon) => {
         const atrConID = atrCon.id;
         const atrIDs = getAtrIDs(atrConID);
@@ -319,23 +344,111 @@ export default function Connection({
 
           if (pos1 && pos2 && srcNode && trgtNode) {
             return (
-              <path
-                key={atrConID}
-                d={getPathData(pos1, pos2, srcNode.id, trgtNode.id)}
-                stroke='#818181'
-                strokeWidth={3}
-                // strokeDasharray={'5,5'}
-                fill='none'
-                onClick={() => atrConHook.deleteAtrCon(atrConID)}
-                className='hover:cursor-pointer'
-                strokeOpacity={0.6}
-              />
+              <g key={atrConID}>
+                <path
+                  ref={(pathElement) => {
+                    if (pathElement) {
+                      setTimeout(
+                        () => calculateMidpoint(pathElement, atrCon.id),
+                        0,
+                      );
+                    }
+                  }}
+                  key={atrConID}
+                  d={getPathData(pos1, pos2, srcNode.id, trgtNode.id)}
+                  stroke='#818181'
+                  strokeWidth={3}
+                  // strokeDasharray={'5,5'}
+                  fill='none'
+                  onClick={() => atrConHook.deleteAtrCon(atrConID)}
+                  className='hover:cursor-pointer'
+                  strokeOpacity={0.6}
+                />
+                {/* circle in the middle of connection */}
+                {midCon[atrConID] && (
+                  <circle
+                    cx={midCon[atrConID].x}
+                    cy={midCon[atrConID].y}
+                    r={5}
+                    fill='white'
+                    stroke='black'
+                    className='hover:opacity-100 opacity-70'
+                    onClick={() => {
+                      if (pendingAtrCon) {
+                        if (onAtrConClick([srcAtrID, trgtAtrID]))
+                          atrConHook.deleteAtrCon(atrConID);
+                      } else {
+                        alert(
+                          'Click an attribute first, then the circle to create a attribute multi connection.',
+                        );
+                      }
+                    }}
+                  />
+                )}
+              </g>
             );
           }
         }
         return null;
       })}
 
+      {/* Multi node connections */}
+      {atrMultiCon.map((atrMultiCon) => {
+        if (atrMultiCon.attributes) {
+          const atrMultiConID = atrMultiCon.id;
+
+          const atrIDs = atrMultiCon.attributes.map((a) => a.id);
+          const atrPositions = atrIDs
+            .map((atrID) => getAttributePosition(atrID))
+            .filter((pos): pos is { x: number; y: number } => pos !== null);
+          const midpoint = getMidpoint(atrPositions);
+
+          if (midpoint && atrPositions.length > 0) {
+            return atrPositions.map((position, index) => (
+              <g key={index}>
+                <path
+                  key={`${atrMultiConID}-${index}`}
+                  stroke='#818181'
+                  strokeWidth={3}
+                  strokeOpacity={0.6}
+                  d={getShortestPath(
+                    midpoint,
+                    position,
+                    undefined,
+                    atrIDs[index],
+                  )}
+                />
+                {/* diamond */}
+                <path
+                  d={`M ${midpoint.x} ${midpoint.y - 12}
+                  L ${midpoint.x + 7} ${midpoint.y}
+                  L ${midpoint.x} ${midpoint.y + 12}
+                  L ${midpoint.x - 7} ${midpoint.y} Z`}
+                  onClick={() => {
+                    if (pendingAtrCon) {
+                      onAtrMultiConClick(
+                        atrMultiConID,
+                        pendingAtrCon.attributeID,
+                      );
+                    } else {
+                      if (
+                        confirm(
+                          'Delete attribute multi connection? (To add attribute to multi connection click attribute first, then diamond).',
+                        )
+                      ) {
+                        atrMultiConHook.deleteAtrMultiCon(atrMultiConID);
+                      }
+                    }
+                  }}
+                />
+              </g>
+            ));
+          }
+        }
+        return null;
+      })}
+
+      {/* Edge connections */}
       {edgeConnection.map((edgeCon) => {
         const edgeConID = edgeCon.id;
         const edgeIDs = getEdgeIDs(edgeConID);

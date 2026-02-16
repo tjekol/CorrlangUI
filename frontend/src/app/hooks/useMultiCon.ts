@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { IMultiConnection } from '../interface/Connection/IMultiConnection';
 import { multiConAtom } from '../GlobalValues';
+import { IMultiConnection } from '../interface/IConnections';
 
 export const useMultiCon = () => {
   const [loading, setLoading] = useState(true);

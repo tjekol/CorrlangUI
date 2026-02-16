@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { atrConAtom } from '../GlobalValues';
-import { IAtrConnection } from '../interface/Connection/IAtrConnection';
+import { IAtrConnection } from '../interface/IConnections';
 
 export const useAtrCon = () => {
   const [loading, setLoading] = useState(true);

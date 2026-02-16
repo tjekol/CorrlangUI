@@ -1,5 +1,4 @@
-import { IConnection } from '../interface/Connection/IConnection';
-import { IEdgeConnection } from '../interface/Connection/IEdgeConnection';
+import { IEdgeConnection } from '../interface/IConnections';
 import { IPendingEdgeCon } from '../interface/IStates';
 
 export const handleEdgeCon = (

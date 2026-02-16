@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { edgeConAtom } from '../GlobalValues';
-import { IEdgeConnection } from '../interface/Connection/IEdgeConnection';
+import { IEdgeConnection } from '../interface/IConnections';
 
 export const useEdgeCon = () => {
   const [loading, setLoading] = useState(true);
