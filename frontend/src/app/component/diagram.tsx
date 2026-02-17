@@ -7,7 +7,6 @@ import { useConnection } from '../hooks/useConnection';
 import { useAtrCon } from '../hooks/useAtrCon';
 import { useEffect, useState, useMemo } from 'react';
 import { handleConnection } from '../handler/handleConnection';
-import { handleMultiConUpd } from '../handler/handleMultiConUpd';
 import { handleAtrCon } from '../handler/handleAtrCon';
 import {
   IPendingAtrCon,
@@ -18,7 +17,10 @@ import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useSchemas } from '../hooks/useSchemas';
-import { handleMultiCon } from '../handler/handleMultiCon';
+import {
+  handleMultiConCreate,
+  handleMultiConUpdate,
+} from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
@@ -73,7 +75,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     setPendingEdgeCon,
   );
 
-  const handleConClick = handleMultiCon(
+  const handleConClick = handleMultiConCreate(
     createMultiCon,
     pendingCon,
     setPendingCon,
@@ -299,8 +301,9 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         })}
         <Connection
           onConClick={handleConClick}
-          onAtrConClick={handleAtrConClick}
           onMultiConClick={handleMultiClick}
+          onAtrConClick={handleAtrConClick}
+          onAtrMultiConClick={onAtrMultiConClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
           pendingEdgeCon={pendingEdgeCon}

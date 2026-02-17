@@ -26,7 +26,6 @@ export const handleAtrMultiConCreate = (
         const multiConAtrs = [...atrIDs, pendingAtrCon.attributeID]
         console.log(`Creating a connection between attributes: ${multiConAtrs}`)
         createAtrMultiCon(multiConAtrs);
-
         setPendingAtrCon(null);
         return true
       } else if (!isMultiConnected) {

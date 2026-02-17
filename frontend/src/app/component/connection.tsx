@@ -39,8 +39,8 @@ export default function Connection({
   pendingCon: IPendingCon | null;
   pendingAtrCon: IPendingAtrCon | null;
   pendingEdgeCon: IPendingEdgeCon | null;
-  onConClick: (nodeIDs: number[]) => void;
-  onMultiConClick: (id: number, nodeID: number) => void;
+  onConClick: (nodeIDs: number[]) => boolean | void;
+  onMultiConClick: (id: number, nodeID: number) => boolean | void;
   onAtrConClick: (atrIDs: number[]) => boolean | void;
   onAtrMultiConClick: (id: number, atrID: number) => boolean | void;
 }) {
@@ -248,11 +248,9 @@ export default function Connection({
                       className='hover:opacity-100 opacity-70'
                       onClick={() => {
                         if (pendingCon) {
-                          onConClick([srcNode.id, trgtNode.id]);
-                          conHook.deleteCon(conID);
-                          relevantAtrCons.forEach((atrCon) => {
-                            atrConHook.deleteAtrCon(atrCon.id);
-                          });
+                          if (onConClick([srcNode.id, trgtNode.id])) {
+                            conHook.deleteCon(conID);
+                          }
                         } else {
                           alert(
                             'Click a node first, then the circle to create a multi-connection.',
