@@ -10,6 +10,7 @@ import {
   atrConAtom,
   multiConAtom,
   nodeConAtom,
+  atrMultiConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
@@ -44,6 +45,7 @@ export default function Node({
   const cons = useAtomValue(nodeConAtom);
   const multiCons = useAtomValue(multiConAtom);
   const atrCons = useAtomValue(atrConAtom);
+  const atrMultiCons = useAtomValue(atrMultiConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
@@ -66,7 +68,7 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const hasConnection =
+  const isConnected =
     cons.some((con) => con.srcNodeID === id || con.trgtNodeID === id) ||
     multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
 
@@ -97,7 +99,7 @@ export default function Node({
             attributeID: attribute.id,
             nodeID: id,
             positionX: newX,
-            positionY: newY + height + (height / 2) * (i + 1),
+            positionY: newY + height + (height / 2) * i,
           };
 
           return [leftPos];
@@ -146,7 +148,7 @@ export default function Node({
       {/* Left circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasConnection ? 'opacity-100' : 'opacity-40'
+          isConnected ? 'opacity-100' : 'opacity-40'
         }`}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
@@ -162,7 +164,7 @@ export default function Node({
       {/* Right circle */}
       <circle
         className={`hover:cursor-pointer hover:opacity-100 ${
-          hasConnection ? 'opacity-100' : 'opacity-40'
+          isConnected ? 'opacity-100' : 'opacity-40'
         }`}
         cx={rightCirclePosition.x}
         cy={rightCirclePosition.y}
@@ -210,20 +212,23 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isActive = atrCons.some(
-          (atr) =>
-            atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
-        );
+        const isActive =
+          atrCons.some(
+            (atr) =>
+              atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
+          ) ||
+          atrMultiCons.some((multiCon) =>
+            multiCon.attributes.some((atr) => atr.id === attribute.id),
+          );
 
-        const alertMsg =
-          'Node needs to be connected to node before connecting attributes.';
+        const alertMsg = 'Connect nodes before connecting attributes.';
 
         return (
           <g key={i}>
             {/* Left circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasConnection && 'hover:opacity-100'
+                isConnected && 'hover:opacity-100'
               }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={leftCirclePosition.x}
               cy={leftCirclePosition.y}
@@ -232,7 +237,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasConnection) {
+                if (isConnected) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,
@@ -248,7 +253,7 @@ export default function Node({
             {/* Right circles */}
             <circle
               className={`hover:cursor-pointer ${
-                hasConnection && 'hover:opacity-100'
+                isConnected && 'hover:opacity-100'
               } ${isActive ? 'opacity-100' : 'opacity-40'}`}
               cx={rightCirclePosition.x}
               cy={rightCirclePosition.y}
@@ -257,7 +262,7 @@ export default function Node({
               stroke='#818181'
               strokeWidth={1}
               onClick={() => {
-                if (hasConnection) {
+                if (isConnected) {
                   (console.log(
                     'Clicked on attribute: ',
                     attribute,

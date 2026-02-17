@@ -26,6 +26,7 @@
     "next": "^15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "tar": "^7.5.7",
     "ts-proto": "^2.8.3"
   },
   "devDependencies": {
@@ -37,7 +38,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "15.5.4",
-    "prisma": "^7.3.0",
+    "prisma": "^7.4.0",
     "protolint": "^0.56.4",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"

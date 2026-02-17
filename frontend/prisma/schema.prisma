@@ -29,13 +29,14 @@ model Node {
   srcCons Connection[] @relation(name: "source")
   trgtCons Connection[] @relation(name: "target")
   schema Schema @relation(fields: [schemaID], references: [id])
-  multiConnection MultiConnection[]
+  multiCons MultiConnection[]
 }
 
 model Edge {
   id  Int   @id @default(autoincrement())
   srcNodeID Int
   trgtNodeID Int
+  refName String
   lowerBound Int?
   upperBound Int?
   isOrdered Boolean @default(false)
@@ -43,6 +44,9 @@ model Edge {
 
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
+
+  srcCons EdgeConnection[] @relation(name: "source")
+  trgtCons EdgeConnection[] @relation(name: "target")
 }
 
 model Attribute {
@@ -54,6 +58,7 @@ model Attribute {
   node Node @relation(fields: [nodeID], references: [id])
   srcAtrs AtrConnection[] @relation(name: "source")
   trgtAtrs AtrConnection[] @relation(name: "target")
+  atrMultiCons AtrMultiConnection[]
 }
 
 model Connection {
@@ -77,4 +82,18 @@ model AtrConnection {
 
   srcAtr Attribute @relation(name: "source", fields: [srcAtrID], references: [id])
   trgtAtr Attribute @relation(name: "target", fields: [trgtAtrID], references: [id])
+}
+
+model AtrMultiConnection {
+  id  Int   @id @default(autoincrement())
+  attributes Attribute[]
+}
+
+model EdgeConnection {
+  id  Int   @id @default(autoincrement())
+  srcEdgeID Int
+  trgtEdgeID Int
+
+  srcEdge Edge @relation(name: "source", fields: [srcEdgeID], references: [id])
+  trgtEdge Edge @relation(name: "target", fields: [trgtEdgeID], references: [id])
 }

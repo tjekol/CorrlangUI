@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useAtom } from 'jotai';
 import { nodeConAtom } from '../GlobalValues';
-import { IConnection } from '../interface/Connection/IConnection';
+import { IConnection } from '../interface/IConnections';
 
 export const useConnection = () => {
   const [loading, setLoading] = useState(true);

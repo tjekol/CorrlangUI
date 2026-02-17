@@ -7,20 +7,33 @@ import { useConnection } from '../hooks/useConnection';
 import { useAtrCon } from '../hooks/useAtrCon';
 import { useEffect, useState, useMemo } from 'react';
 import { handleConnection } from '../handler/handleConnection';
-import { handleMultiConUpd } from '../handler/handleMultiConUpd';
 import { handleAtrCon } from '../handler/handleAtrCon';
-import { IPendingAtrCon, IPendingCon } from '../interface/IStates';
+import {
+  IPendingAtrCon,
+  IPendingCon,
+  IPendingEdgeCon,
+} from '../interface/IStates';
 import { useAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useSchemas } from '../hooks/useSchemas';
-import { handleMultiCon } from '../handler/handleMultiCon';
+import {
+  handleMultiConCreate,
+  handleMultiConUpdate,
+} from '../handler/handleMultiCon';
 import { useMultiCon } from '../hooks/useMultiCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
+import { useEdgeCon } from '../hooks/useEdgeCon';
+import { handleEdgeCon } from '../handler/handleEdgeCon';
+import {
+  handleAtrMultiConCreate,
+  handleAtrMultiConUpdate,
+} from '../handler/handleAtrMultiCon';
+import { useAtrMultiCon } from '../hooks/useAtrMultiCon';
 
 export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
@@ -28,8 +41,10 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { attributes, atrLoading, refetchAttributes } = useAttributes();
   const { edges, edgeLoading, refetchEdges } = useEdges();
   const { cons, createCon } = useConnection();
-  const { multiCons, createMultiCon, updateMultiCon } = useMultiCon();
+  const { createMultiCon, updateMultiCon } = useMultiCon();
   const { atrCons, createAtrCon } = useAtrCon();
+  const { createAtrMultiCon, updateAtrMultiCon } = useAtrMultiCon();
+  const { edgeCons, createEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
@@ -37,6 +52,10 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
     null,
   );
+  const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingEdgeCon | null>(
+    null,
+  );
+
   const [liveNodePositions, setLiveNodePositions] = useAtom(
     liveNodePositionsAtom,
   );
@@ -49,13 +68,20 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     setPendingCon,
   );
 
-  const handleConClick = handleMultiCon(
+  const handleEdgeClick = handleEdgeCon(
+    edgeCons,
+    createEdgeCon,
+    pendingEdgeCon,
+    setPendingEdgeCon,
+  );
+
+  const handleConClick = handleMultiConCreate(
     createMultiCon,
     pendingCon,
     setPendingCon,
   );
 
-  const handleMultiClick = handleMultiConUpd(
+  const handleMultiClick = handleMultiConUpdate(
     updateMultiCon,
     pendingCon,
     setPendingCon,
@@ -64,6 +90,18 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const handleAttributeClick = handleAtrCon(
     atrCons,
     createAtrCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
+
+  const handleAtrConClick = handleAtrMultiConCreate(
+    createAtrMultiCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
+
+  const onAtrMultiConClick = handleAtrMultiConUpdate(
+    updateAtrMultiCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
@@ -233,44 +271,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         className='min-w-full'
       >
         <defs>
-          {/* Arrows for edges */}
-          <marker
-            id='line'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='6'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path d='M 0 0 L 10 5 L 0 10 z' />
-          </marker>
-
-          <marker
-            id='arrow-dir'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='8'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path stroke='black' fill='none' d='M 0 0 L 10 5 L 0 10' />
-          </marker>
-
-          <marker
-            id='arrow-ih'
-            viewBox='0 0 10 10'
-            refX='10'
-            refY='5'
-            markerWidth='6'
-            markerHeight='6'
-            orient='auto'
-          >
-            <path stroke='black' fill='white' d='M 0 0 L 10 5 L 0 10 z' />
-          </marker>
-
-          {/* Diamond for multi connections */}
+          {/* Diamond */}
           <marker
             id='diamond'
             viewBox='0 0 20 20'
@@ -298,13 +299,16 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
             </text>
           );
         })}
-        <Edge edges={filteredEdges} />
         <Connection
           onConClick={handleConClick}
           onMultiConClick={handleMultiClick}
+          onAtrConClick={handleAtrConClick}
+          onAtrMultiConClick={onAtrMultiConClick}
           pendingCon={pendingCon}
           pendingAtrCon={pendingAtrCon}
+          pendingEdgeCon={pendingEdgeCon}
         />
+        <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />
         {loading || edgeLoading || layoutLoading || atrLoading ? (
           <text x={50} y={50}>
             {loading || atrLoading ? 'Loading...' : 'Calculating layout...'}

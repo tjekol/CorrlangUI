@@ -1,13 +1,17 @@
-import { useAtomValue } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom } from '../GlobalValues';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midConAtom, midEdgeAtom, liveAtrPositionsAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 
 export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
+  const liveAtrPositions = useAtomValue(liveAtrPositionsAtom);
   const nodes = useAtomValue(nodeAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
   const attributes = useAtomValue(atrAtom);
+  const setMidCon = useSetAtom(midConAtom)
+  const setMidEdge = useSetAtom(midEdgeAtom)
+
   const height = 40
 
   const getNode = (attributeID: number): INode | null => {
@@ -56,6 +60,14 @@ export const useCalculation = () => {
   }
 
   const getAttributePosition = (attributeID: number) => {
+    const livePos = liveAtrPositions.find((pos) => pos.attributeID === attributeID);
+    if (livePos) {
+      return {
+        x: livePos.positionX,
+        y: livePos.positionY,
+      };
+    }
+
     const parentNode = getNode(attributeID)
     if (!parentNode) return null;
 
@@ -77,43 +89,87 @@ export const useCalculation = () => {
     };
   };
 
+  // calculate midpoint for a path
+  const calculateMidpoint = (pathElement: SVGPathElement, conID: number) => {
+    const totalLength = pathElement.getTotalLength();
+    if (!isFinite(totalLength) || totalLength === 0) return;
+
+    const pt = pathElement.getPointAtLength(totalLength / 2);
+    setMidCon((prev) => ({
+      ...prev,
+      [conID]: { x: pt.x, y: pt.y },
+    }));
+  };
+
+  const calculateMidpointEdge = (pathElement: SVGPathElement, edgeID: number) => {
+    const totalLength = pathElement.getTotalLength();
+    if (!isFinite(totalLength) || totalLength === 0) return;
+
+    const pt = pathElement.getPointAtLength(totalLength / 2);
+    setMidEdge((prev) => ({
+      ...prev,
+      [edgeID]: { x: pt.x, y: pt.y },
+    }));
+  };
+
   const getPathData = (
-    srcNodeID: number,
     pos1: { x: number; y: number },
-    trgtNodeID: number,
-    pos2: { x: number; y: number }
+    pos2: { x: number; y: number },
+    srcNodeID?: number,
+    trgtNodeID?: number
   ): string => {
-    const srcNodeLength = nodeLengths.find((l) => l.id === srcNodeID)?.length || 0
-    const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNodeID)?.length || 0
 
-    const pos1Y = pos1.y + height / 2
-    const pos2Y = pos2.y + height / 2
+    let pos1Y = pos1.y;
+    let pos2Y = pos2.y;
 
-    // connect to left or rigth circle closest to pos2
-    const diff1X = pos2.x - pos1.x;
-    const diff1XWidth = pos2.x - (pos1.x + srcNodeLength);
-    const pos1X =
-      Math.abs(diff1X) < Math.abs(diff1XWidth) ? pos1.x : pos1.x + srcNodeLength;
+    let pos1X = pos1.x;
+    let pos2X = pos2.x;
 
-    // conntect to left or rigth circle closest to pos1
-    const diff2X = pos1X - pos2.x;
-    const diff2XWidth = pos1X - (pos2.x + trgtNodeLength);
-    const pos2X =
-      Math.abs(diff2X) < Math.abs(diff2XWidth) ? pos2.x : pos2.x + trgtNodeLength;
+    if (srcNodeID && trgtNodeID) {
+      const srcNodeLength = nodeLengths.find((l) => l.id === srcNodeID)?.length || 0
+      const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNodeID)?.length || 0
 
-    const actualDiffY = pos1Y - pos2Y;
-    if (actualDiffY < 1 && actualDiffY > -1) {
-      return `M ${pos1X} ${pos1Y} L ${pos2X} ${pos2Y}`;
+      pos1Y = pos1.y + height / 2
+      pos2Y = pos2.y + height / 2
+
+      // connect to left or rigth circle closest to pos2
+      const diff1X = pos2.x - pos1.x;
+      const diff1XWidth = pos2.x - (pos1.x + srcNodeLength);
+      pos1X =
+        Math.abs(diff1X) < Math.abs(diff1XWidth) ? pos1.x : pos1.x + srcNodeLength;
+
+      // conntect to left or rigth circle closest to pos1
+      const diff2X = pos1X - pos2.x;
+      const diff2XWidth = pos1X - (pos2.x + trgtNodeLength);
+      pos2X =
+        Math.abs(diff2X) < Math.abs(diff2XWidth) ? pos2.x : pos2.x + trgtNodeLength;
+
+      const actualDiffY = pos1Y - pos2Y;
+      if (actualDiffY < 1 && actualDiffY > -1) {
+        return `M ${pos1X} ${pos1Y} L ${pos2X} ${pos2Y}`;
+      }
+
+      const distance = Math.abs(pos2X - pos1X);
+      const curveStrength = Math.min(distance * 0.8, 100);
+
+      const controlPoint1X =
+        pos1X + (pos1X === pos1.x ? -curveStrength : curveStrength);
+      const controlPoint1Y = pos1Y;
+      const controlPoint2X =
+        pos2X + (pos2X === pos2.x ? -curveStrength : curveStrength);
+      const controlPoint2Y = pos2Y;
+
+      return `M ${pos1X} ${pos1Y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2X} ${pos2Y}`;
     }
 
     const distance = Math.abs(pos2X - pos1X);
     const curveStrength = Math.min(distance * 0.8, 100);
 
     const controlPoint1X =
-      pos1X + (pos1X === pos1.x ? -curveStrength : curveStrength);
+      pos1X + (pos1X > pos2X ? -curveStrength : curveStrength);
     const controlPoint1Y = pos1Y;
     const controlPoint2X =
-      pos2X + (pos2X === pos2.x ? -curveStrength : curveStrength);
+      pos2X + (pos1X < pos2X ? -curveStrength : curveStrength);
     const controlPoint2Y = pos2Y;
 
     return `M ${pos1X} ${pos1Y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${pos2X} ${pos2Y}`;
@@ -131,10 +187,14 @@ export const useCalculation = () => {
     };
   }
 
-  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number) => {
+  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number, atrID?: number) => {
     let nodeLength = 0;
+
     if (nodeID) {
       nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
+    } else if (atrID) {
+      let node = getNode(atrID)
+      nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
     } else {
       const livePos = livePositions.find(pos => pos.positionX === position.x && pos.positionY === position.y);
       nodeLength = nodeLengths.find(l => l.id === livePos?.nodeID)?.length || 0;
@@ -190,5 +250,5 @@ export const useCalculation = () => {
     return { pos1X, pos1Y, pos2X, pos2Y }
   }
 
-  return { getNode, getNodePosition, calculateNodeLength, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
+  return { getNode, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
 }

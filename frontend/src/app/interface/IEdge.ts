@@ -2,6 +2,7 @@ export interface IEdge {
   id: number;
   srcNodeID: number;
   trgtNodeID: number;
+  refName: string;
   lowerBound: number;
   upperBound: number;
   isOrdered: boolean;

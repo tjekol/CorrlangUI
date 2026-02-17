@@ -8,16 +8,22 @@ import { useAtrCon } from './hooks/useAtrCon';
 import { useConnection } from './hooks/useConnection';
 import { useMultiCon } from './hooks/useMultiCon';
 import { ICorrespondence } from './interface/ICorrespondence';
+import { useEdgeCon } from './hooks/useEdgeCon';
+import { useAtrMultiCon } from './hooks/useAtrMultiCon';
 
 export default function Home() {
   const { deleteAllCons } = useConnection();
   const { deleteAllMultiCons } = useMultiCon();
   const { deleteAllAtrCons } = useAtrCon();
+  const { deleteAllEdgeCons } = useEdgeCon();
+  const { deleteAllAtrMultiCons } = useAtrMultiCon();
 
   const reset = () => {
     deleteAllCons();
     deleteAllMultiCons();
     deleteAllAtrCons();
+    deleteAllEdgeCons();
+    deleteAllAtrMultiCons();
   };
 
   const [exportIsOpen, setExportIsOpen] = useState<boolean>(false);
@@ -39,9 +45,7 @@ export default function Home() {
         {!corres || (
           <div className='flex justify-between'>
             <button
-              onClick={() => {
-                resetCorres();
-              }}
+              onClick={() => (resetCorres(), setExportIsOpen(false))}
               className='border bg-blue-50 rounded-md px-4 py-1'
             >
               Pick correspondence
