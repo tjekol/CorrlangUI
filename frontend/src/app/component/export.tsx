@@ -4,6 +4,7 @@ import { useAtomValue } from 'jotai';
 import {
   atrAtom,
   atrConAtom,
+  atrMultiConAtom,
   multiConAtom,
   nodeAtom,
   nodeConAtom,
@@ -18,15 +19,16 @@ export default function Export() {
   const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
   const multiCons = useAtomValue(multiConAtom);
+  const atrMultiCons = useAtomValue(atrMultiConAtom);
 
   const [exportResult, setExportResult] = useState<string[]>([]);
 
   useEffect(() => {
     setExportResult([]);
 
-    nodeCons.map((nc) => {
-      const srcNode = nodes.find((n) => n.id === nc.srcNodeID);
-      const trgtNode = nodes.find((n) => n.id === nc.trgtNodeID);
+    nodeCons.map((con) => {
+      const srcNode = nodes.find((n) => n.id === con.srcNodeID);
+      const trgtNode = nodes.find((n) => n.id === con.trgtNodeID);
 
       if (srcNode && trgtNode) {
         const srcSchema = schemas.find((s) => s.id === srcNode.schemaID);
@@ -40,9 +42,9 @@ export default function Export() {
       }
     });
 
-    atrCons.map((ac) => {
-      const srcAtr = attributes.find((a) => a.id === ac.srcAtrID);
-      const trgtAtr = attributes.find((a) => a.id === ac.trgtAtrID);
+    atrCons.map((con) => {
+      const srcAtr = attributes.find((a) => a.id === con.srcAtrID);
+      const trgtAtr = attributes.find((a) => a.id === con.trgtAtrID);
 
       if (srcAtr && trgtAtr) {
         const srcNode = nodes.find((n) => n.id === srcAtr.nodeID);
@@ -61,30 +63,65 @@ export default function Export() {
       }
     });
 
-    multiCons.map((mc) => {
-      const nodeIDs = mc.nodes.map((n) => n.id);
+    multiCons.map((con) => {
+      const nodeIDs = con.nodes.map((n) => n.id);
       const multiConNodes = nodes.filter((node) => nodeIDs.includes(node.id));
 
-      const multiRes: { schemaTitle: string; nodeTitle: string }[] = [];
+      const result: { schemaTitle: string; nodeTitle: string }[] = [];
 
       for (const node of multiConNodes) {
         const schema = schemas.find((s) => s.id === node.schemaID);
         if (schema)
-          multiRes.push({ schemaTitle: schema?.title, nodeTitle: node.title });
+          result.push({ schemaTitle: schema?.title, nodeTitle: node.title });
       }
 
-      const firstNode = multiRes[0];
-      const restOfNodes = multiRes
+      const firstNode = result[0];
+      const restOfNodes = result
         .splice(1)
         .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle);
 
       if (firstNode && restOfNodes)
         setExportResult((prev) => [
           ...prev,
-          `identify (${firstNode.schemaTitle}.${firstNode.nodeTitle},${restOfNodes}) as ${firstNode.nodeTitle}; \n `,
+          `identify (${firstNode.schemaTitle}.${firstNode.nodeTitle},${restOfNodes}) as ${firstNode.nodeTitle}; \n`,
         ]);
     });
-  }, [nodeCons, atrCons, multiCons]);
+
+    atrMultiCons.map((con) => {
+      const atrIDs = con.attributes.map((a) => a.id);
+      const conAtrs = attributes.filter((a) => atrIDs.includes(a.id));
+
+      const result: {
+        schemaTitle: string;
+        nodeTitle: string;
+        atrText: string;
+      }[] = [];
+
+      for (const atr of conAtrs) {
+        const node = nodes.find((n) => n.id === atr.nodeID);
+        if (node) {
+          const schema = schemas.find((s) => s.id === node.schemaID);
+          if (schema)
+            result.push({
+              schemaTitle: schema.title,
+              nodeTitle: node.title,
+              atrText: atr.text,
+            });
+        }
+      }
+
+      const firstAtr = result[0];
+      const restOfAtrs = result
+        .splice(1)
+        .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + ' ' + r.atrText);
+
+      if (firstAtr && restOfAtrs)
+        setExportResult((prev) => [
+          ...prev,
+          `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.atrText},${restOfAtrs}) as ${firstAtr.atrText}; \n`,
+        ]);
+    });
+  }, [nodeCons, atrCons, multiCons, atrMultiCons]);
 
   return (
     <p className='bg-[#F9F9F9] m-auto h-full p-5 rounded-sm border whitespace-pre-wrap'>
