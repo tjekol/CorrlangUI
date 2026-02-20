@@ -3,14 +3,10 @@
 import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
-import { useConnection } from '../hooks/useConnection';
-import { useAtrCon } from '../hooks/useAtrCon';
 import { useEffect, useState, useMemo } from 'react';
-import { handleConnection } from '../handler/handleConnection';
-import { handleAtrCon } from '../handler/handleAtrCon';
 import {
   IPendingAtrCon,
-  IPendingCon,
+  IPendingNodeCon,
   IPendingEdgeCon,
 } from '../interface/IStates';
 import { useAtom } from 'jotai';
@@ -18,10 +14,10 @@ import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useSchemas } from '../hooks/useSchemas';
 import {
-  handleMultiConCreate,
-  handleMultiConUpdate,
-} from '../handler/handleMultiCon';
-import { useMultiCon } from '../hooks/useMultiCon';
+  handleNodeConCreate,
+  handleNodeConUpdate,
+} from '../handler/handleNodeCon';
+import { useNodeCon } from '../hooks/useNodeCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
@@ -30,25 +26,25 @@ import { ICorrespondence } from '../interface/ICorrespondence';
 import { useEdgeCon } from '../hooks/useEdgeCon';
 import { handleEdgeCon } from '../handler/handleEdgeCon';
 import {
-  handleAtrMultiConCreate,
-  handleAtrMultiConUpdate,
-} from '../handler/handleAtrMultiCon';
-import { useAtrMultiCon } from '../hooks/useAtrMultiCon';
+  handleAtrConCreate,
+  handleAtrConUpdate,
+} from '../handler/handleAtrCon';
+import { useAtrCon } from '../hooks/useAtrCon';
 
 export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
   const { nodes, loading, refetchNodes } = useNodes();
   const { attributes, atrLoading, refetchAttributes } = useAttributes();
   const { edges, edgeLoading, refetchEdges } = useEdges();
-  const { cons, createCon } = useConnection();
-  const { createMultiCon, updateMultiCon } = useMultiCon();
-  const { atrCons, createAtrCon } = useAtrCon();
-  const { createAtrMultiCon, updateAtrMultiCon } = useAtrMultiCon();
+  const { nodeCon, createNodeCon, updateNodeCon } = useNodeCon();
+  const { atrCon, createAtrCon, updateAtrCon } = useAtrCon();
   const { edgeCons, createEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
-  const [pendingCon, setPendingCon] = useState<IPendingCon | null>(null);
+  const [pendingNodeCon, setPendingNodeCon] = useState<IPendingNodeCon | null>(
+    null,
+  );
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
     null,
   );
@@ -61,11 +57,18 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
 
-  const handleHeaderClick = handleConnection(
-    cons,
-    createCon,
-    pendingCon,
-    setPendingCon,
+  const handleNodeClick = handleNodeConCreate(
+    nodeCon,
+    createNodeCon,
+    pendingNodeCon,
+    setPendingNodeCon,
+  );
+
+  const handleAttributeClick = handleAtrConCreate(
+    atrCon,
+    createAtrCon,
+    pendingAtrCon,
+    setPendingAtrCon,
   );
 
   const handleEdgeClick = handleEdgeCon(
@@ -75,33 +78,14 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     setPendingEdgeCon,
   );
 
-  const handleConClick = handleMultiConCreate(
-    createMultiCon,
-    pendingCon,
-    setPendingCon,
+  const handleNodeConClick = handleNodeConUpdate(
+    updateNodeCon,
+    pendingNodeCon,
+    setPendingNodeCon,
   );
 
-  const handleMultiClick = handleMultiConUpdate(
-    updateMultiCon,
-    pendingCon,
-    setPendingCon,
-  );
-
-  const handleAttributeClick = handleAtrCon(
-    atrCons,
-    createAtrCon,
-    pendingAtrCon,
-    setPendingAtrCon,
-  );
-
-  const handleAtrConClick = handleAtrMultiConCreate(
-    createAtrMultiCon,
-    pendingAtrCon,
-    setPendingAtrCon,
-  );
-
-  const onAtrMultiConClick = handleAtrMultiConUpdate(
-    updateAtrMultiCon,
+  const handleAtrConClick = handleAtrConUpdate(
+    updateAtrCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
@@ -300,11 +284,9 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           );
         })}
         <Connection
-          onConClick={handleConClick}
-          onMultiConClick={handleMultiClick}
+          onConClick={handleNodeConClick}
           onAtrConClick={handleAtrConClick}
-          onAtrMultiConClick={onAtrMultiConClick}
-          pendingCon={pendingCon}
+          pendingNodeCon={pendingNodeCon}
           pendingAtrCon={pendingAtrCon}
           pendingEdgeCon={pendingEdgeCon}
         />
@@ -338,7 +320,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
                 positionY={livePositions?.positionY || n.positionY || 0}
                 schemaID={n.schemaID}
                 color={color}
-                onHeaderClick={handleHeaderClick}
+                onNodeClick={handleNodeClick}
                 onAttributeClick={handleAttributeClick}
               />
             );

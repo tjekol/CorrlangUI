@@ -1,73 +1,91 @@
 import { useAtomValue } from 'jotai';
 import { IAtrConnection } from '../interface/IConnections';
 import { IPendingAtrCon } from '../interface/IStates';
-import { multiConAtom, nodeConAtom } from '../GlobalValues';
+import { atrConAtom, nodeConAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
-export const handleAtrCon = (
-  cons: IAtrConnection[],
-  createAtrCon: (srcAtrID: number, trgtAtrID: number) => void,
+export const handleAtrConCreate = (
+  atrCons: IAtrConnection[],
+  createAtrCon: (atrIDs: number[]) => void,
   pendingAtrCon: IPendingAtrCon | null,
-  setPendingAtrCon: (pendingEdge: IPendingAtrCon | null) => void
+  setPendingAtrCon: (pendingAtrCon: IPendingAtrCon | null) => void
 ) => {
-  const nodeCons = useAtomValue(nodeConAtom);
-  const multiCons = useAtomValue(multiConAtom);
+  const nodeCons = useAtomValue(nodeConAtom)
   const { getNode } = useCalculation();
 
-  return (id: number, circlePosition: { x: number; y: number }) => {
-    if (!pendingAtrCon) {
-      const newAtrConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
+  return (atrID: number, circlePosition?: { x: number; y: number }) => {
+    console.log('Attribute clicked:', {
+      attributeID: atrID,
+      position: circlePosition,
+    });
 
+    if (!pendingAtrCon && circlePosition) {
+      const newAtrConID = Math.max(0, ...atrCons.map((e) => e.id)) + 1;
       setPendingAtrCon({
         atrConID: newAtrConID,
-        attributeID: id,
+        attributeID: atrID,
         positionX: circlePosition.x,
         positionY: circlePosition.y,
       });
-
-      console.log('First attribute selected:', {
-        attributeID: id,
-        position: circlePosition,
-      });
       return false
     } else {
-      // checks if attribute nodes are connected before connecting attributes
-      const nodeID = getNode(id)?.id
-      const pendingNodeID = getNode(pendingAtrCon.attributeID)?.id
+      // check if atr is already in connection
+      if (pendingAtrCon && atrID !== pendingAtrCon.attributeID) {
 
-      let isNodesConnected = nodeID && pendingNodeID && nodeCons.some(con => (
-        con.srcNodeID === nodeID && con.trgtNodeID === pendingNodeID) ||
-        (con.trgtNodeID === nodeID && con.srcNodeID === pendingNodeID)
-      );
+        // check if attribute nodes are connected
+        const allAtrIDs = [atrID, pendingAtrCon.attributeID]
+        const nodeIDs = allAtrIDs.map(atrID => getNode(atrID)?.id).filter(id => id !== undefined)
+        const isNodeConnected = nodeCons.some(nodeCon => nodeIDs.every(nodeID => nodeCon.nodes.some(node => node.id === nodeID)))
 
-      let isMultiConnected = nodeID && pendingNodeID && multiCons.some(con => (
-        con.nodes.map(n => n.id).includes(nodeID) &&
-        con.nodes.map(n => n.id).includes(pendingNodeID)
-      ))
-
-      if (pendingAtrCon.attributeID !== id && (isNodesConnected || isMultiConnected)) {
-        console.log(
-          'Creating connection between attributes:',
-          pendingAtrCon.attributeID,
-          'and',
-          id
-        );
-
-        createAtrCon(
-          pendingAtrCon.attributeID,
-          id
-        );
-        setPendingAtrCon(null);
-        return true
-      } else if (pendingAtrCon.attributeID !== id && !isNodesConnected) {
-        alert("The nodes of the clicked attributes need to be connected first.")
-        setPendingAtrCon(null);
-        return false
+        if (isNodeConnected) {
+          createAtrCon(allAtrIDs);
+          setPendingAtrCon(null);
+          return true
+        } else {
+          alert("Attribute nodes needs to be connected.")
+          setPendingAtrCon(null);
+          return false
+        }
       } else {
-        console.log('Same node clicked, canceling attribute connection creation');
+        console.log('Same attribute clicked or attribute alredy exists in connection.');
         setPendingAtrCon(null);
         return false
       }
     }
-  };
+  }
+};
+
+export const handleAtrConUpdate = (
+  updateAtrMultiCon: (atrConID: number, atrID: number) => void,
+  pendingAtrCon: IPendingAtrCon | null,
+  setPendingAtrCon: (pendingAtrCon: IPendingAtrCon | null) => void
+) => {
+  const nodeCons = useAtomValue(nodeConAtom)
+  const atrCons = useAtomValue(atrConAtom)
+  const { getNode } = useCalculation();
+
+  return (atrConID: number, atrID: number) => {
+    if (!pendingAtrCon) {
+      alert(`Click on attribute first to add to attribute connection.`)
+    } else {
+
+      // check if attribute nodes are connected
+      const atrNodeID = getNode(atrID)?.id
+      const filteredNodeCons = nodeCons.filter(con => con.nodes.find(node => node.id === atrNodeID))
+      const filteredAtrCons = atrCons.filter(atrCon => atrCon.id === atrConID)
+      const filteredNodeIDs = filteredNodeCons.map(con => con.nodes.map(n => n.id))
+      const filteredAtrNodeIDs = filteredAtrCons.map(con => con.attributes.map(a => a.nodeID))
+      const isNodeConnected = filteredNodeIDs.some(nodeIDs => filteredAtrNodeIDs.some(atrNodeIDs => atrNodeIDs.every(atrNodeID => nodeIDs.includes(atrNodeID))));
+
+      if (isNodeConnected) {
+        updateAtrMultiCon(atrConID, atrID);
+        setPendingAtrCon(null);
+        return true
+      } else {
+        alert("Attribute nodes needs to be connected.")
+        setPendingAtrCon(null);
+        return false
+      }
+    }
+  }
 };

@@ -11,7 +11,10 @@ export default function Edge({
   onEdgeClick,
 }: {
   edges: IEdge[];
-  onEdgeClick: (id: number, circlePosition: { x: number; y: number }) => void;
+  onEdgeClick: (
+    edgeID: number,
+    circlePosition: { x: number; y: number },
+  ) => void;
 }) {
   const nodes = useAtomValue(nodeAtom);
   const edgeCons = useAtomValue(edgeConAtom);
@@ -33,9 +36,7 @@ export default function Edge({
   };
 
   const isConnected = (edgeID: number) => {
-    return edgeCons.some(
-      (e) => e.srcEdgeID === edgeID || e.trgtEdgeID === edgeID,
-    );
+    return edgeCons.some((con) => con.edges.find((e) => e.id === edgeID));
   };
 
   return (
@@ -152,14 +153,7 @@ export default function Edge({
                         fill='white'
                         stroke='black'
                         className={`hover:opacity-100 ${isConnected(edgeID) ? 'opacity-100' : 'opacity-70'}`}
-                        onClick={() => (
-                          console.log(
-                            'Clicked on edge',
-                            edgeID,
-                            midEdge[edgeID],
-                          ),
-                          onEdgeClick(edgeID, midEdge[edgeID])
-                        )}
+                        onClick={() => onEdgeClick(edgeID, midEdge[edgeID])}
                       />
                     )}
 

@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all atr multi connections
+// GET - Fetch all attribute connections
 export async function GET() {
   try {
-    const multiCon = await prisma.atrMultiConnection.findMany({
+    const con = await prisma.atrConnection.findMany({
       include: {
         attributes: {
           select: {
@@ -15,22 +15,22 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(multiCon);
+    return NextResponse.json(con);
   } catch (error) {
-    console.error('Error fetching attribute multi connection:', error);
+    console.error('Error fetching attribute connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch attribute multi connection' },
+      { error: 'Failed to fetch attribute connection' },
       { status: 500 }
     );
   }
 }
 
-// POST - Create a new multi connection
+// POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
     const { atrIDs } = await request.json();
 
-    const con = await prisma.atrMultiConnection.create({
+    const con = await prisma.atrConnection.create({
       data: {
         attributes: {
           connect: atrIDs.map((id: number) => ({ id }))
@@ -48,22 +48,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating attribute multi connection:', error);
+    console.error('Error creating attribute connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create attribute multi connection' },
+      { error: 'Failed to create attribute connection' },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update attribute multi connection
+// PUT - Update attribute connection
 export async function PUT(request: NextRequest) {
   try {
-    const { id, atrID } = await request.json();
+    const { atrConID, atrID } = await request.json();
 
-    const con = await prisma.atrMultiConnection.update({
+    const con = await prisma.atrConnection.update({
       where: {
-        id: id
+        id: atrConID
       },
       data: {
         attributes: {
@@ -82,9 +82,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating attribute multi connection:', error);
+    console.error('Error updating attribute connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update attribute multi connection' },
+      { error: 'Failed to update attribute connection' },
       { status: 500 }
     );
   }
@@ -97,19 +97,19 @@ export async function DELETE(request: NextRequest) {
     let deletedCon;
     if (id) {
       // Delete related connections
-      deletedCon = await prisma.atrMultiConnection.deleteMany({
+      deletedCon = await prisma.atrConnection.deleteMany({
         where: {
           id: id,
         },
       });
     } else {
-      deletedCon = await prisma.atrMultiConnection.deleteMany()
+      deletedCon = await prisma.atrConnection.deleteMany()
     }
     return NextResponse.json(deletedCon);
   } catch (error) {
-    console.error('Error deleting attribute multi connection:', error);
+    console.error('Error deleting attribute connection:', error);
     return NextResponse.json(
-      { error: 'Failed to delete attribute multi connection' },
+      { error: 'Failed to delete attribute connection' },
       { status: 500 }
     );
   }

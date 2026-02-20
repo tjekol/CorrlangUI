@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all multi connections
+// GET - Fetch all connections
 export async function GET() {
   try {
-    const multiCon = await prisma.multiConnection.findMany({
+    const multiCon = await prisma.nodeConnection.findMany({
       include: {
         nodes: {
           select: {
@@ -16,20 +16,20 @@ export async function GET() {
 
     return NextResponse.json(multiCon);
   } catch (error) {
-    console.error('Error fetching multi connection:', error);
+    console.error('Error fetching connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch multi connection' },
+      { error: 'Failed to fetch connection' },
       { status: 500 }
     );
   }
 }
 
-// POST - Create a new multi connection
+// POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
     const { nodeIDs } = await request.json();
 
-    const con = await prisma.multiConnection.create({
+    const con = await prisma.nodeConnection.create({
       data: {
         nodes: {
           connect: nodeIDs.map((id: number) => ({ id }))
@@ -46,22 +46,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating multi connection:', error);
+    console.error('Error creating connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create multi connection' },
+      { error: 'Failed to create connection' },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update multi connection
+// PUT - Update connection
 export async function PUT(request: NextRequest) {
   try {
-    const { id, nodeID } = await request.json();
+    const { conID, nodeID } = await request.json();
 
-    const con = await prisma.multiConnection.update({
+    const con = await prisma.nodeConnection.update({
       where: {
-        id: id
+        id: conID
       },
       data: {
         nodes: {
@@ -79,9 +79,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating multi connection:', error);
+    console.error('Error updating connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update multi connection' },
+      { error: 'Failed to update connection' },
       { status: 500 }
     );
   }
@@ -94,19 +94,19 @@ export async function DELETE(request: NextRequest) {
     let deletedCon;
     if (id) {
       // Delete related connections
-      deletedCon = await prisma.multiConnection.deleteMany({
+      deletedCon = await prisma.nodeConnection.deleteMany({
         where: {
           id: id,
         },
       });
     } else {
-      deletedCon = await prisma.multiConnection.deleteMany()
+      deletedCon = await prisma.nodeConnection.deleteMany()
     }
     return NextResponse.json(deletedCon);
   } catch (error) {
-    console.error('Error deleting multi connection:', error);
+    console.error('Error deleting connection:', error);
     return NextResponse.json(
-      { error: 'Failed to delete multi connection' },
+      { error: 'Failed to delete connection' },
       { status: 500 }
     );
   }

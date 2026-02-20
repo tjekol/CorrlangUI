@@ -4,7 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET - Fetch all edge connections
 export async function GET() {
   try {
-    const connections = await prisma.edgeConnection.findMany();
+    const connections = await prisma.edgeConnection.findMany({
+      include: {
+        edges: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
 
     return NextResponse.json(connections);
   } catch (error) {
@@ -19,13 +27,19 @@ export async function GET() {
 // POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
-    const { srcEdgeID, trgtEdgeID } = await request.json();
+    const { edgeIDs } = await request.json();
 
     const con = await prisma.edgeConnection.create({
       data: {
-        srcEdgeID,
-        trgtEdgeID
+        edges: {
+          connect: edgeIDs.map((id: number) => ({ id }))
+        }
       },
+      include: {
+        edges: {
+          select: { id: true }
+        }
+      }
     });
 
     return NextResponse.json(con, { status: 201 });
