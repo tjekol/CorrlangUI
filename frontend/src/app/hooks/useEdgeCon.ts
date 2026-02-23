@@ -45,6 +45,22 @@ export const useEdgeCon = () => {
     setEdgeCon(prev => [...prev, conData]);
   })
 
+  const updateEdgeCon = (edgeConID: number, edgeID: number) => handleAsync(async () => {
+    const res = await fetch('/api/edge-connection', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edgeConID, edgeID }),
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to update edge connection');
+    }
+
+    const conData: IEdgeConnection = await res.json();
+    console.log(`Removed edge connection with id: ${edgeConID}`);
+    setEdgeCon(prev => prev.map(edgeCon => edgeCon.id === edgeConID ? conData : edgeCon));
+  })
+
   const deleteEdgeCon = (id: number) => handleAsync(async () => {
     const res = await fetch('/api/edge-connection', {
       method: 'DELETE',
@@ -75,5 +91,5 @@ export const useEdgeCon = () => {
 
   useEffect(() => { fetchEdgeCons() }, [])
 
-  return { edgeCons: edgeCon, loading, createEdgeCon, deleteEdgeCon, deleteAllEdgeCons };
+  return { edgeCon, loading, createEdgeCon, updateEdgeCon, deleteEdgeCon, deleteAllEdgeCons };
 };

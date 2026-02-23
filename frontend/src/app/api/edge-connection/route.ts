@@ -52,6 +52,39 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Update connection
+export async function PUT(request: NextRequest) {
+  try {
+    const { edgeConID, edgeID } = await request.json();
+
+    const con = await prisma.edgeConnection.update({
+      where: {
+        id: edgeConID
+      },
+      data: {
+        edges: {
+          connect: { id: edgeID }
+        }
+      },
+      include: {
+        edges: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(con, { status: 201 });
+  } catch (error) {
+    console.error('Error updating connection:', error);
+    return NextResponse.json(
+      { error: 'Failed to update connection' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Delete edge connections by ID
 export async function DELETE(request: NextRequest) {
   try {

@@ -15,7 +15,9 @@ export const nodeColor = ['#86AD5A', '#A96CB5', '#5C97DC', '#D16370', '#F8A72F',
 export const nodeLengthAtom = atom<{ id: number, length: number }[]>([]); // [{ id: 1, length: 6 }]
 
 // Midpoints paths (edge/connections)
-export const midConAtom = atom<Record<number, { x: number; y: number }>>({});
+export const midNodeConAtom = atom<Record<number, { x: number; y: number }>>({});
+export const midAtrConAtom = atom<Record<number, { x: number; y: number }>>({});
+export const midEdgeConAtom = atom<Record<number, { x: number; y: number }>>({});
 export const midEdgeAtom = atom<Record<number, { x: number; y: number }>>({});
 
 // Edges

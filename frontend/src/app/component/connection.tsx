@@ -7,13 +7,13 @@ import {
   IPendingEdgeCon,
 } from '../interface/IStates';
 import {
-  atrAtom,
+  nodeConAtom,
   atrConAtom,
   edgeConAtom,
-  midConAtom,
+  midNodeConAtom,
+  midAtrConAtom,
+  midEdgeConAtom,
   midEdgeAtom,
-  nodeAtom,
-  nodeConAtom,
 } from '../GlobalValues';
 import { useEffect, useState } from 'react';
 import { useCalculation } from '../hooks/useCalculation';
@@ -27,20 +27,19 @@ export default function Connection({
   pendingEdgeCon,
   onConClick,
   onAtrConClick,
+  onEdgeConClick,
 }: {
   pendingNodeCon: IPendingNodeCon | null;
   pendingAtrCon: IPendingAtrCon | null;
   pendingEdgeCon: IPendingEdgeCon | null;
-  onConClick: (conID: number, nodeID: number) => boolean | void;
+  onConClick: (nodeConID: number, nodeID: number) => boolean | void;
   onAtrConClick: (atrConID: number, atrID: number) => boolean | void;
+  onEdgeConClick: (edgeConID: number, edgeID: number) => boolean | void;
 }) {
   // Hooks
   const nodeConHook = useNodeCon();
   const atrConHook = useAtrCon();
   const edgeConHook = useEdgeCon();
-
-  const nodes = useAtomValue(nodeAtom);
-  const attributes = useAtomValue(atrAtom);
 
   // Connections
   const nodeCons = useAtomValue(nodeConAtom);
@@ -48,7 +47,9 @@ export default function Connection({
   const edgeCons = useAtomValue(edgeConAtom);
 
   // Middle position of connections
-  const midCon = useAtomValue(midConAtom);
+  const midNodeCon = useAtomValue(midNodeConAtom);
+  const midAtrCon = useAtomValue(midAtrConAtom);
+  const midEdgeCon = useAtomValue(midEdgeConAtom);
   const midEdge = useAtomValue(midEdgeAtom);
 
   const {
@@ -178,7 +179,7 @@ export default function Connection({
                   ref={(pathElement) => {
                     if (pathElement) {
                       setTimeout(
-                        () => calculateMidpoint(pathElement, conID),
+                        () => calculateMidpoint(pathElement, conID, 0),
                         0,
                       );
                     }
@@ -282,7 +283,7 @@ export default function Connection({
                   ref={(pathElement) => {
                     if (pathElement) {
                       setTimeout(
-                        () => calculateMidpoint(pathElement, atrConID),
+                        () => calculateMidpoint(pathElement, atrConID, 1),
                         0,
                       );
                     }
@@ -377,24 +378,49 @@ export default function Connection({
 
           if (srcEdgeID && trgtEdgeID && pos1 && pos2) {
             return (
-              <path
-                key={edgeConID}
-                d={getPathData(pos1, pos2)}
-                stroke='#818181'
-                strokeWidth={3}
-                fill='none'
-                onClick={() => {
-                  if (
-                    confirm(
-                      `Delete edge connection from edge ${srcEdgeID} to edge ${trgtEdgeID}`,
-                    )
-                  ) {
-                    edgeConHook.deleteEdgeCon(edgeConID);
-                  }
-                }}
-                className='hover:cursor-pointer'
-                strokeOpacity={0.6}
-              />
+              <g key={edgeConID}>
+                <path
+                  ref={(pathElement) => {
+                    if (pathElement) {
+                      setTimeout(
+                        () => calculateMidpoint(pathElement, edgeConID, 2),
+                        0,
+                      );
+                    }
+                  }}
+                  d={getPathData(pos1, pos2)}
+                  stroke='#818181'
+                  strokeWidth={3}
+                  fill='none'
+                  onClick={() => {
+                    if (confirm(`Delete edge connection.`)) {
+                      edgeConHook.deleteEdgeCon(edgeConID);
+                    }
+                  }}
+                  className='hover:cursor-pointer'
+                  strokeOpacity={0.6}
+                />
+                {/* circle in the middle of connection */}
+                {midEdgeCon[edgeConID] && (
+                  <circle
+                    cx={midEdgeCon[edgeConID].x}
+                    cy={midEdgeCon[edgeConID].y}
+                    r={5}
+                    fill='white'
+                    stroke='#818181'
+                    className='hover:opacity-100 opacity-70'
+                    onClick={() => {
+                      if (pendingEdgeCon) {
+                        onEdgeConClick(edgeConID, pendingEdgeCon.edgeID);
+                      } else {
+                        alert(
+                          'Click an edge first, then the circle to add to connection.',
+                        );
+                      }
+                    }}
+                  />
+                )}
+              </g>
             );
           }
         } else if (edgeIDs) {

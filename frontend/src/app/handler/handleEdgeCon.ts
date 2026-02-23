@@ -1,7 +1,7 @@
 import { IEdgeConnection } from '../interface/IConnections';
 import { IPendingEdgeCon } from '../interface/IStates';
 
-export const handleEdgeCon = (
+export const handleEdgeConCreate = (
   edgeCons: IEdgeConnection[],
   createEdgeCon: (edgeIDs: number[]) => void,
   pendingEdgeCon: IPendingEdgeCon | null,
@@ -34,6 +34,23 @@ export const handleEdgeCon = (
         setPendingEdgeCon(null);
         return false
       }
+    }
+  };
+};
+
+export const handleEdgeConUpdate = (
+  updateEdgeCon: (edgeConID: number, edgeID: number) => void,
+  pendingEdgeCon: IPendingEdgeCon | null,
+  setPendingEdgeCon: (pendingEdge: IPendingEdgeCon | null) => void
+) => {
+  return (edgeConID: number, edgeID: number) => {
+    if (!pendingEdgeCon) {
+      alert(`Click on an edge first to add to connection.`)
+      return false
+    } else {
+      updateEdgeCon(edgeConID, edgeID);
+      setPendingEdgeCon(null);
+      return true
     }
   };
 };

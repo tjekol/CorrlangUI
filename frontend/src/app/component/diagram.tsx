@@ -24,7 +24,10 @@ import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
 import { useEdgeCon } from '../hooks/useEdgeCon';
-import { handleEdgeCon } from '../handler/handleEdgeCon';
+import {
+  handleEdgeConCreate,
+  handleEdgeConUpdate,
+} from '../handler/handleEdgeCon';
 import {
   handleAtrConCreate,
   handleAtrConUpdate,
@@ -38,7 +41,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { edges, edgeLoading, refetchEdges } = useEdges();
   const { nodeCon, createNodeCon, updateNodeCon } = useNodeCon();
   const { atrCon, createAtrCon, updateAtrCon } = useAtrCon();
-  const { edgeCons, createEdgeCon } = useEdgeCon();
+  const { edgeCon, createEdgeCon, updateEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
 
   // local state to store first click of node/attribute
@@ -71,8 +74,8 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     setPendingAtrCon,
   );
 
-  const handleEdgeClick = handleEdgeCon(
-    edgeCons,
+  const handleEdgeClick = handleEdgeConCreate(
+    edgeCon,
     createEdgeCon,
     pendingEdgeCon,
     setPendingEdgeCon,
@@ -88,6 +91,12 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     updateAtrCon,
     pendingAtrCon,
     setPendingAtrCon,
+  );
+
+  const handleEdgeConClick = handleEdgeConUpdate(
+    updateEdgeCon,
+    pendingEdgeCon,
+    setPendingEdgeCon,
   );
 
   const [diagramDimensions, setDiagramDimensions] = useState({
@@ -286,6 +295,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         <Connection
           onConClick={handleNodeConClick}
           onAtrConClick={handleAtrConClick}
+          onEdgeConClick={handleEdgeConClick}
           pendingNodeCon={pendingNodeCon}
           pendingAtrCon={pendingAtrCon}
           pendingEdgeCon={pendingEdgeCon}

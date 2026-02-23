@@ -36,7 +36,7 @@ export default function Edge({
   };
 
   const isConnected = (edgeID: number) => {
-    return edgeCons.some((con) => con.edges.find((e) => e.id === edgeID));
+    return edgeCons.some((con) => con.edges.some((e) => e.id === edgeID));
   };
 
   return (
