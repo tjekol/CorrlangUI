@@ -63,6 +63,11 @@ export default function Connection({
     calculateMidpoint,
   } = useCalculation();
 
+  const strokeOpacity = 0.8;
+  const nodeConColor = '#22223B';
+  const atrConColor = '#4A4E69';
+  const edgeConColor = '#9A8C98';
+
   const getNodeIDs = (nodeConID: number): number[] | undefined => {
     const nodeCon = nodeCons.find((c) => c.id === nodeConID);
     if (nodeCon) {
@@ -119,7 +124,7 @@ export default function Connection({
           strokeDasharray={'5,5'}
           fill='none'
           className='hover:cursor-pointer'
-          strokeOpacity={0.6}
+          strokeOpacity={strokeOpacity}
         />
       )}
       {pendingAtrCon && hasMousePosition && (
@@ -134,7 +139,7 @@ export default function Connection({
           strokeDasharray={'5,5'}
           fill='none'
           className='hover:cursor-pointer'
-          strokeOpacity={0.6}
+          strokeOpacity={strokeOpacity}
         />
       )}
       {pendingEdgeCon && hasMousePosition && (
@@ -149,7 +154,7 @@ export default function Connection({
           strokeDasharray={'5,5'}
           fill='none'
           className='hover:cursor-pointer'
-          strokeOpacity={0.6}
+          strokeOpacity={strokeOpacity}
         />
       )}
 
@@ -185,7 +190,7 @@ export default function Connection({
                     }
                   }}
                   d={getPathData(pos1, pos2, srcNodeID, trgtNodeID)}
-                  stroke='black'
+                  stroke={nodeConColor}
                   strokeWidth={3.5}
                   fill='none'
                   onClick={() => {
@@ -198,16 +203,16 @@ export default function Connection({
                     }
                   }}
                   className='hover:cursor-pointer'
-                  strokeOpacity={0.6}
+                  strokeOpacity={strokeOpacity}
                 />
                 {/* circle in the middle of connection */}
-                {midCon[conID] && (
+                {midNodeCon[conID] && (
                   <circle
-                    cx={midCon[conID].x}
-                    cy={midCon[conID].y}
+                    cx={midNodeCon[conID].x}
+                    cy={midNodeCon[conID].y}
                     r={6}
                     fill='white'
-                    stroke='black'
+                    stroke={nodeConColor}
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingNodeCon) {
@@ -233,8 +238,9 @@ export default function Connection({
               <g key={index}>
                 <path
                   key={conID}
-                  stroke='#818181'
+                  stroke={nodeConColor}
                   strokeWidth={3}
+                  strokeOpacity={strokeOpacity}
                   d={getShortestPath(midpoint, position, nodeIDs[index])}
                 />
                 {/* diamond */}
@@ -290,7 +296,7 @@ export default function Connection({
                   }}
                   key={atrConID}
                   d={getPathData(pos1, pos2, srcNode.id, trgtNode.id)}
-                  stroke='#818181'
+                  stroke={atrConColor}
                   strokeWidth={3}
                   fill='none'
                   onClick={() => {
@@ -299,16 +305,16 @@ export default function Connection({
                     }
                   }}
                   className='hover:cursor-pointer'
-                  strokeOpacity={0.6}
+                  strokeOpacity={strokeOpacity}
                 />
                 {/* circle in the middle of connection */}
-                {midCon[atrConID] && (
+                {midAtrCon[atrConID] && (
                   <circle
-                    cx={midCon[atrConID].x}
-                    cy={midCon[atrConID].y}
+                    cx={midAtrCon[atrConID].x}
+                    cy={midAtrCon[atrConID].y}
                     r={5}
                     fill='white'
-                    stroke='black'
+                    stroke={atrConColor}
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingAtrCon) {
@@ -334,9 +340,9 @@ export default function Connection({
               <g key={index}>
                 <path
                   key={`${atrConID}-${index}`}
-                  stroke='#818181'
+                  stroke={atrConColor}
                   strokeWidth={3}
-                  strokeOpacity={0.6}
+                  strokeOpacity={strokeOpacity}
                   d={getShortestPath(
                     midpoint,
                     position,
@@ -389,7 +395,7 @@ export default function Connection({
                     }
                   }}
                   d={getPathData(pos1, pos2)}
-                  stroke='#818181'
+                  stroke={edgeConColor}
                   strokeWidth={3}
                   fill='none'
                   onClick={() => {
@@ -398,7 +404,7 @@ export default function Connection({
                     }
                   }}
                   className='hover:cursor-pointer'
-                  strokeOpacity={0.6}
+                  strokeOpacity={strokeOpacity}
                 />
                 {/* circle in the middle of connection */}
                 {midEdgeCon[edgeConID] && (
@@ -407,7 +413,7 @@ export default function Connection({
                     cy={midEdgeCon[edgeConID].y}
                     r={5}
                     fill='white'
-                    stroke='#818181'
+                    stroke={edgeConColor}
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingEdgeCon) {
@@ -424,6 +430,37 @@ export default function Connection({
             );
           }
         } else if (edgeIDs) {
+          const edgePositions = edgeIDs.map((edgeID) => midEdge[edgeID]);
+          const midpoint = getMidpoint(edgePositions);
+          if (midpoint && edgePositions.length > 0) {
+            return edgePositions.map((position, index) => (
+              <g key={index}>
+                <path
+                  key={`${edgeConID}-${index}`}
+                  stroke={edgeConColor}
+                  strokeWidth={3}
+                  strokeOpacity={strokeOpacity}
+                  d={getShortestPath(midpoint, position)}
+                ></path>
+                {/* diamond */}
+                <path
+                  d={`M ${midpoint.x} ${midpoint.y - 8}
+                  L ${midpoint.x + 6} ${midpoint.y}
+                  L ${midpoint.x} ${midpoint.y + 8}
+                  L ${midpoint.x - 6} ${midpoint.y} Z`}
+                  onClick={() => {
+                    if (pendingEdgeCon) {
+                      onEdgeConClick(edgeConID, pendingEdgeCon.edgeID);
+                    } else {
+                      if (confirm('Delete edge connection?')) {
+                        edgeConHook.deleteEdgeCon(edgeConID);
+                      }
+                    }
+                  }}
+                />
+              </g>
+            ));
+          }
         }
       })}
     </>
