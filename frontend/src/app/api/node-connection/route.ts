@@ -57,11 +57,11 @@ export async function POST(request: NextRequest) {
 // PUT - Update connection
 export async function PUT(request: NextRequest) {
   try {
-    const { conID, nodeID } = await request.json();
+    const { nodeConID, nodeID } = await request.json();
 
     const con = await prisma.nodeConnection.update({
       where: {
-        id: conID
+        id: nodeConID
       },
       data: {
         nodes: {

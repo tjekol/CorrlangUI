@@ -45,11 +45,11 @@ export const useNodeCon = () => {
     setNodeCon(prev => [...prev, conData]);
   })
 
-  const updateNodeCon = (conID: number, nodeID: number) => handleAsync(async () => {
+  const updateNodeCon = (nodeConID: number, nodeID: number) => handleAsync(async () => {
     const res = await fetch('/api/node-connection', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ conID, nodeID }),
+      body: JSON.stringify({ nodeConID, nodeID }),
     })
 
     if (!res.ok) {
@@ -59,7 +59,7 @@ export const useNodeCon = () => {
 
     const conData: INodeConnection = await res.json();
     console.log(`Updated connection ${conData.id} with node: ${nodeID}`);
-    setNodeCon(prev => prev.map(con => con.id === conID ? conData : con));
+    setNodeCon(prev => prev.map(con => con.id === nodeConID ? conData : con));
   })
 
   const deleteNodeCon = (id: number) => handleAsync(async () => {
