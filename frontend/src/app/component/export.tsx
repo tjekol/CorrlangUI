@@ -4,8 +4,8 @@ import { useAtomValue } from 'jotai';
 import {
   atrAtom,
   atrConAtom,
-  atrMultiConAtom,
-  multiConAtom,
+  edgeAtom,
+  edgeConAtom,
   nodeAtom,
   nodeConAtom,
   schemaAtom,
@@ -16,10 +16,10 @@ export default function Export() {
   const schemas = useAtomValue(schemaAtom);
   const nodes = useAtomValue(nodeAtom);
   const attributes = useAtomValue(atrAtom);
+  const edges = useAtomValue(edgeAtom);
   const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
-  const multiCons = useAtomValue(multiConAtom);
-  const atrMultiCons = useAtomValue(atrMultiConAtom);
+  const edgeCons = useAtomValue(edgeConAtom);
 
   const [exportResult, setExportResult] = useState<string[]>([]);
 
@@ -27,43 +27,6 @@ export default function Export() {
     setExportResult([]);
 
     nodeCons.map((con) => {
-      const srcNode = nodes.find((n) => n.id === con.srcNodeID);
-      const trgtNode = nodes.find((n) => n.id === con.trgtNodeID);
-
-      if (srcNode && trgtNode) {
-        const srcSchema = schemas.find((s) => s.id === srcNode.schemaID);
-        const trgtSchema = schemas.find((s) => s.id === trgtNode.schemaID);
-
-        if (srcSchema && trgtSchema)
-          setExportResult((prev) => [
-            ...prev,
-            `identify (${srcSchema.title}.${srcNode.title}, ${trgtSchema.title}.${trgtNode.title}) as ${srcNode.title}; \n`,
-          ]);
-      }
-    });
-
-    atrCons.map((con) => {
-      const srcAtr = attributes.find((a) => a.id === con.srcAtrID);
-      const trgtAtr = attributes.find((a) => a.id === con.trgtAtrID);
-
-      if (srcAtr && trgtAtr) {
-        const srcNode = nodes.find((n) => n.id === srcAtr.nodeID);
-        const trgtNode = nodes.find((n) => n.id === trgtAtr.nodeID);
-
-        if (srcNode && trgtNode) {
-          const srcSchema = schemas.find((s) => s.id === srcNode.schemaID);
-          const trgtSchema = schemas.find((s) => s.id === trgtNode.schemaID);
-
-          if (srcSchema && trgtSchema)
-            setExportResult((prev) => [
-              ...prev,
-              `identify (${srcSchema.title}.${srcNode.title}.${srcAtr.text}, ${trgtSchema.title}.${trgtNode.title}.${trgtAtr.text}) as ${srcAtr.text}; \n`,
-            ]);
-        }
-      }
-    });
-
-    multiCons.map((con) => {
       const nodeIDs = con.nodes.map((n) => n.id);
       const multiConNodes = nodes.filter((node) => nodeIDs.includes(node.id));
 
@@ -87,7 +50,7 @@ export default function Export() {
         ]);
     });
 
-    atrMultiCons.map((con) => {
+    atrCons.map((con) => {
       const atrIDs = con.attributes.map((a) => a.id);
       const conAtrs = attributes.filter((a) => atrIDs.includes(a.id));
 
@@ -113,7 +76,7 @@ export default function Export() {
       const firstAtr = result[0];
       const restOfAtrs = result
         .splice(1)
-        .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + ' ' + r.atrText);
+        .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + '.' + r.atrText);
 
       if (firstAtr && restOfAtrs)
         setExportResult((prev) => [
@@ -121,7 +84,41 @@ export default function Export() {
           `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.atrText},${restOfAtrs}) as ${firstAtr.atrText}; \n`,
         ]);
     });
-  }, [nodeCons, atrCons, multiCons, atrMultiCons]);
+
+    edgeCons.map((con) => {
+      const edgeIDs = con.edges.map((e) => e.id);
+      const conEdges = edges.filter((e) => edgeIDs.includes(e.id));
+
+      const result: {
+        schemaTitle: string;
+        nodeTitle: string;
+        edgeText: string;
+      }[] = [];
+
+      for (const edge of conEdges) {
+        const node = nodes.find((n) => n.id === edge.srcNodeID);
+        if (node) {
+          const schema = schemas.find((s) => s.id === node.schemaID);
+          if (schema)
+            result.push({
+              schemaTitle: schema.title,
+              nodeTitle: node.title,
+              edgeText: edge.refName,
+            });
+        }
+      }
+      const firstAtr = result[0];
+      const restOfAtrs = result
+        .splice(1)
+        .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + '.' + r.edgeText);
+
+      if (firstAtr && restOfAtrs)
+        setExportResult((prev) => [
+          ...prev,
+          `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.edgeText},${restOfAtrs}) as ${firstAtr.edgeText}; \n`,
+        ]);
+    });
+  }, [nodeCons, atrCons, edgeCons]);
 
   return (
     <p className='bg-[#F9F9F9] m-auto h-full p-5 rounded-sm border whitespace-pre-wrap'>
