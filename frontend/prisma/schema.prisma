@@ -24,12 +24,10 @@ model Node {
   schemaID Int
 
   attributes Attribute[]
+  nodeCons NodeConnection[]
   srcEdges Edge[] @relation(name: "source")
   trgtEdges Edge[] @relation(name: "target")
-  srcCons Connection[] @relation(name: "source")
-  trgtCons Connection[] @relation(name: "target")
   schema Schema @relation(fields: [schemaID], references: [id])
-  multiCons MultiConnection[]
 }
 
 model Edge {
@@ -42,11 +40,9 @@ model Edge {
   isOrdered Boolean @default(false)
   type Int @default(0)
 
+  edgeCons EdgeConnection[]
   srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
   trgNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
-
-  srcCons EdgeConnection[] @relation(name: "source")
-  trgtCons EdgeConnection[] @relation(name: "target")
 }
 
 model Attribute {
@@ -55,45 +51,21 @@ model Attribute {
   text String
   type String?
   
+  atrCons AtrConnection[]
   node Node @relation(fields: [nodeID], references: [id])
-  srcAtrs AtrConnection[] @relation(name: "source")
-  trgtAtrs AtrConnection[] @relation(name: "target")
-  atrMultiCons AtrMultiConnection[]
 }
 
-model Connection {
-  id  Int   @id @default(autoincrement())
-  srcNodeID Int
-  trgtNodeID Int
-
-  srcNode Node @relation(name: "source", fields: [srcNodeID], references: [id])
-  trgtNode Node @relation(name: "target", fields: [trgtNodeID], references: [id])
-}
-
-model MultiConnection {
+model NodeConnection {
   id  Int   @id @default(autoincrement())
   nodes Node[]
 }
 
 model AtrConnection {
   id  Int   @id @default(autoincrement())
-  srcAtrID Int
-  trgtAtrID Int
-
-  srcAtr Attribute @relation(name: "source", fields: [srcAtrID], references: [id])
-  trgtAtr Attribute @relation(name: "target", fields: [trgtAtrID], references: [id])
-}
-
-model AtrMultiConnection {
-  id  Int   @id @default(autoincrement())
   attributes Attribute[]
 }
 
 model EdgeConnection {
   id  Int   @id @default(autoincrement())
-  srcEdgeID Int
-  trgtEdgeID Int
-
-  srcEdge Edge @relation(name: "source", fields: [srcEdgeID], references: [id])
-  trgtEdge Edge @relation(name: "target", fields: [trgtEdgeID], references: [id])
+  edges Edge[]
 }

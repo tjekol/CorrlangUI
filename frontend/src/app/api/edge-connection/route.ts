@@ -4,7 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET - Fetch all edge connections
 export async function GET() {
   try {
-    const connections = await prisma.edgeConnection.findMany();
+    const connections = await prisma.edgeConnection.findMany({
+      include: {
+        edges: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
 
     return NextResponse.json(connections);
   } catch (error) {
@@ -19,13 +27,19 @@ export async function GET() {
 // POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
-    const { srcEdgeID, trgtEdgeID } = await request.json();
+    const { edgeIDs } = await request.json();
 
     const con = await prisma.edgeConnection.create({
       data: {
-        srcEdgeID,
-        trgtEdgeID
+        edges: {
+          connect: edgeIDs.map((id: number) => ({ id }))
+        }
       },
+      include: {
+        edges: {
+          select: { id: true }
+        }
+      }
     });
 
     return NextResponse.json(con, { status: 201 });
@@ -33,6 +47,39 @@ export async function POST(request: NextRequest) {
     console.error('Error creating edge connection:', error);
     return NextResponse.json(
       { error: 'Failed to create edge connection' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update connection
+export async function PUT(request: NextRequest) {
+  try {
+    const { edgeConID, edgeID } = await request.json();
+
+    const con = await prisma.edgeConnection.update({
+      where: {
+        id: edgeConID
+      },
+      data: {
+        edges: {
+          connect: { id: edgeID }
+        }
+      },
+      include: {
+        edges: {
+          select: {
+            id: true
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(con, { status: 201 });
+  } catch (error) {
+    console.error('Error updating connection:', error);
+    return NextResponse.json(
+      { error: 'Failed to update connection' },
       { status: 500 }
     );
   }

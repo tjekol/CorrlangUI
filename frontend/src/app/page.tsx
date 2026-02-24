@@ -1,29 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import Correspondence from './component/correspondence';
 import Diagram from './component/diagram';
 import Export from './component/export';
-import { useState } from 'react';
-import { useAtrCon } from './hooks/useAtrCon';
-import { useConnection } from './hooks/useConnection';
-import { useMultiCon } from './hooks/useMultiCon';
 import { ICorrespondence } from './interface/ICorrespondence';
+import { useNodeCon } from './hooks/useNodeCon';
+import { useAtrCon } from './hooks/useAtrCon';
 import { useEdgeCon } from './hooks/useEdgeCon';
-import { useAtrMultiCon } from './hooks/useAtrMultiCon';
 
 export default function Home() {
-  const { deleteAllCons } = useConnection();
-  const { deleteAllMultiCons } = useMultiCon();
-  const { deleteAllAtrCons } = useAtrCon();
+  const { deleteAllNodeCons } = useNodeCon();
   const { deleteAllEdgeCons } = useEdgeCon();
-  const { deleteAllAtrMultiCons } = useAtrMultiCon();
+  const { deleteAllAtrCons } = useAtrCon();
 
   const reset = () => {
-    deleteAllCons();
-    deleteAllMultiCons();
-    deleteAllAtrCons();
+    deleteAllNodeCons();
     deleteAllEdgeCons();
-    deleteAllAtrMultiCons();
+    deleteAllAtrCons();
   };
 
   const [exportIsOpen, setExportIsOpen] = useState<boolean>(false);

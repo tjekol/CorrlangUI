@@ -7,7 +7,7 @@ import { IEdgeConnection } from '../interface/IConnections';
 
 export const useEdgeCon = () => {
   const [loading, setLoading] = useState(true);
-  const [edgeCons, setEdgeCons] = useAtom(edgeConAtom);
+  const [edgeCon, setEdgeCon] = useAtom(edgeConAtom);
 
   const handleAsync = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -21,59 +21,75 @@ export const useEdgeCon = () => {
   };
 
   const fetchEdgeCons = () => handleAsync(async () => {
-    const res = await fetch('/api/edgeConnection');
+    const res = await fetch('/api/edge-connection');
     if (!res.ok) {
       throw new Error('Failed to fetch edge connections.');
     }
     const conData: IEdgeConnection[] = await res.json();
-    setEdgeCons(conData)
+    setEdgeCon(conData)
   })
 
-  const createEdgeCon = (srcEdgeID: number, trgtEdgeID: number) => handleAsync(async () => {
-    const res = await fetch('/api/edgeConnection', {
+  const createEdgeCon = (edgeIDs: number[]) => handleAsync(async () => {
+    const res = await fetch('/api/edge-connection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ srcEdgeID, trgtEdgeID }),
+      body: JSON.stringify({ edgeIDs }),
     })
 
     if (!res.ok) {
-      console.log('Failed to create attribute connections:', res);
+      console.log('Failed to create edge connection:', res);
       return;
     }
     const conData: IEdgeConnection = await res.json();
-    console.log(`Added edge connection: ${conData.id} between edges ${srcEdgeID}-${trgtEdgeID}`);
-    setEdgeCons(prev => [...prev, conData]);
+    console.log(`Added edge connection: ${conData.id} between edges ${edgeIDs}`);
+    setEdgeCon(prev => [...prev, conData]);
+  })
+
+  const updateEdgeCon = (edgeConID: number, edgeID: number) => handleAsync(async () => {
+    const res = await fetch('/api/edge-connection', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edgeConID, edgeID }),
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to update edge connection');
+    }
+
+    const conData: IEdgeConnection = await res.json();
+    console.log(`Removed edge connection with id: ${edgeConID}`);
+    setEdgeCon(prev => prev.map(edgeCon => edgeCon.id === edgeConID ? conData : edgeCon));
   })
 
   const deleteEdgeCon = (id: number) => handleAsync(async () => {
-    const res = await fetch('/api/edgeConnection', {
+    const res = await fetch('/api/edge-connection', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete attribute connections');
+      throw new Error('Failed to delete edge connection');
     }
-    console.log(`Removed attribute connections with id: ${id}`);
-    setEdgeCons(prev => prev.filter(edgeCon => edgeCon.id !== id));
+    console.log(`Removed edge connection with id: ${id}`);
+    setEdgeCon(prev => prev.filter(edgeCon => edgeCon.id !== id));
   })
 
   const deleteAllEdgeCons = () => handleAsync(async () => {
-    const res = await fetch('/api/edgeConnection', {
+    const res = await fetch('/api/edge-connection', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete connections');
+      throw new Error('Failed to delete edge connections');
     }
     console.log(`Removed all edge connections`);
-    setEdgeCons([]);
+    setEdgeCon([]);
   })
 
   useEffect(() => { fetchEdgeCons() }, [])
 
-  return { edgeCons, loading, createEdgeCon, deleteEdgeCon, deleteAllEdgeCons };
+  return { edgeCon, loading, createEdgeCon, updateEdgeCon, deleteEdgeCon, deleteAllEdgeCons };
 };

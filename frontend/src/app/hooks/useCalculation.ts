@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midConAtom, midEdgeAtom, liveAtrPositionsAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 
@@ -9,7 +9,9 @@ export const useCalculation = () => {
   const nodes = useAtomValue(nodeAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
   const attributes = useAtomValue(atrAtom);
-  const setMidCon = useSetAtom(midConAtom)
+  const setMidNodeCon = useSetAtom(midNodeConAtom)
+  const setMidAtrCon = useSetAtom(midAtrConAtom)
+  const setMidEdgeCon = useSetAtom(midEdgeConAtom)
   const setMidEdge = useSetAtom(midEdgeAtom)
 
   const height = 40
@@ -90,15 +92,37 @@ export const useCalculation = () => {
   };
 
   // calculate midpoint for a path
-  const calculateMidpoint = (pathElement: SVGPathElement, conID: number) => {
+  const calculateMidpoint = (pathElement: SVGPathElement, conID: number, type: number) => {
     const totalLength = pathElement.getTotalLength();
     if (!isFinite(totalLength) || totalLength === 0) return;
 
     const pt = pathElement.getPointAtLength(totalLength / 2);
-    setMidCon((prev) => ({
-      ...prev,
-      [conID]: { x: pt.x, y: pt.y },
-    }));
+
+    switch (type) {
+      // nodes
+      case 0:
+        setMidNodeCon((prev) => ({
+          ...prev,
+          [conID]: { x: pt.x, y: pt.y },
+        }));
+        break;
+      // attributes
+      case 1:
+        setMidAtrCon((prev) => ({
+          ...prev,
+          [conID]: { x: pt.x, y: pt.y },
+        }));
+        break;
+      // edges
+      case 2:
+        setMidEdgeCon((prev) => ({
+          ...prev,
+          [conID]: { x: pt.x, y: pt.y },
+        }));
+        break;
+      default:
+        console.log("Calculation of midpoint failed.")
+    }
   };
 
   const calculateMidpointEdge = (pathElement: SVGPathElement, edgeID: number) => {
@@ -176,7 +200,7 @@ export const useCalculation = () => {
   };
 
   const getMidpoint = (positions: { x: number, y: number }[]) => {
-    if (positions.length === 0) return null;
+    if (!positions || positions.length === 0) return null;
 
     const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
     const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
@@ -196,8 +220,7 @@ export const useCalculation = () => {
       let node = getNode(atrID)
       nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
     } else {
-      const livePos = livePositions.find(pos => pos.positionX === position.x && pos.positionY === position.y);
-      nodeLength = nodeLengths.find(l => l.id === livePos?.nodeID)?.length || 0;
+      return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`
     }
 
     const diffX = midpoint.x - position.x;

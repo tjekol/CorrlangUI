@@ -1,4 +1,4 @@
-export interface IPendingCon {
+export interface IPendingNodeCon {
   conID: number;
   nodeID: number;
   positionX: number;

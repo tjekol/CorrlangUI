@@ -7,18 +7,19 @@ import {
   liveNodePositionsAtom,
   liveAtrPositionsAtom,
   nodeLengthAtom,
-  atrConAtom,
-  multiConAtom,
   nodeConAtom,
-  atrMultiConAtom,
+  atrConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
 interface NodeProps extends INode {
   color: string;
-  onHeaderClick: (id: number, circlePosition: { x: number; y: number }) => void;
+  onNodeClick: (
+    nodeID: number,
+    circlePosition: { x: number; y: number },
+  ) => void;
   onAttributeClick: (
-    id: number,
+    atrID: number,
     circlePosition: { x: number; y: number },
   ) => void;
 }
@@ -31,21 +32,19 @@ export default function Node({
   positionY,
   schemaID,
   color,
-  onHeaderClick,
+  onNodeClick,
   onAttributeClick,
 }: NodeProps) {
   const [position, setPosition] = useState({ x: positionX, y: positionY });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  const { calculateNodeLength } = useCalculation();
   const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
+
+  const { calculateNodeLength } = useCalculation();
   const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
-  const cons = useAtomValue(nodeConAtom);
-  const multiCons = useAtomValue(multiConAtom);
+  const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
-  const atrMultiCons = useAtomValue(atrMultiConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
@@ -68,9 +67,9 @@ export default function Node({
     y: position.y + height / 2,
   };
 
-  const isConnected =
-    cons.some((con) => con.srcNodeID === id || con.trgtNodeID === id) ||
-    multiCons.some((multiCon) => multiCon.nodes.some((node) => node.id === id));
+  const isConnected = nodeCons.some((con) =>
+    con.nodes.find((n) => n.id === id),
+  );
 
   const moveNode = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
@@ -147,19 +146,18 @@ export default function Node({
       />
       {/* Left circle */}
       <circle
-        className={`hover:cursor-pointer hover:opacity-100 ${
-          isConnected ? 'opacity-100' : 'opacity-40'
-        }`}
+        className={`hover:cursor-pointer hover:opacity-100 
+          ${isConnected ? 'opacity-100' : 'opacity-40'}
+          `}
         cx={leftCirclePosition.x}
         cy={leftCirclePosition.y}
         r={7}
         fill='#D9D9D9'
         stroke='black'
         strokeWidth={1}
-        onClick={() => (
-          console.log('Clicked on node: ', id),
-          onHeaderClick(id, leftCirclePosition)
-        )}
+        onClick={() => {
+          onNodeClick(id, leftCirclePosition);
+        }}
       />
       {/* Right circle */}
       <circle
@@ -172,10 +170,9 @@ export default function Node({
         fill='#D9D9D9'
         stroke='black'
         strokeWidth={1}
-        onClick={() => (
-          console.log('Clicked on node: ', id),
-          onHeaderClick(id, rightCirclePosition)
-        )}
+        onClick={() => {
+          onNodeClick(id, rightCirclePosition);
+        }}
       />
       {/* Header text */}
       <text
@@ -203,6 +200,7 @@ export default function Node({
       />
 
       {attributes.map((attribute, i) => {
+        const atrID = attribute.id;
         const leftCirclePosition = {
           x: position.x,
           y: position.y + height + (height / 2) * (i + 1),
@@ -212,15 +210,9 @@ export default function Node({
           y: position.y + height + (height / 2) * (i + 1),
         };
 
-        const isActive =
-          atrCons.some(
-            (atr) =>
-              atr.srcAtrID === attribute.id || atr.trgtAtrID === attribute.id,
-          ) ||
-          atrMultiCons.some((multiCon) =>
-            multiCon.attributes.some((atr) => atr.id === attribute.id),
-          );
-
+        const isActive = atrCons.some((con) =>
+          con.attributes.find((a) => a.id === atrID),
+        );
         const alertMsg = 'Connect nodes before connecting attributes.';
 
         return (
@@ -238,13 +230,7 @@ export default function Node({
               strokeWidth={1}
               onClick={() => {
                 if (isConnected) {
-                  (console.log(
-                    'Clicked on attribute: ',
-                    attribute,
-                    attribute.id,
-                    leftCirclePosition,
-                  ),
-                    onAttributeClick(attribute.id, leftCirclePosition));
+                  onAttributeClick(atrID, leftCirclePosition);
                 } else {
                   alert(alertMsg);
                 }
@@ -263,13 +249,7 @@ export default function Node({
               strokeWidth={1}
               onClick={() => {
                 if (isConnected) {
-                  (console.log(
-                    'Clicked on attribute: ',
-                    attribute,
-                    attribute.id,
-                    leftCirclePosition,
-                  ),
-                    onAttributeClick(attribute.id, rightCirclePosition));
+                  onAttributeClick(atrID, rightCirclePosition);
                 } else {
                   alert(alertMsg);
                 }
