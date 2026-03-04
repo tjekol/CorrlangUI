@@ -8,6 +8,7 @@ import { ICorrespondence } from './interface/ICorrespondence';
 import { useNodeCon } from './hooks/useNodeCon';
 import { useAtrCon } from './hooks/useAtrCon';
 import { useEdgeCon } from './hooks/useEdgeCon';
+import ActionDiagram from './component/action-diagram';
 
 export default function Home() {
   const { deleteAllNodeCons } = useNodeCon();
@@ -20,6 +21,7 @@ export default function Home() {
     deleteAllAtrCons();
   };
 
+  const [actionIsOpen, setActionIsOpen] = useState<boolean>(false);
   const [exportIsOpen, setExportIsOpen] = useState<boolean>(false);
   const [corres, setCorres] = useState<ICorrespondence>();
 
@@ -45,6 +47,14 @@ export default function Home() {
               Pick correspondence
             </button>
             <div className='flex gap-2'>
+              <button
+                onClick={() => {
+                  setActionIsOpen(!actionIsOpen);
+                }}
+                className='border rounded-md px-4 py-1'
+              >
+                Connect actions
+              </button>
               <button
                 onClick={() => {
                   if (confirm('Remove all connections')) reset();
@@ -74,7 +84,15 @@ export default function Home() {
         {!corres ? (
           <Correspondence onDataEmit={handleData} reset={reset} />
         ) : (
-          <Diagram cor={corres} />
+          <>
+            <Diagram cor={corres} />
+            <dialog
+              open={actionIsOpen}
+              className='bg-blue-50 mt-20 overflow-auto h-3/4 rounded-sm border p-4 m-auto w-5/6'
+            >
+              <ActionDiagram cor={corres} />
+            </dialog>
+          </>
         )}
       </div>
     </div>

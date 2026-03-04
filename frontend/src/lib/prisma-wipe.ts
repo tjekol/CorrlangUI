@@ -2,11 +2,13 @@ import { prisma } from '@/lib/prisma'
 
 async function main() {
   const deleteSchema = prisma.schema.deleteMany()
+  const deleteAction = prisma.action.deleteMany()
   const deleteNode = prisma.node.deleteMany()
+  const deleteMethod = prisma.method.deleteMany()
   const deleteAtr = prisma.attribute.deleteMany()
   const deleteEdge = prisma.edge.deleteMany()
 
-  await prisma.$transaction([deleteEdge, deleteAtr, deleteNode, deleteSchema])
+  await prisma.$transaction([deleteEdge, deleteAtr, deleteNode, deleteMethod, deleteAction, deleteSchema])
 }
 
 main()

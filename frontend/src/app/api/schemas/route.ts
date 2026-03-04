@@ -11,8 +11,9 @@ export async function GET() {
 
     const schemas = await prisma.schema.findMany({
       include: {
-        nodes: true
-      }
+        nodes: true,
+        actions: true
+      },
     });
 
     return NextResponse.json(schemas);

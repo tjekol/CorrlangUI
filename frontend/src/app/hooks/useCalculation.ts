@@ -2,6 +2,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
+import { IMethod } from '../interface/IMethod';
 
 export const useCalculation = () => {
   const livePositions = useAtomValue(liveNodePositionsAtom);
@@ -50,8 +51,8 @@ export const useCalculation = () => {
     }
   };
 
-  const calculateNodeLength = (attributes: IAttribute[], title: string) => {
-    const labels = [...attributes.map((label) => label.text)];
+  const calculateNodeLength = (attributes: IAttribute[] | IMethod[], title: string) => {
+    const labels = [...attributes.map((label) => 'text' in label ? label.text : label.name)];
     const strLenghts = labels.map((str) =>
       str.length > 5 ? str.length * 1.4 : str.length * 2.5,
     );
