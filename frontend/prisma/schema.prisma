@@ -92,3 +92,11 @@ model EdgeConnection {
   id  Int   @id @default(autoincrement())
   edges Edge[]
 }
+model ActionConnection {
+  id  Int   @id @default(autoincrement())
+  actions Action[]
+}
+model MethodConnection {
+  id  Int   @id @default(autoincrement())
+  methods Method[]
+}

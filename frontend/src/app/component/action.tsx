@@ -4,11 +4,11 @@ import { useState, useLayoutEffect } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { IAction } from '../interface/IAction';
 import {
-  nodeConAtom,
-  atrConAtom,
   liveActionPositionsAtom,
   liveMethodPositionsAtom,
   actionLengthAtom,
+  actionConAtom,
+  methodConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
@@ -27,7 +27,7 @@ interface ActionProps extends IAction {
 export default function Action({
   id,
   name: title,
-  methods: attributes,
+  methods,
   positionX,
   positionY,
   schemaID,
@@ -43,12 +43,12 @@ export default function Action({
 
   const { calculateNodeLength } = useCalculation();
   const [nodeLengths, setNodeLengths] = useAtom(actionLengthAtom);
-  const nodeCons = useAtomValue(nodeConAtom);
-  const atrCons = useAtomValue(atrConAtom);
+  const nodeCons = useAtomValue(actionConAtom);
+  const atrCons = useAtomValue(methodConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
-    const width = calculateNodeLength(attributes, title);
+    const width = calculateNodeLength(methods, title);
 
     setNodeLengths((prevLengths) => {
       const existing = prevLengths.find((item) => item.id === id);
@@ -68,7 +68,7 @@ export default function Action({
   };
 
   const isConnected = nodeCons.some((con) =>
-    con.nodes.find((n) => n.id === id),
+    con.actions.find((n) => n.id === id),
   );
 
   const moveNode = (newX: number, newY: number) => {
@@ -89,10 +89,10 @@ export default function Action({
 
     setLiveAtrPosition((prev) => {
       const filteredPrev = prev.filter(
-        (atr) => !attributes.some((attr) => attr.id === atr.attributeID),
+        (atr) => !methods.some((attr) => attr.id === atr.attributeID),
       );
 
-      const newAtrPositions = attributes
+      const newAtrPositions = methods
         .map((attribute, i) => {
           const leftPos = {
             attributeID: attribute.id,
@@ -190,16 +190,14 @@ export default function Action({
         x={position.x}
         y={position.y + height}
         width={nodeLength}
-        height={
-          attributes.length === 1 ? height : (height * attributes.length) / 1.4
-        }
+        height={methods.length === 1 ? height : (height * methods.length) / 1.4}
         fill='#FFFFFF'
         stroke={color}
         strokeWidth={1}
         rx={5}
       />
 
-      {attributes.map((attribute, i) => {
+      {methods.map((attribute, i) => {
         const atrID = attribute.id;
         const leftCirclePosition = {
           x: position.x,
@@ -211,7 +209,7 @@ export default function Action({
         };
 
         const isActive = atrCons.some((con) =>
-          con.attributes.find((a) => a.id === atrID),
+          con.methods.find((a) => a.id === atrID),
         );
         const alertMsg = 'Connect nodes before connecting attributes.';
 

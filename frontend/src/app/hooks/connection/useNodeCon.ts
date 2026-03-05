@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { INodeConnection } from '../interface/IConnections';
-import { nodeConAtom } from '../GlobalValues';
+import { INodeConnection } from '../../interface/IConnections';
+import { nodeConAtom } from '../../GlobalValues';
 
 export const useNodeCon = () => {
   const [loading, setLoading] = useState(true);
@@ -62,7 +62,7 @@ export const useNodeCon = () => {
     setNodeCon(prev => prev.map(con => con.id === nodeConID ? conData : con));
   })
 
-  const deleteNodeCon = (id: number) => handleAsync(async () => {
+  const deleteCon = (id: number) => handleAsync(async () => {
     const res = await fetch('/api/node-connection', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -92,5 +92,5 @@ export const useNodeCon = () => {
 
   useEffect(() => { fetchNodeCons() }, [])
 
-  return { nodeCon, loading, createNodeCon, updateNodeCon, deleteNodeCon, deleteAllNodeCons };
+  return { nodeCon, loading, createNodeCon, updateNodeCon, deleteNodeCon: deleteCon, deleteAllNodeCons };
 };

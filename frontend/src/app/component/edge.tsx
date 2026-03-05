@@ -48,8 +48,8 @@ export default function Edge({
         if (nodes) {
           const { srcNode, trgtNode } = nodes;
           if (srcNode && trgtNode) {
-            const pos1 = getNodePosition(srcNode.id);
-            const pos2 = getNodePosition(trgtNode.id);
+            const pos1 = getNodePosition(srcNode.id, 0);
+            const pos2 = getNodePosition(trgtNode.id, 0);
             if (pos1 && pos2) {
               // nodes under same schema
               if (srcNode.schemaID === trgtNode.schemaID) {

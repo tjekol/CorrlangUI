@@ -8,32 +8,37 @@ import { IAction } from '../interface/IAction';
 import { useSchemas } from '../hooks/useSchemas';
 import { useAction } from '../hooks/useAction';
 import { useMethod } from '../hooks/useMethod';
-import { useNodeCon } from '../hooks/useNodeCon';
-import { useAtrCon } from '../hooks/useAtrCon';
 import { useCalculation } from '../hooks/useCalculation';
+import { useActionCon } from '../hooks/connection/useActionCon';
 import { IPendingAtrCon, IPendingNodeCon } from '../interface/IStates';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import {
   liveActionPositionsAtom,
-  liveNodePositionsAtom,
+  midActionConAtom,
+  midMethodConAtom,
   nodeColor,
 } from '../GlobalValues';
 import {
-  handleNodeConCreate,
-  handleNodeConUpdate,
-} from '../handler/handleNodeCon';
+  handleActionConCreate,
+  handleActionConUpdate,
+} from '../handler/handleActionCon';
+import { useMethodCon } from '../hooks/connection/useMethodCon';
 import {
-  handleAtrConCreate,
-  handleAtrConUpdate,
-} from '../handler/handleAtrCon';
+  handleMethodConCreate,
+  handleMethodConUpdate,
+} from '../handler/handleMethodCon';
 
-export default function Diagram({ cor }: { cor: ICorrespondence }) {
+export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
   const { actions, loading, refetchActions } = useAction();
   const { methods, methodLoading, refetchMethods } = useMethod();
-  // const { nodeCon, createNodeCon, updateNodeCon } = useNodeCon();
-  // const { atrCon, createAtrCon, updateAtrCon } = useAtrCon();
+  const { actionCon, createActionCon, updateActionCon, deleteActionCon } =
+    useActionCon();
+  const { methodCon, createMethodCon, updateMethodCon, deleteMethodCon } =
+    useMethodCon();
   const { calculateNodeLength } = useCalculation();
+  const midActionCon = useAtomValue(midActionConAtom);
+  const midMethodCon = useAtomValue(midMethodConAtom);
 
   // local state to store first click of node/attribute
   const [pendingNodeCon, setPendingNodeCon] = useState<IPendingNodeCon | null>(
@@ -48,31 +53,31 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
 
-  // const handleNodeClick = handleNodeConCreate(
-  //   nodeCon,
-  //   createNodeCon,
-  //   pendingNodeCon,
-  //   setPendingNodeCon,
-  // );
+  const handleNodeClick = handleActionConCreate(
+    actionCon,
+    createActionCon,
+    pendingNodeCon,
+    setPendingNodeCon,
+  );
 
-  // const handleAttributeClick = handleAtrConCreate(
-  //   atrCon,
-  //   createAtrCon,
-  //   pendingAtrCon,
-  //   setPendingAtrCon,
-  // );
+  const handleMethodClick = handleMethodConCreate(
+    methodCon,
+    createMethodCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
 
-  // const handleNodeConClick = handleNodeConUpdate(
-  //   updateNodeCon,
-  //   pendingNodeCon,
-  //   setPendingNodeCon,
-  // );
+  const handleNodeConClick = handleActionConUpdate(
+    updateActionCon,
+    pendingNodeCon,
+    setPendingNodeCon,
+  );
 
-  // const handleAtrConClick = handleAtrConUpdate(
-  //   updateAtrCon,
-  //   pendingAtrCon,
-  //   setPendingAtrCon,
-  // );
+  const handleMethodConClick = handleMethodConUpdate(
+    updateMethodCon,
+    pendingAtrCon,
+    setPendingAtrCon,
+  );
 
   const [diagramDimensions, setDiagramDimensions] = useState({
     width: 800,
@@ -206,7 +211,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   }, [
     filteredSchemas,
     nodesWithAttributes,
-    // filteredEdges,
     methods,
     methodLoading,
     setLiveNodePositions,
@@ -237,14 +241,19 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
             />
           </marker>
         </defs>
-        {/* <Connection
+        <Connection
+          conType={1}
+          cons={actionCon}
           onConClick={handleNodeConClick}
-          onAtrConClick={handleAtrConClick}
-          onEdgeConClick={handleEdgeConClick}
-          pendingNodeCon={pendingNodeCon}
-          pendingAtrCon={pendingAtrCon}
-          pendingEdgeCon={pendingEdgeCon}
-        /> */}
+          deleteCon={deleteActionCon}
+          deleteChildCon={deleteMethodCon}
+          pendingCon={pendingNodeCon}
+          midCon={midActionCon}
+          onChildConClick={handleMethodConClick}
+          pendingChildCon={pendingAtrCon}
+          childCons={methodCon}
+          midChildCon={midMethodCon}
+        />
         {loading || layoutLoading || methodLoading ? (
           <text x={50} y={50}>
             {loading || methodLoading ? 'Loading...' : 'Calculating layout...'}
@@ -274,9 +283,8 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
                 positionY={livePositions?.positionY || n.positionY || 0}
                 schemaID={n.schemaID}
                 color={color}
-                // TODO: make useable
-                onNodeClick={() => null}
-                onAttributeClick={() => null}
+                onNodeClick={handleNodeClick}
+                onAttributeClick={handleMethodClick}
               />
             );
           })

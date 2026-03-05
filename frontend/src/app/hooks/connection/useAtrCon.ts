@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { IAtrConnection } from '../interface/IConnections';
-import { atrConAtom } from '../GlobalValues';
+import { IAtrConnection } from '../../interface/IConnections';
+import { atrConAtom } from '../../GlobalValues';
 
 export const useAtrCon = () => {
   const [loading, setLoading] = useState(true);
@@ -62,7 +62,7 @@ export const useAtrCon = () => {
     setAtrCon(prev => prev.map(con => con.id === atrConID ? conData : con));
   })
 
-  const deleteAtrCon = (id: number) => handleAsync(async () => {
+  const deleteCon = (id: number) => handleAsync(async () => {
     const res = await fetch('/api/atr-connection', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -92,5 +92,5 @@ export const useAtrCon = () => {
 
   useEffect(() => { fetchAtrCons() }, [])
 
-  return { atrCon, loading, createAtrCon, updateAtrCon, deleteAtrCon, deleteAllAtrCons };
+  return { atrCon, loading, createAtrCon, updateAtrCon, deleteAtrCon: deleteCon, deleteAllAtrCons };
 };

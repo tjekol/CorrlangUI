@@ -9,21 +9,24 @@ import {
   IPendingNodeCon,
   IPendingEdgeCon,
 } from '../interface/IStates';
-import { useAtom } from 'jotai';
-import { liveNodePositionsAtom, nodeColor } from '../GlobalValues';
+import { useAtom, useAtomValue } from 'jotai';
+import {
+  liveNodePositionsAtom,
+  midAtrConAtom,
+  midNodeConAtom,
+  nodeColor,
+} from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useSchemas } from '../hooks/useSchemas';
 import {
   handleNodeConCreate,
   handleNodeConUpdate,
 } from '../handler/handleNodeCon';
-import { useNodeCon } from '../hooks/useNodeCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
 import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
-import { useEdgeCon } from '../hooks/useEdgeCon';
 import {
   handleEdgeConCreate,
   handleEdgeConUpdate,
@@ -32,17 +35,21 @@ import {
   handleAtrConCreate,
   handleAtrConUpdate,
 } from '../handler/handleAtrCon';
-import { useAtrCon } from '../hooks/useAtrCon';
+import { useAtrCon } from '../hooks/connection/useAtrCon';
+import { useEdgeCon } from '../hooks/connection/useEdgeCon';
+import { useNodeCon } from '../hooks/connection/useNodeCon';
 
 export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
   const { nodes, loading, refetchNodes } = useNodes();
   const { attributes, atrLoading, refetchAttributes } = useAttributes();
   const { edges, edgeLoading, refetchEdges } = useEdges();
-  const { nodeCon, createNodeCon, updateNodeCon } = useNodeCon();
-  const { atrCon, createAtrCon, updateAtrCon } = useAtrCon();
+  const { nodeCon, createNodeCon, updateNodeCon, deleteNodeCon } = useNodeCon();
+  const { atrCon, createAtrCon, updateAtrCon, deleteAtrCon } = useAtrCon();
   const { edgeCon, createEdgeCon, updateEdgeCon } = useEdgeCon();
   const { calculateNodeLength } = useCalculation();
+  const midNodeCon = useAtomValue(midNodeConAtom);
+  const midAtrCon = useAtomValue(midAtrConAtom);
 
   // local state to store first click of node/attribute
   const [pendingNodeCon, setPendingNodeCon] = useState<IPendingNodeCon | null>(
@@ -293,11 +300,19 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           );
         })}
         <Connection
+          conType={0}
+          cons={nodeCon}
           onConClick={handleNodeConClick}
-          onAtrConClick={handleAtrConClick}
+          deleteCon={deleteNodeCon}
+          deleteChildCon={deleteAtrCon}
+          pendingCon={pendingNodeCon}
+          midCon={midNodeCon}
+          childCons={atrCon}
+          onChildConClick={handleAtrConClick}
+          pendingChildCon={pendingAtrCon}
+          midChildCon={midAtrCon}
+          edgeCons={edgeCon}
           onEdgeConClick={handleEdgeConClick}
-          pendingNodeCon={pendingNodeCon}
-          pendingAtrCon={pendingAtrCon}
           pendingEdgeCon={pendingEdgeCon}
         />
         <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />

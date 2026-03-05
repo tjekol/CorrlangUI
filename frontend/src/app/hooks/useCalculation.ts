@@ -1,19 +1,28 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom } from '../GlobalValues';
+import { liveNodePositionsAtom, nodeAtom, nodeLengthAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom, liveActionPositionsAtom, liveMethodPositionsAtom, actionAtom, methodAtom, actionLengthAtom, midActionConAtom, midMethodConAtom } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { IMethod } from '../interface/IMethod';
+import { IAction } from '../interface/IAction';
 
 export const useCalculation = () => {
-  const livePositions = useAtomValue(liveNodePositionsAtom);
+  const liveNodePositions = useAtomValue(liveNodePositionsAtom);
   const liveAtrPositions = useAtomValue(liveAtrPositionsAtom);
+  const liveActionPositions = useAtomValue(liveActionPositionsAtom);
+  const liveMethodPositions = useAtomValue(liveMethodPositionsAtom);
   const nodes = useAtomValue(nodeAtom);
+  const actions = useAtomValue(actionAtom);
   const nodeLengths = useAtomValue(nodeLengthAtom);
+  const actionLengths = useAtomValue(actionLengthAtom);
   const attributes = useAtomValue(atrAtom);
+  const methods = useAtomValue(methodAtom);
+
   const setMidNodeCon = useSetAtom(midNodeConAtom)
   const setMidAtrCon = useSetAtom(midAtrConAtom)
   const setMidEdgeCon = useSetAtom(midEdgeConAtom)
   const setMidEdge = useSetAtom(midEdgeAtom)
+  const setMidActionCon = useSetAtom(midActionConAtom)
+  const setMidMethodCon = useSetAtom(midMethodConAtom)
 
   const height = 40
 
@@ -27,22 +36,52 @@ export const useCalculation = () => {
     return parentNode;
   };
 
-  const getNodePosition = (nodeID: number) => {
-    const livePos = livePositions.find((pos) => pos.nodeID === nodeID);
-    if (livePos) {
-      return {
-        x: livePos.positionX,
-        y: livePos.positionY,
-      };
-    }
-    const node = nodes.find((n) => n.id === nodeID);
-    if (node) {
-      const position = { x: node.positionX || 0, y: node.positionY || 0 };
-      // circle position
-      return {
-        x: position.x,
-        y: position.y,
-      };
+  const getAction = (methodID: number): IAction | null => {
+    const method = methods.find((m) => m.id === methodID);
+    if (!method) return null;
+
+    const parentNode = actions.find((a) => a.id === method.actionID);
+    if (!parentNode) return null;
+
+    return parentNode;
+  };
+
+  const getNodePosition = (id: number, conType: number) => {
+    if (conType === 0) {
+      const livePos = liveNodePositions.find((pos) => pos.nodeID === id);
+      if (livePos) {
+        return {
+          x: livePos.positionX,
+          y: livePos.positionY,
+        };
+      }
+      const node = nodes.find((n) => n.id === id);
+      if (node) {
+        const position = { x: node.positionX || 0, y: node.positionY || 0 };
+        // circle position
+        return {
+          x: position.x,
+          y: position.y,
+        };
+      }
+    } else if (conType === 1) {
+      const livePos = liveActionPositions.find((pos) => pos.nodeID === id);
+      if (livePos) {
+        return {
+          x: livePos.positionX,
+          y: livePos.positionY,
+        };
+      }
+      const action = actions.find((n) => n.id === id);
+      if (action) {
+        const position = { x: action.positionX || 0, y: action.positionY || 0 };
+        // circle position
+        return {
+          x: position.x,
+          y: position.y,
+        };
+      }
+
     } else {
       return {
         x: 0,
@@ -62,34 +101,64 @@ export const useCalculation = () => {
     return width
   }
 
-  const getAttributePosition = (attributeID: number) => {
-    const livePos = liveAtrPositions.find((pos) => pos.attributeID === attributeID);
-    if (livePos) {
+  const getAttributePosition = (id: number, conType: number) => {
+    if (conType === 0) {
+      const livePos = liveAtrPositions.find((pos) => pos.attributeID === id);
+      if (livePos) {
+        return {
+          x: livePos.positionX,
+          y: livePos.positionY,
+        };
+      }
+
+      const parentNode = getNode(id)
+      if (!parentNode) return null;
+
+      const nodeAttributes = attributes.filter((atr) => atr.nodeID === parentNode.id);
+      const attributeIndex = nodeAttributes.findIndex(
+        (atr) => atr.id === id
+      );
+      if (attributeIndex === -1) return null;
+
+      const nodePos = getNodePosition(parentNode.id, 0);
+      if (!nodePos) return null;
+
+      const attributeY =
+        nodePos.y + height + (height / 2) * (attributeIndex);
+
       return {
-        x: livePos.positionX,
-        y: livePos.positionY,
+        x: nodePos.x,
+        y: attributeY,
+      };
+    } else if (conType === 1) {
+      const livePos = liveMethodPositions.find((pos) => pos.attributeID === id);
+      if (livePos) {
+        return {
+          x: livePos.positionX,
+          y: livePos.positionY,
+        };
+      }
+
+      const parentNode = getAction(id)
+      if (!parentNode) return null;
+
+      const actionMethods = methods.filter((m) => m.actionID === parentNode.id);
+      const attributeIndex = actionMethods.findIndex(
+        (atr) => atr.id === id
+      );
+      if (attributeIndex === -1) return null;
+
+      const nodePos = getNodePosition(parentNode.id, 1);
+      if (!nodePos) return null;
+
+      const attributeY =
+        nodePos.y + height + (height / 2) * (attributeIndex);
+
+      return {
+        x: nodePos.x,
+        y: attributeY,
       };
     }
-
-    const parentNode = getNode(attributeID)
-    if (!parentNode) return null;
-
-    const nodeAttributes = attributes.filter((atr) => atr.nodeID === parentNode.id);
-    const attributeIndex = nodeAttributes.findIndex(
-      (atr) => atr.id === attributeID
-    );
-    if (attributeIndex === -1) return null;
-
-    const nodePos = getNodePosition(parentNode.id);
-    if (!nodePos) return null;
-
-    const attributeY =
-      nodePos.y + height + (height / 2) * (attributeIndex);
-
-    return {
-      x: nodePos.x,
-      y: attributeY,
-    };
   };
 
   // calculate midpoint for a path
@@ -121,6 +190,20 @@ export const useCalculation = () => {
           [conID]: { x: pt.x, y: pt.y },
         }));
         break;
+      // actions
+      case 3:
+        setMidActionCon((prev) => ({
+          ...prev,
+          [conID]: { x: pt.x, y: pt.y },
+        }));
+        break;
+      // methods
+      case 4:
+        setMidMethodCon((prev) => ({
+          ...prev,
+          [conID]: { x: pt.x, y: pt.y },
+        }));
+        break;
       default:
         console.log("Calculation of midpoint failed.")
     }
@@ -138,12 +221,12 @@ export const useCalculation = () => {
   };
 
   const getPathData = (
+    conType: number,
     pos1: { x: number; y: number },
     pos2: { x: number; y: number },
     srcNodeID?: number,
     trgtNodeID?: number
   ): string => {
-
     let pos1Y = pos1.y;
     let pos2Y = pos2.y;
 
@@ -151,8 +234,14 @@ export const useCalculation = () => {
     let pos2X = pos2.x;
 
     if (srcNodeID && trgtNodeID) {
-      const srcNodeLength = nodeLengths.find((l) => l.id === srcNodeID)?.length || 0
-      const trgtNodeLength = nodeLengths.find((l) => l.id === trgtNodeID)?.length || 0
+      let srcNodeLength = 0, trgtNodeLength = 0;
+      if (conType === 0) {
+        srcNodeLength = nodeLengths.find((l) => l.id === srcNodeID)?.length || 0
+        trgtNodeLength = nodeLengths.find((l) => l.id === trgtNodeID)?.length || 0
+      } else if (conType === 1) {
+        srcNodeLength = actionLengths.find((l) => l.id === srcNodeID)?.length || 0
+        trgtNodeLength = actionLengths.find((l) => l.id === trgtNodeID)?.length || 0
+      }
 
       pos1Y = pos1.y + height / 2
       pos2Y = pos2.y + height / 2
@@ -212,14 +301,23 @@ export const useCalculation = () => {
     };
   }
 
-  const getShortestPath = (midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number, atrID?: number) => {
+  const getShortestPath = (conType: number, midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number, atrID?: number) => {
     let nodeLength = 0;
 
-    if (nodeID) {
-      nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
-    } else if (atrID) {
-      let node = getNode(atrID)
-      nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
+    if (conType === 0) {
+      if (nodeID) {
+        nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
+      } else if (atrID) {
+        let node = getNode(atrID)
+        nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
+      }
+    } else if (conType === 1) {
+      if (nodeID) {
+        nodeLength = actionLengths.find(l => l.id === nodeID)?.length || 0;
+      } else if (atrID) {
+        let node = getAction(atrID)
+        nodeLength = actionLengths.find(l => l.id === node?.id)?.length || 0;
+      }
     } else {
       return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`
     }
@@ -274,5 +372,5 @@ export const useCalculation = () => {
     return { pos1X, pos1Y, pos2X, pos2Y }
   }
 
-  return { getNode, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
+  return { getNode, getAction, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getAttributePosition, getPathData, getMidpoint, getShortestPath, getTempPathData, getArrowData }
 }
