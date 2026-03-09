@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import Action from './action';
 import Connection from './connection';
 import { ICorrespondence } from '../interface/ICorrespondence';
@@ -52,6 +52,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     liveActionPositionsAtom,
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const handleNodeClick = handleActionConCreate(
     actionCon,
@@ -219,6 +220,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
       <svg
+        ref={svgRef}
         width={diagramDimensions.width}
         height={diagramDimensions.height}
         overflow='visible'
@@ -253,6 +255,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
           pendingChildCon={pendingAtrCon}
           childCons={methodCon}
           midChildCon={midMethodCon}
+          svgRef={svgRef}
         />
         {loading || layoutLoading || methodLoading ? (
           <text x={50} y={50}>

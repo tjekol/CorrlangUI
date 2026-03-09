@@ -7,7 +7,7 @@ import {
   IPendingEdgeCon,
 } from '../interface/IStates';
 import { midEdgeConAtom, midEdgeAtom } from '../GlobalValues';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCalculation } from '../hooks/useCalculation';
 import { useEdgeCon } from '../hooks/connection/useEdgeCon';
 import NodeConnection from './node-connection';
@@ -35,6 +35,7 @@ export default function Connection({
   edgeCons,
   pendingEdgeCon,
   onEdgeConClick,
+  svgRef,
 }: {
   conType: number;
   cons: INodeConnection[] | IActionConnection[];
@@ -50,6 +51,7 @@ export default function Connection({
   edgeCons?: IEdgeConnection[];
   onEdgeConClick?: (edgeConID: number, edgeID: number) => boolean | void;
   pendingEdgeCon?: IPendingEdgeCon | null;
+  svgRef?: React.RefObject<SVGSVGElement | null>;
 }) {
   const edgeConHook = useEdgeCon();
   const midEdgeCon = useAtomValue(midEdgeConAtom);
@@ -77,7 +79,7 @@ export default function Connection({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const svg = document.querySelector('svg');
+      const svg = svgRef?.current || document.querySelector('svg');
       if (svg) {
         const rect = svg.getBoundingClientRect();
         setMousePosition({
@@ -93,7 +95,7 @@ export default function Connection({
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [pendingCon, pendingChildCon, pendingEdgeCon]);
+  }, [pendingCon, pendingChildCon, pendingEdgeCon, svgRef]);
 
   let hasMousePosition = mousePosition.x !== 0 && mousePosition.y !== 0;
 

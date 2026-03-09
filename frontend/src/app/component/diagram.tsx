@@ -3,7 +3,7 @@
 import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   IPendingAtrCon,
   IPendingNodeCon,
@@ -66,6 +66,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     liveNodePositionsAtom,
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null)!;
 
   const handleNodeClick = handleNodeConCreate(
     nodeCon,
@@ -265,6 +266,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
       <svg
+        ref={svgRef}
         width={diagramDimensions.width}
         height={diagramDimensions.height}
         overflow='visible'
@@ -311,9 +313,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           onChildConClick={handleAtrConClick}
           pendingChildCon={pendingAtrCon}
           midChildCon={midAtrCon}
-          edgeCons={edgeCon}
-          onEdgeConClick={handleEdgeConClick}
-          pendingEdgeCon={pendingEdgeCon}
+          svgRef={svgRef}
         />
         <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />
         {loading || edgeLoading || layoutLoading || atrLoading ? (
