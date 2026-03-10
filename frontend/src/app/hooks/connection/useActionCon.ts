@@ -14,7 +14,7 @@ export const useActionCon = () => {
     try {
       await fn();
     } catch (error) {
-      console.error('Action connection operation failed:', error);
+      console.error('Action action connection operation failed:', error);
     } finally {
       setLoading(false);
     }
@@ -23,7 +23,7 @@ export const useActionCon = () => {
   const fetchCons = () => handleAsync(async () => {
     const res = await fetch('/api/action-connection');
     if (!res.ok) {
-      throw new Error('Failed to fetch connections');
+      throw new Error('Failed to fetch action connections');
     }
     const conData: IActionConnection[] = await res.json();
     setCon(conData)
@@ -37,11 +37,11 @@ export const useActionCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to create connection:', res);
+      console.log('Failed to create action connection:', res);
       return;
     }
     const conData: IActionConnection = await res.json();
-    console.log(`Added connection: ${conData.id} between ${ids}`);
+    console.log(`Added action connection: ${conData.id} between ${ids}`);
     setCon(prev => [...prev, conData]);
   })
 
@@ -53,12 +53,12 @@ export const useActionCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to update connection:', res);
+      console.log('Failed to update action connection:', res);
       return;
     }
 
     const conData: IActionConnection = await res.json();
-    console.log(`Updated connection ${conData.id} with ${id}`);
+    console.log(`Updated action connection ${conData.id} with ${id}`);
     setCon(prev => prev.map(con => con.id === conID ? conData : con));
   })
 
@@ -70,9 +70,9 @@ export const useActionCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete connection');
+      throw new Error('Failed to delete action connection');
     }
-    console.log(`Removed connection with id: ${id}`);
+    console.log(`Removed action connection with id: ${id}`);
     setCon(prev => prev.filter(con => con.id !== id));
   })
 
@@ -84,9 +84,9 @@ export const useActionCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to connections');
+      throw new Error('Failed to delete action action connections');
     }
-    console.log(`Removed all connections`);
+    console.log(`Removed all action connections`);
     setCon([]);
   })
 

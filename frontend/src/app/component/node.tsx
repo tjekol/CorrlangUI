@@ -15,11 +15,11 @@ import { useCalculation } from '../hooks/useCalculation';
 interface NodeProps extends INode {
   color: string;
   onNodeClick: (
-    nodeID: number,
+    id: number,
     circlePosition: { x: number; y: number },
   ) => void;
   onAttributeClick: (
-    atrID: number,
+    id: number,
     circlePosition: { x: number; y: number },
   ) => void;
 }

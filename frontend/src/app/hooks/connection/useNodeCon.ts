@@ -29,11 +29,11 @@ export const useNodeCon = () => {
     setNodeCon(conData)
   })
 
-  const createNodeCon = (nodeIDs: number[]) => handleAsync(async () => {
+  const createNodeCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/node-connection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nodeIDs }),
+      body: JSON.stringify({ ids }),
     })
 
     if (!res.ok) {
@@ -41,15 +41,15 @@ export const useNodeCon = () => {
       return;
     }
     const conData: INodeConnection = await res.json();
-    console.log(`Added connection: ${conData.id} between nodes ${nodeIDs}`);
+    console.log(`Added connection: ${conData.id} between nodes ${ids}`);
     setNodeCon(prev => [...prev, conData]);
   })
 
-  const updateNodeCon = (nodeConID: number, nodeID: number) => handleAsync(async () => {
+  const updateNodeCon = (conID: number, id: number) => handleAsync(async () => {
     const res = await fetch('/api/node-connection', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nodeConID, nodeID }),
+      body: JSON.stringify({ conID, id }),
     })
 
     if (!res.ok) {
@@ -58,8 +58,8 @@ export const useNodeCon = () => {
     }
 
     const conData: INodeConnection = await res.json();
-    console.log(`Updated connection ${conData.id} with node: ${nodeID}`);
-    setNodeCon(prev => prev.map(con => con.id === nodeConID ? conData : con));
+    console.log(`Updated connection ${conData.id} with node: ${id}`);
+    setNodeCon(prev => prev.map(con => con.id === conID ? conData : con));
   })
 
   const deleteCon = (id: number) => handleAsync(async () => {

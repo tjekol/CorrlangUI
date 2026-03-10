@@ -14,7 +14,7 @@ export const useMethodCon = () => {
     try {
       await fn();
     } catch (error) {
-      console.error('Action connection operation failed:', error);
+      console.error('Action method connection operation failed:', error);
     } finally {
       setLoading(false);
     }
@@ -23,7 +23,7 @@ export const useMethodCon = () => {
   const fetchCons = () => handleAsync(async () => {
     const res = await fetch('/api/method-connection');
     if (!res.ok) {
-      throw new Error('Failed to fetch connections');
+      throw new Error('Failed to fetch method connections');
     }
     const conData: IMethodConnection[] = await res.json();
     setCon(conData)
@@ -37,11 +37,11 @@ export const useMethodCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to create connection:', res);
+      console.log('Failed to create method connection:', res);
       return;
     }
     const conData: IMethodConnection = await res.json();
-    console.log(`Added connection: ${conData.id} between ${ids}`);
+    console.log(`Added method connection: ${conData.id} between ${ids}`);
     setCon(prev => [...prev, conData]);
   })
 
@@ -53,12 +53,12 @@ export const useMethodCon = () => {
     })
 
     if (!res.ok) {
-      console.log('Failed to update connection:', res);
+      console.log('Failed to update method connection:', res);
       return;
     }
 
     const conData: IMethodConnection = await res.json();
-    console.log(`Updated connection ${conData.id} with ${id}`);
+    console.log(`Updated method connection ${conData.id} with ${id}`);
     setCon(prev => prev.map(con => con.id === conID ? conData : con));
   })
 
@@ -70,9 +70,9 @@ export const useMethodCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to delete connection');
+      throw new Error('Failed to delete method connection');
     }
-    console.log(`Removed connection with id: ${id}`);
+    console.log(`Removed method connection with id: ${id}`);
     setCon(prev => prev.filter(con => con.id !== id));
   })
 
@@ -84,9 +84,9 @@ export const useMethodCon = () => {
     })
 
     if (!res.ok) {
-      throw new Error('Failed to connections');
+      throw new Error('Failed to method connections');
     }
-    console.log(`Removed all connections`);
+    console.log(`Removed all method connections`);
     setCon([]);
   })
 

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET - Fetch all connections
 export async function GET() {
   try {
-    const multiCon = await prisma.actionConnection.findMany({
+    const con = await prisma.actionConnection.findMany({
       include: {
         actions: {
           select: {
@@ -14,11 +14,11 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(multiCon);
+    return NextResponse.json(con);
   } catch (error) {
-    console.error('Error fetching connection:', error);
+    console.error('Error fetching action connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch connection' },
+      { error: 'Failed to fetch action connection' },
       { status: 500 }
     );
   }
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating connection:', error);
+    console.error('Error creating action connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create connection' },
+      { error: 'Failed to create action connection' },
       { status: 500 }
     );
   }
@@ -79,9 +79,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating connection:', error);
+    console.error('Error updating action connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update connection' },
+      { error: 'Failed to update action connection' },
       { status: 500 }
     );
   }
@@ -104,9 +104,9 @@ export async function DELETE(request: NextRequest) {
     }
     return NextResponse.json(deletedCon);
   } catch (error) {
-    console.error('Error deleting connection:', error);
+    console.error('Error deleting action connection:', error);
     return NextResponse.json(
-      { error: 'Failed to delete connection' },
+      { error: 'Failed to delete action connection' },
       { status: 500 }
     );
   }

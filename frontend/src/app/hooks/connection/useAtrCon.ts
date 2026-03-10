@@ -29,11 +29,11 @@ export const useAtrCon = () => {
     setAtrCon(conData)
   })
 
-  const createAtrCon = (atrIDs: number[]) => handleAsync(async () => {
+  const createAtrCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/atr-connection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ atrIDs }),
+      body: JSON.stringify({ ids }),
     })
 
     if (!res.ok) {
@@ -41,15 +41,15 @@ export const useAtrCon = () => {
       return;
     }
     const conData: IAtrConnection = await res.json();
-    console.log(`Added attribute connection: ${conData.id} between attributes ${atrIDs}`);
+    console.log(`Added attribute connection: ${conData.id} between attributes ${ids}`);
     setAtrCon(prev => [...prev, conData]);
   })
 
-  const updateAtrCon = (atrConID: number, atrID: number) => handleAsync(async () => {
+  const updateAtrCon = (conID: number, id: number) => handleAsync(async () => {
     const res = await fetch('/api/atr-connection', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ atrConID, atrID }),
+      body: JSON.stringify({ conID, id }),
     })
 
     if (!res.ok) {
@@ -58,8 +58,8 @@ export const useAtrCon = () => {
     }
 
     const conData: IAtrConnection = await res.json();
-    console.log(`Updated attribute connection ${conData.id} with attributes: ${atrID}`);
-    setAtrCon(prev => prev.map(con => con.id === atrConID ? conData : con));
+    console.log(`Updated attribute connection ${conData.id} with attributes: ${id}`);
+    setAtrCon(prev => prev.map(con => con.id === conID ? conData : con));
   })
 
   const deleteCon = (id: number) => handleAsync(async () => {

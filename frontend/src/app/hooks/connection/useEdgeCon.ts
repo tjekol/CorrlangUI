@@ -29,11 +29,11 @@ export const useEdgeCon = () => {
     setEdgeCon(conData)
   })
 
-  const createEdgeCon = (edgeIDs: number[]) => handleAsync(async () => {
+  const createEdgeCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/edge-connection', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edgeIDs }),
+      body: JSON.stringify({ ids }),
     })
 
     if (!res.ok) {
@@ -41,15 +41,15 @@ export const useEdgeCon = () => {
       return;
     }
     const conData: IEdgeConnection = await res.json();
-    console.log(`Added edge connection: ${conData.id} between edges ${edgeIDs}`);
+    console.log(`Added edge connection: ${conData.id} between edges ${ids}`);
     setEdgeCon(prev => [...prev, conData]);
   })
 
-  const updateEdgeCon = (edgeConID: number, edgeID: number) => handleAsync(async () => {
+  const updateEdgeCon = (conID: number, id: number) => handleAsync(async () => {
     const res = await fetch('/api/edge-connection', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edgeConID, edgeID }),
+      body: JSON.stringify({ conID, id }),
     })
 
     if (!res.ok) {
@@ -57,8 +57,8 @@ export const useEdgeCon = () => {
     }
 
     const conData: IEdgeConnection = await res.json();
-    console.log(`Removed edge connection with id: ${edgeConID}`);
-    setEdgeCon(prev => prev.map(edgeCon => edgeCon.id === edgeConID ? conData : edgeCon));
+    console.log(`Removed edge connection with id: ${conID}`);
+    setEdgeCon(prev => prev.map(edgeCon => edgeCon.id === conID ? conData : edgeCon));
   })
 
   const deleteEdgeCon = (id: number) => handleAsync(async () => {

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET - Fetch all connections
 export async function GET() {
   try {
-    const multiCon = await prisma.nodeConnection.findMany({
+    const con = await prisma.nodeConnection.findMany({
       include: {
         nodes: {
           select: {
@@ -14,11 +14,11 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(multiCon);
+    return NextResponse.json(con);
   } catch (error) {
-    console.error('Error fetching connection:', error);
+    console.error('Error fetching node connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch connection' },
+      { error: 'Failed to fetch node connection' },
       { status: 500 }
     );
   }
@@ -27,12 +27,12 @@ export async function GET() {
 // POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
-    const { nodeIDs } = await request.json();
+    const { ids } = await request.json();
 
     const con = await prisma.nodeConnection.create({
       data: {
         nodes: {
-          connect: nodeIDs.map((id: number) => ({ id }))
+          connect: ids.map((id: number) => ({ id }))
         }
       },
       include: {
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating connection:', error);
+    console.error('Error creating node connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create connection' },
+      { error: 'Failed to create node connection' },
       { status: 500 }
     );
   }
@@ -57,15 +57,15 @@ export async function POST(request: NextRequest) {
 // PUT - Update connection
 export async function PUT(request: NextRequest) {
   try {
-    const { nodeConID, nodeID } = await request.json();
+    const { conID, id } = await request.json();
 
     const con = await prisma.nodeConnection.update({
       where: {
-        id: nodeConID
+        id: conID
       },
       data: {
         nodes: {
-          connect: { id: nodeID }
+          connect: { id: id }
         }
       },
       include: {
@@ -79,9 +79,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating connection:', error);
+    console.error('Error updating node connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update connection' },
+      { error: 'Failed to update node connection' },
       { status: 500 }
     );
   }
@@ -104,9 +104,9 @@ export async function DELETE(request: NextRequest) {
     }
     return NextResponse.json(deletedCon);
   } catch (error) {
-    console.error('Error deleting connection:', error);
+    console.error('Error deleting node connection:', error);
     return NextResponse.json(
-      { error: 'Failed to delete connection' },
+      { error: 'Failed to delete node connection' },
       { status: 500 }
     );
   }

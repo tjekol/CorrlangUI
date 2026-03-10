@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET - Fetch all edge connections
 export async function GET() {
   try {
-    const connections = await prisma.edgeConnection.findMany({
+    const con = await prisma.edgeConnection.findMany({
       include: {
         edges: {
           select: {
@@ -14,7 +14,7 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(connections);
+    return NextResponse.json(con);
   } catch (error) {
     console.error('Error fetching edge connections:', error);
     return NextResponse.json(
@@ -27,12 +27,12 @@ export async function GET() {
 // POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
-    const { edgeIDs } = await request.json();
+    const { ids } = await request.json();
 
     const con = await prisma.edgeConnection.create({
       data: {
         edges: {
-          connect: edgeIDs.map((id: number) => ({ id }))
+          connect: ids.map((id: number) => ({ id }))
         }
       },
       include: {
@@ -55,15 +55,15 @@ export async function POST(request: NextRequest) {
 // PUT - Update connection
 export async function PUT(request: NextRequest) {
   try {
-    const { edgeConID, edgeID } = await request.json();
+    const { conID, id } = await request.json();
 
     const con = await prisma.edgeConnection.update({
       where: {
-        id: edgeConID
+        id: conID
       },
       data: {
         edges: {
-          connect: { id: edgeID }
+          connect: { id: id }
         }
       },
       include: {

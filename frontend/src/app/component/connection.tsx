@@ -40,12 +40,12 @@ export default function Connection({
   pendingCon: IPendingCon | null;
   midCon: Record<number, { x: number; y: number }>;
   childCons: IAtrConnection[] | IMethodConnection[];
-  onChildConClick: (atrConID: number, atrID: number) => boolean | void;
+  onChildConClick: (conID: number, id: number) => boolean | void;
   deleteChildCon: (id: number) => void;
   pendingChildCon: IPendingCon | null;
   midChildCon: Record<number, { x: number; y: number }>;
   edgeCons?: IEdgeConnection[];
-  onEdgeConClick?: (edgeConID: number, edgeID: number) => boolean | void;
+  onEdgeConClick?: (conID: number, id: number) => boolean | void;
   pendingEdgeCon?: IPendingCon | null;
   svgRef?: React.RefObject<SVGSVGElement | null>;
 }) {

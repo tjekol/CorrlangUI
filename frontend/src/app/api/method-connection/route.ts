@@ -17,9 +17,9 @@ export async function GET() {
 
     return NextResponse.json(con);
   } catch (error) {
-    console.error('Error fetching attribute connection:', error);
+    console.error('Error fetching method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch attribute connection' },
+      { error: 'Failed to fetch method connection' },
       { status: 500 }
     );
   }
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating attribute connection:', error);
+    console.error('Error creating method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create attribute connection' },
+      { error: 'Failed to create method connection' },
       { status: 500 }
     );
   }
@@ -82,9 +82,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating attribute connection:', error);
+    console.error('Error updating method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update attribute connection' },
+      { error: 'Failed to update method connection' },
       { status: 500 }
     );
   }
