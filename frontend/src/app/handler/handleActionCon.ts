@@ -1,15 +1,15 @@
-import { INodeConnection } from '../interface/IConnections';
+import { IActionConnection } from '../interface/IConnections';
 import { IPendingCon } from '../interface/IStates';
 
-export const handleNodeConCreate = (
-  cons: INodeConnection[],
-  createNodeCon: (ids: number[]) => void,
+export const handleActionConCreate = (
+  cons: IActionConnection[],
+  createActionCon: (ids: number[]) => void,
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
   return (id: number, circlePosition?: { x: number, y: number }) => {
-    console.log('Node selected:', {
-      nodeID: id,
+    console.log('Action selected:', {
+      actionID: id,
       position: circlePosition
     });
 
@@ -25,12 +25,12 @@ export const handleNodeConCreate = (
     } else {
       // check if node is already in connection
       if (pendingCon && id !== pendingCon.id) {
-        const allNodeIDs = [id, pendingCon.id]
-        createNodeCon(allNodeIDs);
+        const allIDs = [id, pendingCon.id]
+        createActionCon(allIDs);
         setPendingCon(null);
         return true
       } else {
-        console.log('Same node clicked or node alredy exists in connection.');
+        console.log('Same action clicked or action alredy exists in connection.');
         setPendingCon(null);
         return false
       }
@@ -38,18 +38,18 @@ export const handleNodeConCreate = (
   };
 };
 
-export const handleNodeConUpdate = (
-  updateNodeCon: (conID: number, id: number) => void,
-  pendingNodeCon: IPendingCon | null,
-  setPendingNodeCon: (pendingEdge: IPendingCon | null) => void
+export const handleActionConUpdate = (
+  updateActionCon: (conID: number, id: number) => void,
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingEdge: IPendingCon | null) => void
 ) => {
   return (conID: number, id: number) => {
-    if (!pendingNodeCon) {
-      alert(`Click on a node first to add to connection.`)
+    if (!pendingCon) {
+      alert(`Click on an action first to add to connection.`)
       return false
     } else {
-      updateNodeCon(conID, id);
-      setPendingNodeCon(null);
+      updateActionCon(conID, id);
+      setPendingCon(null);
       return true
     }
   }

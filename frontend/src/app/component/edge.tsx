@@ -48,8 +48,8 @@ export default function Edge({
         if (nodes) {
           const { srcNode, trgtNode } = nodes;
           if (srcNode && trgtNode) {
-            const pos1 = getNodePosition(srcNode.id);
-            const pos2 = getNodePosition(trgtNode.id);
+            const pos1 = getNodePosition(srcNode.id, 0);
+            const pos2 = getNodePosition(trgtNode.id, 0);
             if (pos1 && pos2) {
               // nodes under same schema
               if (srcNode.schemaID === trgtNode.schemaID) {
@@ -62,6 +62,8 @@ export default function Edge({
                   trgtNode,
                 );
                 const arrowData = getArrowData(pos1, pos2, srcNode, trgtNode);
+                const midpointX = (arrowData.pos1X + arrowData.pos2X) / 2;
+                const midpointY = (arrowData.pos1Y + arrowData.pos2Y) / 2;
                 const refPadding = 30;
                 const mulPadding = 20;
                 return (
@@ -161,13 +163,13 @@ export default function Edge({
                     <text
                       x={
                         arrowData.pos1X < arrowData.pos2X
-                          ? (arrowData.pos1X + arrowData.pos2X) / 2 - refPadding
-                          : (arrowData.pos1X + arrowData.pos2X) / 2 + refPadding
+                          ? midpointX + refPadding
+                          : midpointX - refPadding
                       }
                       y={
                         arrowData.pos1Y < arrowData.pos2Y
-                          ? (arrowData.pos1Y + arrowData.pos2Y) / 2 - refPadding
-                          : (arrowData.pos1Y + arrowData.pos2Y) / 2 + refPadding
+                          ? midpointY + refPadding
+                          : midpointY - refPadding
                       }
                       textAnchor='middle'
                       dominantBaseline='middle'
@@ -179,15 +181,15 @@ export default function Edge({
                     <text
                       x={
                         edge.type === EdgeType.comp
-                          ? compData.pos1X + mulPadding
-                          : arrowData.pos1X < pos2.x
-                            ? arrowData.pos1X + mulPadding
-                            : arrowData.pos1X - mulPadding
+                          ? compData.pos2X - mulPadding
+                          : arrowData.pos2X > pos1.x
+                            ? arrowData.pos2X - mulPadding
+                            : arrowData.pos2X + mulPadding
                       }
                       y={
-                        arrowData.pos1Y > pos1.y
-                          ? arrowData.pos1Y + mulPadding
-                          : arrowData.pos1Y - mulPadding
+                        arrowData.pos2Y > pos1.y
+                          ? arrowData.pos2Y - mulPadding
+                          : arrowData.pos2Y + mulPadding
                       }
                       textAnchor='middle'
                       dominantBaseline='middle'

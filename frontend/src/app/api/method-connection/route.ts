@@ -1,14 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all edge connections
+// GET - Fetch all attribute connections
 export async function GET() {
   try {
-    const con = await prisma.edgeConnection.findMany({
+    const con = await prisma.methodConnection.findMany({
       include: {
-        edges: {
+        methods: {
           select: {
-            id: true
+            id: true,
+            actionID: true
           }
         }
       }
@@ -16,9 +17,9 @@ export async function GET() {
 
     return NextResponse.json(con);
   } catch (error) {
-    console.error('Error fetching edge connections:', error);
+    console.error('Error fetching method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch edge connections' },
+      { error: 'Failed to fetch method connection' },
       { status: 500 }
     );
   }
@@ -29,47 +30,51 @@ export async function POST(request: NextRequest) {
   try {
     const { ids } = await request.json();
 
-    const con = await prisma.edgeConnection.create({
+    const con = await prisma.methodConnection.create({
       data: {
-        edges: {
+        methods: {
           connect: ids.map((id: number) => ({ id }))
         }
       },
       include: {
-        edges: {
-          select: { id: true }
+        methods: {
+          select: {
+            id: true,
+            actionID: true
+          }
         }
       }
     });
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error creating edge connection:', error);
+    console.error('Error creating method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to create edge connection' },
+      { error: 'Failed to create method connection' },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update connection
+// PUT - Update attribute connection
 export async function PUT(request: NextRequest) {
   try {
     const { conID, id } = await request.json();
 
-    const con = await prisma.edgeConnection.update({
+    const con = await prisma.methodConnection.update({
       where: {
         id: conID
       },
       data: {
-        edges: {
+        methods: {
           connect: { id: id }
         }
       },
       include: {
-        edges: {
+        methods: {
           select: {
-            id: true
+            id: true,
+            actionID: true
           }
         }
       }
@@ -77,36 +82,34 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(con, { status: 201 });
   } catch (error) {
-    console.error('Error updating connection:', error);
+    console.error('Error updating method connection:', error);
     return NextResponse.json(
-      { error: 'Failed to update connection' },
+      { error: 'Failed to update method connection' },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Delete edge connections by ID
+// DELETE - Delete attribute connection by ID or all
 export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json().catch(() => ({}));
     let deletedCon;
-
     if (id) {
-      // Delete related edge connections
-      deletedCon = await prisma.edgeConnection.deleteMany({
+      // Delete related connections
+      deletedCon = await prisma.methodConnection.deleteMany({
         where: {
           id: id,
         },
       });
     } else {
-      deletedCon = await prisma.edgeConnection.deleteMany()
+      deletedCon = await prisma.methodConnection.deleteMany()
     }
-
     return NextResponse.json(deletedCon);
   } catch (error) {
-    console.error('Error deleting edge connection:', error);
+    console.error('Error deleting attribute connection:', error);
     return NextResponse.json(
-      { error: 'Failed to delete edge connection' },
+      { error: 'Failed to delete attribute connection' },
       { status: 500 }
     );
   }

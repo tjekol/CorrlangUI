@@ -5,21 +5,29 @@ import Correspondence from './component/correspondence';
 import Diagram from './component/diagram';
 import Export from './component/export';
 import { ICorrespondence } from './interface/ICorrespondence';
-import { useNodeCon } from './hooks/useNodeCon';
-import { useAtrCon } from './hooks/useAtrCon';
-import { useEdgeCon } from './hooks/useEdgeCon';
+import ActionDiagram from './component/action-diagram';
+import { useAtrCon } from './hooks/connection/useAtrCon';
+import { useEdgeCon } from './hooks/connection/useEdgeCon';
+import { useNodeCon } from './hooks/connection/useNodeCon';
+import { useActionCon } from './hooks/connection/useActionCon';
+import { useMethodCon } from './hooks/connection/useMethodCon';
 
 export default function Home() {
   const { deleteAllNodeCons } = useNodeCon();
   const { deleteAllEdgeCons } = useEdgeCon();
   const { deleteAllAtrCons } = useAtrCon();
+  const { deleteAllActionCons } = useActionCon();
+  const { deleteAllMethodCons } = useMethodCon();
 
   const reset = () => {
     deleteAllNodeCons();
     deleteAllEdgeCons();
     deleteAllAtrCons();
+    deleteAllActionCons();
+    deleteAllMethodCons();
   };
 
+  const [actionIsOpen, setActionIsOpen] = useState<boolean>(false);
   const [exportIsOpen, setExportIsOpen] = useState<boolean>(false);
   const [corres, setCorres] = useState<ICorrespondence>();
 
@@ -47,6 +55,14 @@ export default function Home() {
             <div className='flex gap-2'>
               <button
                 onClick={() => {
+                  setActionIsOpen(!actionIsOpen);
+                }}
+                className='border rounded-md px-4 py-1'
+              >
+                Connect actions
+              </button>
+              <button
+                onClick={() => {
                   if (confirm('Remove all connections')) reset();
                 }}
                 className='border rounded-md px-4 py-1'
@@ -63,6 +79,20 @@ export default function Home() {
           </div>
         )}
 
+        {!corres ? (
+          <Correspondence onDataEmit={handleData} reset={reset} />
+        ) : (
+          <>
+            <Diagram cor={corres} />
+            <dialog
+              open={actionIsOpen}
+              className='bg-blue-50 mt-20 overflow-auto h-3/4 rounded-sm border p-4 m-auto w-5/6'
+            >
+              <ActionDiagram cor={corres} />
+            </dialog>
+          </>
+        )}
+
         <dialog
           open={exportIsOpen}
           className='bg-blue-50 mt-20 overflow-auto h-3/4 rounded-sm border p-4 m-auto w-5/6'
@@ -70,12 +100,6 @@ export default function Home() {
           <h3>Copy results</h3>
           <Export />
         </dialog>
-
-        {!corres ? (
-          <Correspondence onDataEmit={handleData} reset={reset} />
-        ) : (
-          <Diagram cor={corres} />
-        )}
       </div>
     </div>
   );

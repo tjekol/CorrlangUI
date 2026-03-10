@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET - Fetch all attribute connections
+// GET - Fetch all connections
 export async function GET() {
   try {
     const con = await prisma.atrConnection.findMany({
@@ -28,12 +28,12 @@ export async function GET() {
 // POST - Create a new connection
 export async function POST(request: NextRequest) {
   try {
-    const { atrIDs } = await request.json();
+    const { ids } = await request.json();
 
     const con = await prisma.atrConnection.create({
       data: {
         attributes: {
-          connect: atrIDs.map((id: number) => ({ id }))
+          connect: ids.map((id: number) => ({ id }))
         }
       },
       include: {
@@ -59,15 +59,15 @@ export async function POST(request: NextRequest) {
 // PUT - Update attribute connection
 export async function PUT(request: NextRequest) {
   try {
-    const { atrConID, atrID } = await request.json();
+    const { conID, id } = await request.json();
 
     const con = await prisma.atrConnection.update({
       where: {
-        id: atrConID
+        id: conID
       },
       data: {
         attributes: {
-          connect: { id: atrID }
+          connect: { id: id }
         }
       },
       include: {

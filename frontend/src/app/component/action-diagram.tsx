@@ -1,104 +1,81 @@
 'use client';
 
-import Node from './node';
-import Edge from './edge';
-import { useNodes } from '../hooks/useNodes';
 import { useEffect, useState, useMemo, useRef } from 'react';
+import Action from './action';
+import Connection from './connection';
+import { ICorrespondence } from '../interface/ICorrespondence';
+import { IAction } from '../interface/IAction';
+import { useSchemas } from '../hooks/useSchemas';
+import { useAction } from '../hooks/useAction';
+import { useMethod } from '../hooks/useMethod';
+import { useCalculation } from '../hooks/useCalculation';
+import { useActionCon } from '../hooks/connection/useActionCon';
 import { IPendingCon } from '../interface/IStates';
 import { useAtom, useAtomValue } from 'jotai';
 import {
-  liveNodePositionsAtom,
-  midAtrConAtom,
-  midNodeConAtom,
+  liveActionPositionsAtom,
+  midActionConAtom,
+  midMethodConAtom,
   nodeColor,
 } from '../GlobalValues';
-import { INode } from '../interface/INode';
-import { useSchemas } from '../hooks/useSchemas';
 import {
-  handleNodeConCreate,
-  handleNodeConUpdate,
-} from '../handler/handleNodeCon';
-import { useEdges } from '../hooks/useEdges';
-import Connection from './connection';
-import { useCalculation } from '../hooks/useCalculation';
-import { useAttributes } from '../hooks/useAttributes';
-import { ICorrespondence } from '../interface/ICorrespondence';
+  handleActionConCreate,
+  handleActionConUpdate,
+} from '../handler/handleActionCon';
+import { useMethodCon } from '../hooks/connection/useMethodCon';
 import {
-  handleEdgeConCreate,
-  handleEdgeConUpdate,
-} from '../handler/handleEdgeCon';
-import {
-  handleAtrConCreate,
-  handleAtrConUpdate,
-} from '../handler/handleAtrCon';
-import { useAtrCon } from '../hooks/connection/useAtrCon';
-import { useEdgeCon } from '../hooks/connection/useEdgeCon';
-import { useNodeCon } from '../hooks/connection/useNodeCon';
+  handleMethodConCreate,
+  handleMethodConUpdate,
+} from '../handler/handleMethodCon';
 
-export default function Diagram({ cor }: { cor: ICorrespondence }) {
+export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
-  const { nodes, loading, refetchNodes } = useNodes();
-  const { attributes, atrLoading, refetchAttributes } = useAttributes();
-  const { edges, edgeLoading, refetchEdges } = useEdges();
-  const { nodeCon, createNodeCon, updateNodeCon, deleteNodeCon } = useNodeCon();
-  const { atrCon, createAtrCon, updateAtrCon, deleteAtrCon } = useAtrCon();
-  const { edgeCon, createEdgeCon, updateEdgeCon } = useEdgeCon();
+  const { actions, loading, refetchActions } = useAction();
+  const { methods, methodLoading, refetchMethods } = useMethod();
+  const { actionCon, createActionCon, updateActionCon, deleteActionCon } =
+    useActionCon();
+  const { methodCon, createMethodCon, updateMethodCon, deleteMethodCon } =
+    useMethodCon();
   const { calculateNodeLength } = useCalculation();
-  const midNodeCon = useAtomValue(midNodeConAtom);
-  const midAtrCon = useAtomValue(midAtrConAtom);
+  const midActionCon = useAtomValue(midActionConAtom);
+  const midMethodCon = useAtomValue(midMethodConAtom);
 
   // local state to store first click of node/attribute
   const [pendingNodeCon, setPendingNodeCon] = useState<IPendingCon | null>(
     null,
   );
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingCon | null>(null);
-  const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingCon | null>(
-    null,
-  );
 
   const [liveNodePositions, setLiveNodePositions] = useAtom(
-    liveNodePositionsAtom,
+    liveActionPositionsAtom,
   );
   const [layoutLoading, setLayoutLoading] = useState(false);
-  const svgRef = useRef<SVGSVGElement>(null)!;
+  const svgRef = useRef<SVGSVGElement>(null);
 
-  const handleNodeClick = handleNodeConCreate(
-    nodeCon,
-    createNodeCon,
+  const handleNodeClick = handleActionConCreate(
+    actionCon,
+    createActionCon,
     pendingNodeCon,
     setPendingNodeCon,
   );
 
-  const handleAttributeClick = handleAtrConCreate(
-    atrCon,
-    createAtrCon,
+  const handleMethodClick = handleMethodConCreate(
+    methodCon,
+    createMethodCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
 
-  const handleEdgeClick = handleEdgeConCreate(
-    edgeCon,
-    createEdgeCon,
-    pendingEdgeCon,
-    setPendingEdgeCon,
-  );
-
-  const handleNodeConClick = handleNodeConUpdate(
-    updateNodeCon,
+  const handleNodeConClick = handleActionConUpdate(
+    updateActionCon,
     pendingNodeCon,
     setPendingNodeCon,
   );
 
-  const handleAtrConClick = handleAtrConUpdate(
-    updateAtrCon,
+  const handleMethodConClick = handleMethodConUpdate(
+    updateMethodCon,
     pendingAtrCon,
     setPendingAtrCon,
-  );
-
-  const handleEdgeConClick = handleEdgeConUpdate(
-    updateEdgeCon,
-    pendingEdgeCon,
-    setPendingEdgeCon,
   );
 
   const [diagramDimensions, setDiagramDimensions] = useState({
@@ -111,12 +88,10 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
       console.log('🔄 Starting sequential fetch...');
       await refetchSchemas();
       console.log('✅ Schemas done');
-      await refetchNodes();
-      console.log('✅ Nodes done');
-      await refetchAttributes();
-      console.log('✅ Attributes done');
-      await refetchEdges();
-      console.log('✅ Edges done');
+      await refetchActions();
+      console.log('✅ Actions done');
+      await refetchMethods();
+      console.log('✅ Methods done');
     };
 
     fetchSequentially();
@@ -129,31 +104,23 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   }, [schemas]);
 
   const nodesWithAttributes = useMemo(() => {
-    if (!nodes || !attributes) return [];
-    const filteredNodes = nodes.filter((n) =>
+    if (!actions || !methods) return [];
+    const filteredNodes = actions.filter((n) =>
       filteredSchemas.map((s) => s.id).includes(n.schemaID),
     );
-    return filteredNodes.map((node) => ({
-      ...node,
-      attributes: attributes.filter((attr) => attr.nodeID === node.id),
-    }));
-  }, [nodes, attributes]);
 
-  const filteredEdges = useMemo(() => {
-    if (!edges) return [];
-    return edges.filter((e) =>
-      nodesWithAttributes.some(
-        (n) => n.id === e.srcNodeID || n.id === e.trgtNodeID,
-      ),
-    );
-  }, [edges]);
+    return filteredNodes.map((action) => ({
+      ...action,
+      methods: methods.filter((attr) => attr.actionID === action.id),
+    }));
+  }, [actions, methods]);
 
   useEffect(() => {
     if (
       !nodesWithAttributes ||
       nodesWithAttributes.length === 0 ||
-      atrLoading ||
-      !attributes
+      methodLoading ||
+      !methods
     )
       return;
 
@@ -163,17 +130,17 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         const ELK = (await import('elkjs/lib/elk.bundled.js')).default;
         const elk = new ELK();
 
-        const calculateNodeWidth = (node: INode) => {
-          const width = calculateNodeLength(node.attributes, node.title);
+        const calculateNodeWidth = (node: IAction) => {
+          const width = calculateNodeLength(node.methods, node.name);
           return Math.max(width, 100);
         };
 
-        const calculateNodeHeight = (node: INode) => {
+        const calculateNodeHeight = (node: IAction) => {
           const headerHeight = 40;
           const attributeHeight =
-            node.attributes.length === 1
+            node.methods.length === 1
               ? headerHeight
-              : (headerHeight * node.attributes.length) / 1.4;
+              : (headerHeight * node.methods.length) / 1.4;
           return headerHeight + attributeHeight;
         };
 
@@ -185,14 +152,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
 
         const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
           [];
-
-        filteredEdges.forEach((edge) => {
-          elkEdges.push({
-            id: `edgeID-${edge.id}`,
-            sources: [edge.srcNodeID.toString()],
-            targets: [edge.trgtNodeID.toString()],
-          });
-        });
 
         const graph = {
           id: 'root',
@@ -247,10 +206,9 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   }, [
     filteredSchemas,
     nodesWithAttributes,
-    filteredEdges,
-    attributes,
+    methods,
+    methodLoading,
     setLiveNodePositions,
-    atrLoading,
   ]);
 
   return (
@@ -279,39 +237,23 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
             />
           </marker>
         </defs>
-
-        <text x={10} y={20}>
-          Schemas:
-        </text>
-        {filteredSchemas.map((s, i) => {
-          const color = i < nodeColor.length ? nodeColor[i] : nodeColor[0];
-          return (
-            <text x={100 + i * 80} y={20} key={i} fill={color}>
-              {s.title}
-            </text>
-          );
-        })}
         <Connection
-          conType={0}
-          cons={nodeCon}
+          conType={1}
+          cons={actionCon}
           onConClick={handleNodeConClick}
-          deleteCon={deleteNodeCon}
-          deleteChildCon={deleteAtrCon}
+          deleteCon={deleteActionCon}
+          deleteChildCon={deleteMethodCon}
           pendingCon={pendingNodeCon}
-          midCon={midNodeCon}
-          childCons={atrCon}
-          onChildConClick={handleAtrConClick}
+          midCon={midActionCon}
+          onChildConClick={handleMethodConClick}
           pendingChildCon={pendingAtrCon}
-          midChildCon={midAtrCon}
-          edgeCons={edgeCon}
-          onEdgeConClick={handleEdgeConClick}
-          pendingEdgeCon={pendingEdgeCon}
+          childCons={methodCon}
+          midChildCon={midMethodCon}
           svgRef={svgRef}
         />
-        <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />
-        {loading || edgeLoading || layoutLoading || atrLoading ? (
+        {loading || layoutLoading || methodLoading ? (
           <text x={50} y={50}>
-            {loading || atrLoading ? 'Loading...' : 'Calculating layout...'}
+            {loading || methodLoading ? 'Loading...' : 'Calculating layout...'}
           </text>
         ) : (
           nodesWithAttributes.map((n, i) => {
@@ -329,17 +271,17 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
                 : nodeColor[0];
 
             return (
-              <Node
+              <Action
                 key={i}
                 id={n.id}
-                title={n.title}
-                attributes={n.attributes}
+                name={n.name}
+                methods={n.methods}
                 positionX={livePositions?.positionX || n.positionX || 0}
                 positionY={livePositions?.positionY || n.positionY || 0}
                 schemaID={n.schemaID}
                 color={color}
                 onNodeClick={handleNodeClick}
-                onAttributeClick={handleAttributeClick}
+                onAttributeClick={handleMethodClick}
               />
             );
           })

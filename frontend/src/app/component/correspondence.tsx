@@ -12,7 +12,7 @@ export default function Correspondence({
 
   return (
     <div className='flex flex-col m-auto items-start gap-4 border bg-blue-100 w-full p-6 rounded-sm'>
-      <h2 className='text-center m-auto'>Choose correspondences:</h2>
+      <h2 className='text-center m-auto'>Choose correspondence:</h2>
       <ul className='w-1/2 m-auto p-2 flex flex-col gap-2'>
         {corres.map((c) => (
           <li

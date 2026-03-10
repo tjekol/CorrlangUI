@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useLayoutEffect } from 'react';
-import { INode } from '@/app/interface/INode';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { IAction } from '../interface/IAction';
 import {
-  liveNodePositionsAtom,
-  liveAtrPositionsAtom,
-  nodeLengthAtom,
-  nodeConAtom,
-  atrConAtom,
+  liveActionPositionsAtom,
+  liveMethodPositionsAtom,
+  actionLengthAtom,
+  actionConAtom,
+  methodConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
-interface NodeProps extends INode {
+interface ActionProps extends IAction {
   color: string;
   onNodeClick: (
     id: number,
@@ -24,31 +24,31 @@ interface NodeProps extends INode {
   ) => void;
 }
 
-export default function Node({
+export default function Action({
   id,
-  title,
-  attributes,
+  name: title,
+  methods,
   positionX,
   positionY,
   schemaID,
   color,
   onNodeClick,
   onAttributeClick,
-}: NodeProps) {
+}: ActionProps) {
   const [position, setPosition] = useState({ x: positionX, y: positionY });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const setLiveNodePositions = useSetAtom(liveNodePositionsAtom);
-  const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
+  const setLiveNodePositions = useSetAtom(liveActionPositionsAtom);
+  const setLiveAtrPosition = useSetAtom(liveMethodPositionsAtom);
 
   const { calculateNodeLength } = useCalculation();
-  const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
-  const nodeCons = useAtomValue(nodeConAtom);
-  const atrCons = useAtomValue(atrConAtom);
+  const [nodeLengths, setNodeLengths] = useAtom(actionLengthAtom);
+  const nodeCons = useAtomValue(actionConAtom);
+  const atrCons = useAtomValue(methodConAtom);
   const height = 40;
 
   useLayoutEffect(() => {
-    const width = calculateNodeLength(attributes, title);
+    const width = calculateNodeLength(methods, title);
 
     setNodeLengths((prevLengths) => {
       const existing = prevLengths.find((item) => item.id === id);
@@ -68,7 +68,7 @@ export default function Node({
   };
 
   const isConnected = nodeCons.some((con) =>
-    con.nodes.find((n) => n.id === id),
+    con.actions.find((n) => n.id === id),
   );
 
   const moveNode = (newX: number, newY: number) => {
@@ -87,14 +87,14 @@ export default function Node({
 
     setLiveAtrPosition((prev) => {
       const filteredPrev = prev.filter(
-        (atr) => !attributes.some((attr) => attr.id === atr.childID),
+        (atr) => !methods.some((attr) => attr.id === atr.childID),
       );
 
-      const newAtrPositions = attributes
+      const newAtrPositions = methods
         .map((attribute, i) => {
           const leftPos = {
-            childID: attribute.id,
             parentID: id,
+            childID: attribute.id,
             positionX: newX,
             positionY: newY + height + (height / 2) * i,
           };
@@ -188,16 +188,14 @@ export default function Node({
         x={position.x}
         y={position.y + height}
         width={nodeLength}
-        height={
-          attributes.length === 1 ? height : (height * attributes.length) / 1.4
-        }
+        height={methods.length === 1 ? height : (height * methods.length) / 1.4}
         fill='#FFFFFF'
         stroke={color}
         strokeWidth={1}
         rx={5}
       />
 
-      {attributes.map((attribute, i) => {
+      {methods.map((attribute, i) => {
         const atrID = attribute.id;
         const leftCirclePosition = {
           x: position.x,
@@ -209,7 +207,7 @@ export default function Node({
         };
 
         const isActive = atrCons.some((con) =>
-          con.attributes.find((a) => a.id === atrID),
+          con.methods.find((a) => a.id === atrID),
         );
         const alertMsg = 'Connect nodes before connecting attributes.';
 
@@ -260,7 +258,7 @@ export default function Node({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.text}: {attribute.type}
+              {attribute.name}: ''
             </text>
           </g>
         );

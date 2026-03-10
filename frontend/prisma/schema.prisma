@@ -10,10 +10,12 @@ datasource db {
   provider = "sqlite"
 }
 
+// OBJECTS
 model Schema {
   id  Int   @id @default(autoincrement())
   title String
   nodes Node[]
+  actions Action[]
 }
 
 model Node {
@@ -55,6 +57,27 @@ model Attribute {
   node Node @relation(fields: [nodeID], references: [id])
 }
 
+model Action {
+  id Int    @id @default(autoincrement())
+  name String
+  schemaID Int
+  schema Schema @relation(fields: [schemaID], references: [id])
+
+  methods Method[]
+  actCons ActionConnection[]
+}
+
+model Method {
+  id Int    @id @default(autoincrement())
+  name String
+  actionID Int
+
+  methodCons MethodConnection[]
+  action Action @relation(fields: [actionID], references: [id])
+}
+
+
+// CONNECTIONS
 model NodeConnection {
   id  Int   @id @default(autoincrement())
   nodes Node[]
@@ -68,4 +91,12 @@ model AtrConnection {
 model EdgeConnection {
   id  Int   @id @default(autoincrement())
   edges Edge[]
+}
+model ActionConnection {
+  id  Int   @id @default(autoincrement())
+  actions Action[]
+}
+model MethodConnection {
+  id  Int   @id @default(autoincrement())
+  methods Method[]
 }
