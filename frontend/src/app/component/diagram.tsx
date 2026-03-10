@@ -303,6 +303,9 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           onChildConClick={handleAtrConClick}
           pendingChildCon={pendingAtrCon}
           midChildCon={midAtrCon}
+          edgeCons={edgeCon}
+          onEdgeConClick={handleEdgeConClick}
+          pendingEdgeCon={pendingEdgeCon}
           svgRef={svgRef}
         />
         <Edge onEdgeClick={handleEdgeClick} edges={filteredEdges} />
@@ -313,7 +316,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         ) : (
           nodesWithAttributes.map((n, i) => {
             const livePositions = liveNodePositions.find(
-              (pos) => pos.nodeID === n.id,
+              (pos) => pos.id === n.id,
             );
 
             const schemaIndex = filteredSchemas.findIndex(

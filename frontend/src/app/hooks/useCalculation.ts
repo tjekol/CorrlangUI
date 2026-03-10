@@ -48,7 +48,7 @@ export const useCalculation = () => {
 
   const getNodePosition = (id: number, conType: number) => {
     if (conType === 0) {
-      const livePos = liveNodePositions.find((pos) => pos.nodeID === id);
+      const livePos = liveNodePositions.find((pos) => pos.id === id);
       if (livePos) {
         return {
           x: livePos.positionX,
@@ -63,16 +63,21 @@ export const useCalculation = () => {
           x: position.x,
           y: position.y,
         };
+      } else {
+        return {
+          x: 0,
+          y: 0,
+        };
       }
     } else if (conType === 1) {
-      const livePos = liveActionPositions.find((pos) => pos.nodeID === id);
+      const livePos = liveActionPositions.find((pos) => pos.id === id);
       if (livePos) {
         return {
           x: livePos.positionX,
           y: livePos.positionY,
         };
       }
-      const action = actions.find((n) => n.id === id);
+      const action = actions.find((a) => a.id === id);
       if (action) {
         const position = { x: action.positionX || 0, y: action.positionY || 0 };
         // circle position
@@ -80,13 +85,12 @@ export const useCalculation = () => {
           x: position.x,
           y: position.y,
         };
+      } else {
+        return {
+          x: 0,
+          y: 0,
+        };
       }
-
-    } else {
-      return {
-        x: 0,
-        y: 0,
-      };
     }
   };
 
@@ -103,7 +107,7 @@ export const useCalculation = () => {
 
   const getAttributePosition = (id: number, conType: number) => {
     if (conType === 0) {
-      const livePos = liveAtrPositions.find((pos) => pos.attributeID === id);
+      const livePos = liveAtrPositions.find((pos) => pos.childID === id);
       if (livePos) {
         return {
           x: livePos.positionX,
@@ -131,7 +135,7 @@ export const useCalculation = () => {
         y: attributeY,
       };
     } else if (conType === 1) {
-      const livePos = liveMethodPositions.find((pos) => pos.attributeID === id);
+      const livePos = liveMethodPositions.find((pos) => pos.childID === id);
       if (livePos) {
         return {
           x: livePos.positionX,
@@ -311,15 +315,18 @@ export const useCalculation = () => {
         let node = getNode(atrID)
         nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
       }
+      else {
+        return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`
+      }
     } else if (conType === 1) {
       if (nodeID) {
         nodeLength = actionLengths.find(l => l.id === nodeID)?.length || 0;
       } else if (atrID) {
         let node = getAction(atrID)
         nodeLength = actionLengths.find(l => l.id === node?.id)?.length || 0;
+      } else {
+        return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`
       }
-    } else {
-      return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`
     }
 
     const diffX = midpoint.x - position.x;

@@ -75,28 +75,26 @@ export default function Node({
     setPosition({ x: newX, y: newY });
 
     setLiveNodePositions((prev) => {
-      const existing = prev.find((pos) => pos.nodeID === id);
+      const existing = prev.find((pos) => pos.id === id);
       if (existing) {
         return prev.map((pos) =>
-          pos.nodeID === id
-            ? { nodeID: id, positionX: newX, positionY: newY }
-            : pos,
+          pos.id === id ? { id: id, positionX: newX, positionY: newY } : pos,
         );
       } else {
-        return [...prev, { nodeID: id, positionX: newX, positionY: newY }];
+        return [...prev, { id: id, positionX: newX, positionY: newY }];
       }
     });
 
     setLiveAtrPosition((prev) => {
       const filteredPrev = prev.filter(
-        (atr) => !attributes.some((attr) => attr.id === atr.attributeID),
+        (atr) => !attributes.some((attr) => attr.id === atr.childID),
       );
 
       const newAtrPositions = attributes
         .map((attribute, i) => {
           const leftPos = {
-            attributeID: attribute.id,
-            nodeID: id,
+            childID: attribute.id,
+            parentID: id,
             positionX: newX,
             positionY: newY + height + (height / 2) * i,
           };

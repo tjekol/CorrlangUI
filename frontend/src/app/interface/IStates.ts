@@ -5,15 +5,15 @@ export interface IPendingCon {
   positionY: number;
 }
 
-export interface LiveNodePosition {
+export interface LiveParentPosition {
   id: number;
   positionX: number;
   positionY: number;
 }
 
-export interface LiveAtrPosition {
-  nodeID: number;
-  attributeID: number;
+export interface LiveChildPosition {
+  parentID: number;
+  childID: number;
   positionX: number;
   positionY: number;
 }

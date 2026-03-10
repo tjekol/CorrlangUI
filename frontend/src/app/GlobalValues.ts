@@ -3,7 +3,7 @@ import { ISchema } from './interface/ISchema';
 import { INode } from './interface/INode';
 import { IAttribute } from './interface/IAttribute';
 import { IEdge } from './interface/IEdge';
-import { LiveAtrPosition, LiveNodePosition } from './interface/IStates';
+import { LiveChildPosition, LiveParentPosition } from './interface/IStates';
 import { INodeConnection, IAtrConnection, IEdgeConnection, IActionConnection, IMethodConnection } from './interface/IConnections';
 import { IAction } from './interface/IAction';
 import { IMethod } from './interface/IMethod';
@@ -36,7 +36,7 @@ export const midActionConAtom = atom<Record<number, { x: number; y: number }>>({
 export const midMethodConAtom = atom<Record<number, { x: number; y: number }>>({});
 
 // Live positions for nodes and attributes
-export const liveNodePositionsAtom = atom<LiveNodePosition[]>([]); // [ {nodeID: 1, positionX: 0, positionY: 0} ]
-export const liveAtrPositionsAtom = atom<LiveAtrPosition[]>([]);
-export const liveActionPositionsAtom = atom<LiveNodePosition[]>([]);
-export const liveMethodPositionsAtom = atom<LiveAtrPosition[]>([]);
+export const liveNodePositionsAtom = atom<LiveParentPosition[]>([]); // [ {nodeID: 1, positionX: 0, positionY: 0} ]
+export const liveAtrPositionsAtom = atom<LiveChildPosition[]>([]);
+export const liveActionPositionsAtom = atom<LiveParentPosition[]>([]);
+export const liveMethodPositionsAtom = atom<LiveChildPosition[]>([]);
