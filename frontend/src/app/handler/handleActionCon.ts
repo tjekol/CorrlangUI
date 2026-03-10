@@ -1,11 +1,11 @@
 import { IActionConnection } from '../interface/IConnections';
-import { IPendingNodeCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export const handleActionConCreate = (
   cons: IActionConnection[],
   createActionCon: (ids: number[]) => void,
-  pendingNodeCon: IPendingNodeCon | null,
-  setPendingNodeCon: (pendingCon: IPendingNodeCon | null) => void
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
   return (id: number, circlePosition?: { x: number, y: number }) => {
     console.log('Action selected:', {
@@ -13,25 +13,25 @@ export const handleActionConCreate = (
       position: circlePosition
     });
 
-    if (!pendingNodeCon && circlePosition) {
+    if (!pendingCon && circlePosition) {
       const newConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
-      setPendingNodeCon({
+      setPendingCon({
         conID: newConID,
-        nodeID: id,
+        id: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y
       });
       return false
     } else {
       // check if node is already in connection
-      if (pendingNodeCon && id !== pendingNodeCon.nodeID) {
-        const allIDs = [id, pendingNodeCon.nodeID]
+      if (pendingCon && id !== pendingCon.id) {
+        const allIDs = [id, pendingCon.id]
         createActionCon(allIDs);
-        setPendingNodeCon(null);
+        setPendingCon(null);
         return true
       } else {
         console.log('Same action clicked or action alredy exists in connection.');
-        setPendingNodeCon(null);
+        setPendingCon(null);
         return false
       }
     }
@@ -39,17 +39,17 @@ export const handleActionConCreate = (
 };
 
 export const handleActionConUpdate = (
-  updateNodeCon: (conID: number, id: number) => void,
-  pendingNodeCon: IPendingNodeCon | null,
-  setPendingNodeCon: (pendingEdge: IPendingNodeCon | null) => void
+  updateActionCon: (conID: number, id: number) => void,
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingEdge: IPendingCon | null) => void
 ) => {
   return (conID: number, id: number) => {
-    if (!pendingNodeCon) {
+    if (!pendingCon) {
       alert(`Click on an action first to add to connection.`)
       return false
     } else {
-      updateNodeCon(conID, id);
-      setPendingNodeCon(null);
+      updateActionCon(conID, id);
+      setPendingCon(null);
       return true
     }
   }

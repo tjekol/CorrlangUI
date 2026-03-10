@@ -4,11 +4,7 @@ import Node from './node';
 import Edge from './edge';
 import { useNodes } from '../hooks/useNodes';
 import { useEffect, useState, useMemo, useRef } from 'react';
-import {
-  IPendingAtrCon,
-  IPendingNodeCon,
-  IPendingEdgeCon,
-} from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 import { useAtom, useAtomValue } from 'jotai';
 import {
   liveNodePositionsAtom,
@@ -52,13 +48,11 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const midAtrCon = useAtomValue(midAtrConAtom);
 
   // local state to store first click of node/attribute
-  const [pendingNodeCon, setPendingNodeCon] = useState<IPendingNodeCon | null>(
+  const [pendingNodeCon, setPendingNodeCon] = useState<IPendingCon | null>(
     null,
   );
-  const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
-    null,
-  );
-  const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingEdgeCon | null>(
+  const [pendingAtrCon, setPendingAtrCon] = useState<IPendingCon | null>(null);
+  const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingCon | null>(
     null,
   );
 
@@ -213,7 +207,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         const layoutedGraph = await elk.layout(graph);
         if (layoutedGraph.children) {
           const newPositions = layoutedGraph.children.map((child) => ({
-            nodeID: parseInt(child.id),
+            id: parseInt(child.id),
             positionX: child.x || 0,
             positionY: (child.y || 0) + 20,
           }));
@@ -223,17 +217,13 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           if (newPositions.length > 0) {
             const maxX = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodesWithAttributes.find(
-                  (n) => n.id === pos.nodeID,
-                );
+                const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodesWithAttributes.find(
-                  (n) => n.id === pos.nodeID,
-                );
+                const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),
             );

@@ -5,7 +5,7 @@ import {
   IMethodConnection,
   INodeConnection,
 } from '../interface/IConnections';
-import { IPendingNodeCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export default function NodeConnection({
   cons,
@@ -22,7 +22,7 @@ export default function NodeConnection({
   deleteCon(id: number): void;
   deleteChildCon(id: number): void;
   midCon: Record<number, { x: number; y: number }>;
-  pendingNodeCon: IPendingNodeCon | null;
+  pendingNodeCon: IPendingCon | null;
   onConClick: (conID: number, id: number) => boolean | void;
   conType: number;
 }) {
@@ -110,7 +110,7 @@ export default function NodeConnection({
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingNodeCon) {
-                        onConClick(conID, pendingNodeCon.nodeID);
+                        onConClick(conID, pendingNodeCon.id);
                       } else {
                         alert(
                           'Click a node first, then the circle to create a multi-connection.',
@@ -150,7 +150,7 @@ export default function NodeConnection({
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
                   onClick={() => {
                     if (pendingNodeCon) {
-                      onConClick(conID, pendingNodeCon.nodeID);
+                      onConClick(conID, pendingNodeCon.id);
                     } else {
                       if (confirm('Delete node connection?')) {
                         deleteCon(conID);

@@ -1,37 +1,37 @@
 import { IEdgeConnection } from '../interface/IConnections';
-import { IPendingEdgeCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export const handleEdgeConCreate = (
-  edgeCons: IEdgeConnection[],
-  createEdgeCon: (edgeIDs: number[]) => void,
-  pendingEdgeCon: IPendingEdgeCon | null,
-  setPendingEdgeCon: (pendingEdge: IPendingEdgeCon | null) => void
+  cons: IEdgeConnection[],
+  createEdgeCon: (ids: number[]) => void,
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  return (edgeID: number, circlePosition?: { x: number; y: number }) => {
+  return (id: number, circlePosition?: { x: number; y: number }) => {
     console.log('Edge clicked:', {
-      nodeID: edgeID,
+      edgeID: id,
       position: circlePosition
     });
 
-    if (!pendingEdgeCon && circlePosition) {
-      const newEdgeConID = Math.max(0, ...edgeCons.map((e) => e.id)) + 1;
-      setPendingEdgeCon({
-        edgeConID: newEdgeConID,
-        edgeID: edgeID,
+    if (!pendingCon && circlePosition) {
+      const newEdgeConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
+      setPendingCon({
+        conID: newEdgeConID,
+        id: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y
       });
       return false
     } else {
-      if (pendingEdgeCon && edgeID !== pendingEdgeCon.edgeID) {
-        const allEdgeIDs = [edgeID, pendingEdgeCon.edgeID]
+      if (pendingCon && id !== pendingCon.id) {
+        const allEdgeIDs = [id, pendingCon.id]
         console.log(`Creating connection between edges: ${allEdgeIDs}`)
         createEdgeCon(allEdgeIDs);
-        setPendingEdgeCon(null);
+        setPendingCon(null);
         return true
       } else {
         console.log('Same edge clicked, canceling connection creation');
-        setPendingEdgeCon(null);
+        setPendingCon(null);
         return false
       }
     }
@@ -39,17 +39,17 @@ export const handleEdgeConCreate = (
 };
 
 export const handleEdgeConUpdate = (
-  updateEdgeCon: (edgeConID: number, edgeID: number) => void,
-  pendingEdgeCon: IPendingEdgeCon | null,
-  setPendingEdgeCon: (pendingEdge: IPendingEdgeCon | null) => void
+  updateEdgeCon: (conID: number, id: number) => void,
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  return (edgeConID: number, edgeID: number) => {
-    if (!pendingEdgeCon) {
+  return (conID: number, id: number) => {
+    if (!pendingCon) {
       alert(`Click on an edge first to add to connection.`)
       return false
     } else {
-      updateEdgeCon(edgeConID, edgeID);
-      setPendingEdgeCon(null);
+      updateEdgeCon(conID, id);
+      setPendingCon(null);
       return true
     }
   };

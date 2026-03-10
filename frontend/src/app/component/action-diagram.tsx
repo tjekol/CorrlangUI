@@ -10,7 +10,7 @@ import { useAction } from '../hooks/useAction';
 import { useMethod } from '../hooks/useMethod';
 import { useCalculation } from '../hooks/useCalculation';
 import { useActionCon } from '../hooks/connection/useActionCon';
-import { IPendingAtrCon, IPendingNodeCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 import { useAtom, useAtomValue } from 'jotai';
 import {
   liveActionPositionsAtom,
@@ -41,12 +41,10 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const midMethodCon = useAtomValue(midMethodConAtom);
 
   // local state to store first click of node/attribute
-  const [pendingNodeCon, setPendingNodeCon] = useState<IPendingNodeCon | null>(
+  const [pendingNodeCon, setPendingNodeCon] = useState<IPendingCon | null>(
     null,
   );
-  const [pendingAtrCon, setPendingAtrCon] = useState<IPendingAtrCon | null>(
-    null,
-  );
+  const [pendingAtrCon, setPendingAtrCon] = useState<IPendingCon | null>(null);
 
   const [liveNodePositions, setLiveNodePositions] = useAtom(
     liveActionPositionsAtom,
@@ -168,7 +166,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
         const layoutedGraph = await elk.layout(graph);
         if (layoutedGraph.children) {
           const newPositions = layoutedGraph.children.map((child) => ({
-            nodeID: parseInt(child.id),
+            id: parseInt(child.id),
             positionX: child.x || 0,
             positionY: (child.y || 0) + 20,
           }));
@@ -178,17 +176,13 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
           if (newPositions.length > 0) {
             const maxX = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodesWithAttributes.find(
-                  (n) => n.id === pos.nodeID,
-                );
+                const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
               ...newPositions.map((pos, index) => {
-                const node = nodesWithAttributes.find(
-                  (n) => n.id === pos.nodeID,
-                );
+                const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),
             );
@@ -264,7 +258,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
         ) : (
           nodesWithAttributes.map((n, i) => {
             const livePositions = liveNodePositions.find(
-              (pos) => pos.nodeID === n.id,
+              (pos) => pos.id === n.id,
             );
 
             const schemaIndex = filteredSchemas.findIndex(

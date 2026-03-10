@@ -1,6 +1,6 @@
 import { useCalculation } from '../hooks/useCalculation';
 import { IAtrConnection, IMethodConnection } from '../interface/IConnections';
-import { IPendingAtrCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export default function ChildConnecton({
   childCons,
@@ -13,7 +13,7 @@ export default function ChildConnecton({
   childCons: IAtrConnection[] | IMethodConnection[];
   deleteChildCon: (id: number) => void;
   midChildCon: Record<number, { x: number; y: number }>;
-  pendingChildCon: IPendingAtrCon | null;
+  pendingChildCon: IPendingCon | null;
   onChildConClick: (conID: number, id: number) => boolean | void;
   conType: number;
 }) {
@@ -96,7 +96,7 @@ export default function ChildConnecton({
                     className='hover:opacity-100 opacity-70'
                     onClick={() => {
                       if (pendingChildCon) {
-                        onChildConClick(atrConID, pendingChildCon.attributeID);
+                        onChildConClick(atrConID, pendingChildCon.id);
                       } else {
                         alert(
                           'Click an attribute first, then the circle to add to connection.',
@@ -137,7 +137,7 @@ export default function ChildConnecton({
                   L ${midpoint.x - 7} ${midpoint.y} Z`}
                   onClick={() => {
                     if (pendingChildCon) {
-                      onChildConClick(atrConID, pendingChildCon.attributeID);
+                      onChildConClick(atrConID, pendingChildCon.id);
                     } else {
                       if (confirm('Delete attribute connection?')) {
                         deleteChildCon(atrConID);

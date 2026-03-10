@@ -1,11 +1,7 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
-import {
-  IPendingAtrCon,
-  IPendingNodeCon,
-  IPendingEdgeCon,
-} from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 import { midEdgeConAtom, midEdgeAtom } from '../GlobalValues';
 import React, { useEffect, useState } from 'react';
 import { useCalculation } from '../hooks/useCalculation';
@@ -41,16 +37,16 @@ export default function Connection({
   cons: INodeConnection[] | IActionConnection[];
   onConClick: (nodeConID: number, nodeID: number) => boolean | void;
   deleteCon: (id: number) => void;
-  pendingCon: IPendingNodeCon | null;
+  pendingCon: IPendingCon | null;
   midCon: Record<number, { x: number; y: number }>;
   childCons: IAtrConnection[] | IMethodConnection[];
   onChildConClick: (atrConID: number, atrID: number) => boolean | void;
   deleteChildCon: (id: number) => void;
-  pendingChildCon: IPendingAtrCon | null;
+  pendingChildCon: IPendingCon | null;
   midChildCon: Record<number, { x: number; y: number }>;
   edgeCons?: IEdgeConnection[];
   onEdgeConClick?: (edgeConID: number, edgeID: number) => boolean | void;
-  pendingEdgeCon?: IPendingEdgeCon | null;
+  pendingEdgeCon?: IPendingCon | null;
   svgRef?: React.RefObject<SVGSVGElement | null>;
 }) {
   const edgeConHook = useEdgeCon();
@@ -119,7 +115,7 @@ export default function Connection({
       )}
       {pendingChildCon && hasMousePosition && (
         <path
-          key={pendingChildCon.atrConID}
+          key={pendingChildCon.conID}
           d={getTempPathData(
             { x: pendingChildCon.positionX, y: pendingChildCon.positionY },
             mousePosition,
@@ -134,7 +130,7 @@ export default function Connection({
       )}
       {pendingEdgeCon && hasMousePosition && (
         <path
-          key={pendingEdgeCon.edgeConID}
+          key={pendingEdgeCon.conID}
           d={getTempPathData(
             { x: pendingEdgeCon.positionX, y: pendingEdgeCon.positionY },
             mousePosition,
@@ -218,7 +214,7 @@ export default function Connection({
                       className='hover:opacity-100 opacity-70'
                       onClick={() => {
                         if (pendingEdgeCon) {
-                          onEdgeConClick(edgeConID, pendingEdgeCon.edgeID);
+                          onEdgeConClick(edgeConID, pendingEdgeCon.id);
                         } else {
                           alert(
                             'Click an edge first, then the circle to add to connection.',
@@ -251,7 +247,7 @@ export default function Connection({
                   L ${midpoint.x - 6} ${midpoint.y} Z`}
                     onClick={() => {
                       if (pendingEdgeCon) {
-                        onEdgeConClick(edgeConID, pendingEdgeCon.edgeID);
+                        onEdgeConClick(edgeConID, pendingEdgeCon.id);
                       } else {
                         if (confirm('Delete edge connection?')) {
                           edgeConHook.deleteEdgeCon(edgeConID);

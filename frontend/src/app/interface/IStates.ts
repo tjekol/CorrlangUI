@@ -1,26 +1,12 @@
-export interface IPendingNodeCon {
+export interface IPendingCon {
   conID: number;
-  nodeID: number;
-  positionX: number;
-  positionY: number;
-}
-
-export interface IPendingAtrCon {
-  atrConID: number;
-  attributeID: number;
-  positionX: number;
-  positionY: number;
-}
-
-export interface IPendingEdgeCon {
-  edgeConID: number;
-  edgeID: number;
+  id: number;
   positionX: number;
   positionY: number;
 }
 
 export interface LiveNodePosition {
-  nodeID: number;
+  id: number;
   positionX: number;
   positionY: number;
 }

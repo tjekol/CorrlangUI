@@ -1,37 +1,37 @@
 import { INodeConnection } from '../interface/IConnections';
-import { IPendingNodeCon } from '../interface/IStates';
+import { IPendingCon } from '../interface/IStates';
 
 export const handleNodeConCreate = (
-  nodeCons: INodeConnection[],
-  createNodeCon: (nodeIDs: number[]) => void,
-  pendingNodeCon: IPendingNodeCon | null,
-  setPendingNodeCon: (pendingCon: IPendingNodeCon | null) => void
+  cons: INodeConnection[],
+  createNodeCon: (ids: number[]) => void,
+  pendingCon: IPendingCon | null,
+  setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  return (nodeID: number, circlePosition?: { x: number, y: number }) => {
+  return (id: number, circlePosition?: { x: number, y: number }) => {
     console.log('Node selected:', {
-      nodeID: nodeID,
+      nodeID: id,
       position: circlePosition
     });
 
-    if (!pendingNodeCon && circlePosition) {
-      const newConID = Math.max(0, ...nodeCons.map((e) => e.id)) + 1;
-      setPendingNodeCon({
+    if (!pendingCon && circlePosition) {
+      const newConID = Math.max(0, ...cons.map((e) => e.id)) + 1;
+      setPendingCon({
         conID: newConID,
-        nodeID: nodeID,
+        id: id,
         positionX: circlePosition.x,
         positionY: circlePosition.y
       });
       return false
     } else {
       // check if node is already in connection
-      if (pendingNodeCon && nodeID !== pendingNodeCon.nodeID) {
-        const allNodeIDs = [nodeID, pendingNodeCon.nodeID]
+      if (pendingCon && id !== pendingCon.id) {
+        const allNodeIDs = [id, pendingCon.id]
         createNodeCon(allNodeIDs);
-        setPendingNodeCon(null);
+        setPendingCon(null);
         return true
       } else {
         console.log('Same node clicked or node alredy exists in connection.');
-        setPendingNodeCon(null);
+        setPendingCon(null);
         return false
       }
     }
@@ -39,16 +39,16 @@ export const handleNodeConCreate = (
 };
 
 export const handleNodeConUpdate = (
-  updateNodeCon: (conID: number, nodeID: number) => void,
-  pendingNodeCon: IPendingNodeCon | null,
-  setPendingNodeCon: (pendingEdge: IPendingNodeCon | null) => void
+  updateNodeCon: (conID: number, id: number) => void,
+  pendingNodeCon: IPendingCon | null,
+  setPendingNodeCon: (pendingEdge: IPendingCon | null) => void
 ) => {
-  return (conID: number, nodeID: number) => {
+  return (conID: number, id: number) => {
     if (!pendingNodeCon) {
       alert(`Click on a node first to add to connection.`)
       return false
     } else {
-      updateNodeCon(conID, nodeID);
+      updateNodeCon(conID, id);
       setPendingNodeCon(null);
       return true
     }
