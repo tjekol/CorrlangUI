@@ -131,7 +131,7 @@ export default function Export() {
 
   return (
     <ReactCodeMirror
-      className='bg-[#F9F9F9] m-auto min-h-4/5 h-auto p-5 rounded-sm border whitespace-pre-wrap'
+      className='bg-[#F9F9F9] m-auto h-full w-full p-5 rounded-sm border whitespace-pre-wrap'
       value={
         exportResult.length > 0
           ? exportResult
