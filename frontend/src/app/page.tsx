@@ -55,23 +55,23 @@ export default function Home() {
             <div className='flex gap-2'>
               <button
                 onClick={() => {
-                  setActionIsOpen(!actionIsOpen);
-                }}
-                className='border rounded-md px-4 py-1'
-              >
-                Connect actions
-              </button>
-              <button
-                onClick={() => {
                   if (confirm('Remove all connections')) reset();
                 }}
-                className='border rounded-md px-4 py-1'
+                className='bg-red-100 border rounded-md px-4 py-1'
               >
                 Reset connections
               </button>
               <button
+                onClick={() => {
+                  setActionIsOpen(!actionIsOpen);
+                }}
+                className={`bg-blue-50 border rounded-md px-4 py-1 ${actionIsOpen && 'bg-blue-200'}`}
+              >
+                {actionIsOpen ? 'Close actions' : 'Connect actions'}
+              </button>
+              <button
                 onClick={() => setExportIsOpen(!exportIsOpen)}
-                className={` min-w-30 border rounded-md px-4 py-1 ${exportIsOpen ? 'bg-red-100' : 'bg-blue-100'}`}
+                className={` min-w-30 border rounded-md px-4 py-1 ${exportIsOpen ? 'bg-blue-200' : 'bg-blue-100'}`}
               >
                 {exportIsOpen ? 'Close export' : 'Export'}
               </button>
@@ -86,8 +86,9 @@ export default function Home() {
             <Diagram cor={corres} />
             <dialog
               open={actionIsOpen}
-              className='bg-blue-50 mt-20 overflow-auto h-3/4 rounded-sm border p-4 m-auto w-5/6'
+              className='bg-blue-50 mt-20 overflow-auto h-9/10 rounded-sm border p-4 m-auto w-9/10 '
             >
+              <h3 className='mb-2'>Connect actions</h3>
               <ActionDiagram cor={corres} />
             </dialog>
           </>
@@ -95,9 +96,9 @@ export default function Home() {
 
         <dialog
           open={exportIsOpen}
-          className='bg-blue-50 mt-20 overflow-auto h-3/4 rounded-sm border p-4 m-auto w-5/6'
+          className='bg-blue-50 mt-20 overflow-auto h-9/10 rounded-sm border p-4 m-auto w-9/10 open:flex open:flex-col'
         >
-          <h3>Copy results</h3>
+          <h3 className='mb-2'>Copy results</h3>
           <Export />
         </dialog>
       </div>

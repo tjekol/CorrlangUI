@@ -1,6 +1,7 @@
 'use client';
 
 import { useAtomValue } from 'jotai';
+import ReactCodeMirror from '@uiw/react-codemirror';
 import {
   atrAtom,
   atrConAtom,
@@ -10,7 +11,7 @@ import {
   nodeConAtom,
   schemaAtom,
 } from '../GlobalValues';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function Export() {
   const schemas = useAtomValue(schemaAtom);
@@ -21,10 +22,15 @@ export default function Export() {
   const atrCons = useAtomValue(atrConAtom);
   const edgeCons = useAtomValue(edgeConAtom);
 
-  const [exportResult, setExportResult] = useState<string[]>([]);
+  const [exportResult, setExportResult] = useState<string>('');
+
+  const onChange = useCallback((val: string) => {
+    console.log('value', val);
+    setExportResult(val);
+  }, []);
 
   useEffect(() => {
-    setExportResult([]);
+    setExportResult('');
 
     nodeCons.map((con) => {
       const nodeIDs = con.nodes.map((n) => n.id);
@@ -44,10 +50,11 @@ export default function Export() {
         .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle);
 
       if (firstNode && restOfNodes)
-        setExportResult((prev) => [
-          ...prev,
-          `identify (${firstNode.schemaTitle}.${firstNode.nodeTitle},${restOfNodes}) as ${firstNode.nodeTitle}; \n`,
-        ]);
+        setExportResult(
+          (prev) =>
+            prev +
+            `identify (${firstNode.schemaTitle}.${firstNode.nodeTitle},${restOfNodes}) as ${firstNode.nodeTitle}; \n`,
+        );
     });
 
     atrCons.map((con) => {
@@ -79,10 +86,11 @@ export default function Export() {
         .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + '.' + r.atrText);
 
       if (firstAtr && restOfAtrs)
-        setExportResult((prev) => [
-          ...prev,
-          `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.atrText},${restOfAtrs}) as ${firstAtr.atrText}; \n`,
-        ]);
+        setExportResult(
+          (prev) =>
+            prev +
+            `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.atrText},${restOfAtrs}) as ${firstAtr.atrText}; \n`,
+        );
     });
 
     edgeCons.map((con) => {
@@ -113,20 +121,25 @@ export default function Export() {
         .map((r) => ' ' + r.schemaTitle + '.' + r.nodeTitle + '.' + r.edgeText);
 
       if (firstAtr && restOfAtrs)
-        setExportResult((prev) => [
-          ...prev,
-          `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.edgeText},${restOfAtrs}) as ${firstAtr.edgeText}; \n`,
-        ]);
+        setExportResult(
+          (prev) =>
+            prev +
+            `identify (${firstAtr.schemaTitle}.${firstAtr.nodeTitle}.${firstAtr.edgeText},${restOfAtrs}) as ${firstAtr.edgeText}; \n`,
+        );
     });
   }, [nodeCons, atrCons, edgeCons]);
 
   return (
-    <p className='bg-[#F9F9F9] m-auto h-full p-5 rounded-sm border whitespace-pre-wrap'>
-      {exportResult.length > 0
-        ? exportResult.map((res) => {
-            return res;
-          })
-        : 'Create connections between nodes and attributes…'}
-    </p>
+    <ReactCodeMirror
+      className='bg-[#F9F9F9] m-auto h-full w-full p-5 rounded-sm border whitespace-pre-wrap'
+      value={
+        exportResult.length > 0
+          ? exportResult
+          : 'Create connections between nodes and attributes…'
+      }
+      minHeight='200px'
+      height='auto'
+      onChange={onChange}
+    />
   );
 }
