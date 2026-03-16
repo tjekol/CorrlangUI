@@ -12,7 +12,6 @@ import {
   midNodeConAtom,
   nodeColor,
 } from '../GlobalValues';
-import { INode } from '../interface/INode';
 import { useSchemas } from '../hooks/useSchemas';
 import {
   handleNodeConCreate,
@@ -43,7 +42,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { nodeCon, createNodeCon, updateNodeCon, deleteNodeCon } = useNodeCon();
   const { atrCon, createAtrCon, updateAtrCon, deleteAtrCon } = useAtrCon();
   const { edgeCon, createEdgeCon, updateEdgeCon } = useEdgeCon();
-  const { calculateNodeLength } = useCalculation();
+  const { calculateNodeWidth, calculateNodeHeight } = useCalculation();
   const midNodeCon = useAtomValue(midNodeConAtom);
   const midAtrCon = useAtomValue(midAtrConAtom);
 
@@ -162,20 +161,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
       try {
         const ELK = (await import('elkjs/lib/elk.bundled.js')).default;
         const elk = new ELK();
-
-        const calculateNodeWidth = (node: INode) => {
-          const width = calculateNodeLength(node.attributes, node.title);
-          return Math.max(width, 100);
-        };
-
-        const calculateNodeHeight = (node: INode) => {
-          const headerHeight = 40;
-          const attributeHeight =
-            node.attributes.length === 1
-              ? headerHeight
-              : (headerHeight * node.attributes.length) / 1.4;
-          return headerHeight + attributeHeight;
-        };
 
         const children = nodesWithAttributes.map((n) => ({
           id: n.id.toString(),

@@ -1,4 +1,5 @@
 import { useCalculation } from '../hooks/useCalculation';
+import { usePath } from '../hooks/usePath';
 import {
   IActionConnection,
   IAtrConnection,
@@ -26,13 +27,8 @@ export default function NodeConnection({
   onConClick: (conID: number, id: number) => boolean | void;
   conType: number;
 }) {
-  const {
-    getNodePosition,
-    getPathData,
-    getShortestPath,
-    calculateMidpoint,
-    getMidpoint,
-  } = useCalculation();
+  const { getNodePosition, calculateMidpoint, getMidpoint } = useCalculation();
+  const { getPathData, getShortestPath } = usePath();
 
   const nodeConColor = '#22223B';
   const strokeOpacity = 0.8;

@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import Action from './action';
 import Connection from './connection';
 import { ICorrespondence } from '../interface/ICorrespondence';
-import { IAction } from '../interface/IAction';
 import { useSchemas } from '../hooks/useSchemas';
 import { useAction } from '../hooks/useAction';
 import { useMethod } from '../hooks/useMethod';
@@ -36,7 +35,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     useActionCon();
   const { methodCon, createMethodCon, updateMethodCon, deleteMethodCon } =
     useMethodCon();
-  const { calculateNodeLength } = useCalculation();
+  const { calculateNodeWidth, calculateNodeHeight } = useCalculation();
   const midActionCon = useAtomValue(midActionConAtom);
   const midMethodCon = useAtomValue(midMethodConAtom);
 
@@ -129,20 +128,6 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
       try {
         const ELK = (await import('elkjs/lib/elk.bundled.js')).default;
         const elk = new ELK();
-
-        const calculateNodeWidth = (node: IAction) => {
-          const width = calculateNodeLength(node.methods, node.name);
-          return Math.max(width, 100);
-        };
-
-        const calculateNodeHeight = (node: IAction) => {
-          const headerHeight = 40;
-          const attributeHeight =
-            node.methods.length === 1
-              ? headerHeight
-              : (headerHeight * node.methods.length) / 1.4;
-          return headerHeight + attributeHeight;
-        };
 
         const children = nodesWithAttributes.map((n) => ({
           id: n.id.toString(),

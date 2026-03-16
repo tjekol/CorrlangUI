@@ -15,6 +15,7 @@ import {
   IMethodConnection,
   INodeConnection,
 } from '../interface/IConnections';
+import { usePath } from '../hooks/usePath';
 
 export default function Connection({
   conType,
@@ -53,13 +54,8 @@ export default function Connection({
   const midEdgeCon = useAtomValue(midEdgeConAtom);
   const midEdge = useAtomValue(midEdgeAtom);
 
-  const {
-    getPathData,
-    getTempPathData,
-    getMidpoint,
-    getShortestPath,
-    calculateMidpoint,
-  } = useCalculation();
+  const { getMidpoint, calculateMidpoint } = useCalculation();
+  const { getPathData, getShortestPath, getTempPathData } = usePath();
 
   const strokeOpacity = 0.8;
   const edgeConColor = '#9A8C98';
