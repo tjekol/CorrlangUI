@@ -71,11 +71,12 @@ model Method {
   id Int    @id @default(autoincrement())
   name String
   actionID Int
+  input String?
+  output String?
 
   methodCons MethodConnection[]
   action Action @relation(fields: [actionID], references: [id])
 }
-
 
 // CONNECTIONS
 model NodeConnection {

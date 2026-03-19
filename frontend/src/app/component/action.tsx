@@ -182,8 +182,8 @@ export default function Action({
         rx={5}
       />
 
-      {methods.map((attribute, i) => {
-        const atrID = attribute.id;
+      {methods.map((method, i) => {
+        const atrID = method.id;
         const leftCirclePosition = {
           x: position.x,
           y: position.y + height + (height / 2) * (i + 1),
@@ -197,6 +197,11 @@ export default function Action({
           con.methods.find((a) => a.id === atrID),
         );
         const alertMsg = 'Connect nodes before connecting attributes.';
+
+        const methodInput = method.input
+          .replaceAll(',', ', ')
+          .trim()
+          .slice(0, -1);
 
         return (
           <g key={i}>
@@ -245,7 +250,9 @@ export default function Action({
               dominantBaseline='middle'
               pointerEvents='none'
             >
-              {attribute.name}: ''
+              {method.input
+                ? `${method.name}(${methodInput}): ${method.output}`
+                : `${method.name}: ${method.output}`}
             </text>
           </g>
         );

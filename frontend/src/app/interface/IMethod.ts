@@ -1,6 +1,7 @@
 export interface IMethod {
   id: number;
-  actionID: number;
   name: string;
-  type: string;
+  actionID: number;
+  input: string;
+  output: string;
 }

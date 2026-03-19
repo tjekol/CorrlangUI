@@ -64,18 +64,33 @@ function getActions(id: number) {
                 console.log(`Action: ${n}`);
                 console.log(`   Method: ${m}`);
 
+                const inputs = e.getActiontypedetails().getInputsList();
+                const outputs = e.getActiontypedetails().getOutputsList();
+                let input = '', output = '';
+
+                for (const i of inputs) {
+                  input +=
+                    i.getArgumentname().getPartsList()[0] +
+                    ':' +
+                    i.getTypename().getPartsList()[0] + ',';
+                }
+
+                for (const o of outputs) {
+                  output = o.getTypename().getPartsList()[0];
+                }
+
                 let action = await prisma.action.findFirst({
                   where: { name: n, schemaID: s.id }
                 });
 
                 if (action) {
                   const method = await prisma.method.findFirst({
-                    where: { name: m, actionID: action.id }
+                    where: { name: m, actionID: action.id, input: input, output: output }
                   });
 
                   if (!method)
                     await prisma.method.create({
-                      data: { name: m, actionID: action.id }
+                      data: { name: m, actionID: action.id, input: input, output: output }
                     });
                 }
               }
