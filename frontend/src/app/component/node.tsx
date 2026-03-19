@@ -9,6 +9,8 @@ import {
   nodeLengthAtom,
   nodeConAtom,
   atrConAtom,
+  computingVal,
+  height
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { useDraggable } from '../hooks/useDraggable';
@@ -76,7 +78,6 @@ export default function Node({
   const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
   const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
-  const height = 40;
 
   useLayoutEffect(() => {
     const width = calculateNodeLength(attributes, title);
@@ -169,7 +170,7 @@ export default function Node({
         y={position.y + height}
         width={nodeLength}
         height={
-          attributes.length === 1 ? height : (height * attributes.length) / 1.4
+          attributes.length === 1 ? height : (height * attributes.length) / computingVal
         }
         fill='#FFFFFF'
         stroke={color}

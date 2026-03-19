@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai';
-import { liveNodePositionsAtom, nodeAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom, liveActionPositionsAtom, liveMethodPositionsAtom, actionAtom, methodAtom, midActionConAtom, midMethodConAtom } from '../GlobalValues';
+import { height, liveNodePositionsAtom, nodeAtom, atrAtom, midNodeConAtom, midEdgeAtom, liveAtrPositionsAtom, midEdgeConAtom, midAtrConAtom, liveActionPositionsAtom, liveMethodPositionsAtom, actionAtom, methodAtom, midActionConAtom, midMethodConAtom, computingVal } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { IMethod } from '../interface/IMethod';
@@ -21,7 +21,6 @@ export const useCalculation = () => {
   const setMidEdge = useSetAtom(midEdgeAtom)
   const setMidActionCon = useSetAtom(midActionConAtom)
   const setMidMethodCon = useSetAtom(midMethodConAtom)
-  const height = 40
 
   const getNode = (attributeID: number): INode | null => {
     const atr = attributes.find((a) => a.id === attributeID);
@@ -56,22 +55,33 @@ export const useCalculation = () => {
 
   const calculateNodeHeight = (node: INode | IAction) => {
     if ('attributes' in node) {
-      const headerHeight = 40;
+      const headerHeight = height;
       const attributeHeight =
         node.attributes.length === 1
           ? headerHeight
-          : (headerHeight * node.attributes.length) / 1.4;
+          : (headerHeight * node.attributes.length) / computingVal;
       return headerHeight + attributeHeight;
     } else if ('methods' in node) {
-      const headerHeight = 40;
+      const headerHeight = height;
       const attributeHeight =
         node.methods.length === 1
           ? headerHeight
-          : (headerHeight * node.methods.length) / 1.4;
+          : (headerHeight * node.methods.length) / computingVal;
       return headerHeight + attributeHeight;
     }
     return 40
   };
+
+  const calculateNodeLength = (attributes: IAttribute[] | IMethod[], title: string) => {
+    const labels = [...attributes.map((label) => 'text' in label ? label.text + label.type : label.name + label.input + label.output)];
+    const strLenghts = labels.map((str) =>
+      str.length > 40 ? str.length * 0.85 : str.length > 20 ? str.length * 1 : str.length > 5 ? str.length * computingVal : str.length * 2.5
+    );
+    const maxStringLength = Math.max(...strLenghts, title.length);
+    const width = maxStringLength * 10;
+
+    return width
+  }
 
   const getNodePosition = (id: number, conType: number) => {
     if (conType === 0) {
@@ -120,17 +130,6 @@ export const useCalculation = () => {
       }
     }
   };
-
-  const calculateNodeLength = (attributes: IAttribute[] | IMethod[], title: string) => {
-    const labels = [...attributes.map((label) => 'text' in label ? label.text : label.name)];
-    const strLenghts = labels.map((str) =>
-      str.length > 5 ? str.length * 1.4 : str.length * 2.5,
-    );
-    const maxStringLength = Math.max(...strLenghts, title.length);
-    const width = maxStringLength * 12;
-
-    return width
-  }
 
   const getChildrenPosition = (id: number, conType: number) => {
     if (conType === 0) {

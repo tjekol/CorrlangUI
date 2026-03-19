@@ -9,6 +9,8 @@ import {
   actionLengthAtom,
   actionConAtom,
   methodConAtom,
+  computingVal,
+  height
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { useDraggable } from '../hooks/useDraggable';
@@ -80,15 +82,14 @@ export default function Action({
     handleMouseMove,
   } = useDraggable(positionX, positionY, handlePositionChange);
   const { calculateNodeLength } = useCalculation();
-  const [nodeLengths, setNodeLengths] = useAtom(actionLengthAtom);
+  const [actionLengths, setActionLengths] = useAtom(actionLengthAtom);
   const nodeCons = useAtomValue(actionConAtom);
   const atrCons = useAtomValue(methodConAtom);
-  const height = 40;
 
   useLayoutEffect(() => {
     const width = calculateNodeLength(methods, title);
 
-    setNodeLengths((prevLengths) => {
+    setActionLengths((prevLengths) => {
       const existing = prevLengths.find((item) => item.id === id);
       if (existing) {
         return prevLengths;
@@ -97,7 +98,7 @@ export default function Action({
     });
   }, [id]);
 
-  const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
+  const nodeLength = actionLengths.find((item) => item.id === id)?.length || 0;
 
   const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
   const rightCirclePosition = {
@@ -175,7 +176,11 @@ export default function Action({
         x={position.x}
         y={position.y + height}
         width={nodeLength}
-        height={methods.length === 1 ? height : (height * methods.length) / 1.4}
+        height={
+          methods.length === 1
+            ? height
+            : (height * methods.length) / computingVal
+        }
         fill='#FFFFFF'
         stroke={color}
         strokeWidth={1}

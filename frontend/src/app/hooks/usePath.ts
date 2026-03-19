@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { nodeLengthAtom, actionLengthAtom } from '../GlobalValues';
+import { nodeLengthAtom, actionLengthAtom, computingVal, height } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useCalculation } from './useCalculation';
 
@@ -7,7 +7,6 @@ export const usePath = () => {
   const { getNode, getAction, } = useCalculation()
   const nodeLengths = useAtomValue(nodeLengthAtom);
   const actionLengths = useAtomValue(actionLengthAtom);
-  const height = 40
 
   const getPathData = (
     conType: number,
@@ -125,8 +124,8 @@ export const usePath = () => {
     const trgtHeaderHeight = pos2.y + height
     const trgtAtrLen = trgtNode.attributes.length
 
-    const trgtNodeBottom = trgtAtrLen <= 0 ? trgtHeaderHeight : trgtAtrLen === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtAtrLen) / 1.4;
-    const srcNodeBottom = srcAtrLen <= 0 ? srcHeaderHeight : srcAtrLen === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcAtrLen) / 1.4;
+    const trgtNodeBottom = trgtAtrLen <= 0 ? trgtHeaderHeight : trgtAtrLen === 1 ? trgtHeaderHeight + height : trgtHeaderHeight + (height * trgtAtrLen) / computingVal;
+    const srcNodeBottom = srcAtrLen <= 0 ? srcHeaderHeight : srcAtrLen === 1 ? srcHeaderHeight + height : srcHeaderHeight + (height * srcAtrLen) / computingVal;
 
     // connect to top/bottom of node closest to other node
     const diff1Y = trgtHeaderHeight - pos1.y;
