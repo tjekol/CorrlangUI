@@ -4,6 +4,7 @@ import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { IMethod } from '../interface/IMethod';
 import { IAction } from '../interface/IAction';
+import { IPosition } from '../interface/IPosition';
 
 export const useCalculation = () => {
   const liveNodePositions = useAtomValue(liveNodePositionsAtom);
@@ -251,7 +252,7 @@ export const useCalculation = () => {
   };
 
 
-  const getMidpoint = (positions: { x: number, y: number }[]) => {
+  const getMidpoint = (positions: IPosition[]) => {
     if (!positions || positions.length === 0) return null;
 
     const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
@@ -263,5 +264,26 @@ export const useCalculation = () => {
     };
   }
 
-  return { getNode, getAction, calculateNodeWidth, calculateNodeHeight, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getChildrenPosition, getMidpoint }
+  const calcChildCirclePos = (position: IPosition, nodeLength: number, index: number) => {
+    const leftCirclePosition = {
+      x: position.x,
+      y: position.y + height + (height / 2) * (index + 1),
+    };
+    const rightCirclePosition = {
+      x: position.x + nodeLength,
+      y: position.y + height + (height / 2) * (index + 1),
+    };
+    return { leftCirclePosition, rightCirclePosition }
+  }
+  const calcParentCirclePos = (position: IPosition, nodeLength: number) => {
+    const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
+    const rightCirclePosition = {
+      x: position.x + nodeLength,
+      y: position.y + height / 2,
+    };
+
+    return { leftCirclePosition, rightCirclePosition }
+  }
+
+  return { getNode, getAction, calculateNodeWidth, calculateNodeHeight, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getChildrenPosition, getMidpoint, calcChildCirclePos, calcParentCirclePos }
 }

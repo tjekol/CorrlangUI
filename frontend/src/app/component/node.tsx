@@ -9,19 +9,18 @@ import {
   nodeLengthAtom,
   nodeConAtom,
   atrConAtom,
-  computingVal,
-  height
+  height,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { useDraggable } from '../hooks/useDraggable';
+import DrawChild from './draw/child';
+import { IPosition } from '../interface/IPosition';
+import DrawParent from './draw/parent';
 
 interface NodeProps extends INode {
   color: string;
-  onNodeClick: (id: number, circlePosition: { x: number; y: number }) => void;
-  onAttributeClick: (
-    id: number,
-    circlePosition: { x: number; y: number },
-  ) => void;
+  onNodeClick: (id: number, circlePosition: IPosition) => void;
+  onAttributeClick: (id: number, circlePosition: IPosition) => void;
 }
 
 export default function Node({
@@ -30,7 +29,6 @@ export default function Node({
   attributes,
   positionX,
   positionY,
-  schemaID,
   color,
   onNodeClick,
   onAttributeClick,
@@ -72,9 +70,9 @@ export default function Node({
     });
   };
 
-  const { position, setIsDragging, handleMouseDown, handleMouseMove } =
-    useDraggable(positionX, positionY, handlePositionChange);
-  const { calculateNodeLength } = useCalculation();
+  const { position } = useDraggable(positionX, positionY, handlePositionChange);
+  const { calculateNodeLength, calcChildCirclePos, calcParentCirclePos } =
+    useCalculation();
   const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
   const nodeCons = useAtomValue(nodeConAtom);
   const atrCons = useAtomValue(atrConAtom);
@@ -93,11 +91,10 @@ export default function Node({
 
   const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
 
-  const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
-  const rightCirclePosition = {
-    x: position.x + nodeLength,
-    y: position.y + height / 2,
-  };
+  const { leftCirclePosition, rightCirclePosition } = calcParentCirclePos(
+    position,
+    nodeLength,
+  );
 
   const isConnected = nodeCons.some((con) =>
     con.nodes.find((n) => n.id === id),
@@ -106,144 +103,51 @@ export default function Node({
   return (
     <>
       {/* Header */}
-      <rect
-        x={position.x}
-        y={position.y}
-        width={nodeLength}
-        height={height}
-        fill='#FFFFFF'
-        stroke={color}
-        strokeWidth={1}
-        rx={5}
-        onMouseDown={(e) => (
-          setIsDragging(true),
-          handleMouseDown(e.clientX, e.clientY)
-        )}
-        onMouseMove={(e) => handleMouseMove(e.clientX, e.clientY)}
-        onMouseUp={() => setIsDragging(false)}
-        className='hover:cursor-move'
-      />
-      {/* Left circle */}
-      <circle
-        className={`hover:cursor-pointer hover:opacity-100 
-          ${isConnected ? 'opacity-100' : 'opacity-40'}
-          `}
-        cx={leftCirclePosition.x}
-        cy={leftCirclePosition.y}
-        r={7}
-        fill='#D9D9D9'
-        stroke='black'
-        strokeWidth={1}
-        onClick={() => {
-          onNodeClick(id, leftCirclePosition);
-        }}
-      />
-      {/* Right circle */}
-      <circle
-        className={`hover:cursor-pointer hover:opacity-100 ${
-          isConnected ? 'opacity-100' : 'opacity-40'
-        }`}
-        cx={rightCirclePosition.x}
-        cy={rightCirclePosition.y}
-        r={7}
-        fill='#D9D9D9'
-        stroke='black'
-        strokeWidth={1}
-        onClick={() => {
-          onNodeClick(id, rightCirclePosition);
-        }}
-      />
-      {/* Header text */}
-      <text
-        x={position.x + nodeLength / 2}
-        y={position.y + height / 2}
-        textAnchor='middle'
-        dominantBaseline='middle'
-        pointerEvents='none'
-      >
-        {title}
-      </text>
-
-      {/* Body */}
-      <rect
-        x={position.x}
-        y={position.y + height}
-        width={nodeLength}
-        height={
-          attributes.length === 1 ? height : (height * attributes.length) / computingVal
-        }
-        fill='#FFFFFF'
-        stroke={color}
-        strokeWidth={1}
-        rx={5}
+      <DrawParent
+        positionX={positionX}
+        positionY={positionY}
+        nodeLength={nodeLength}
+        color={color}
+        leftCirclePosition={leftCirclePosition}
+        rightCirclePosition={rightCirclePosition}
+        isConnected={isConnected}
+        onParentClick={onNodeClick}
+        id={id}
+        title={title}
+        children={attributes}
+        handlePositionChange={handlePositionChange}
       />
 
       {attributes.map((attribute, i) => {
         const atrID = attribute.id;
-        const leftCirclePosition = {
-          x: position.x,
-          y: position.y + height + (height / 2) * (i + 1),
-        };
-        const rightCirclePosition = {
-          x: position.x + nodeLength,
-          y: position.y + height + (height / 2) * (i + 1),
-        };
+        const { leftCirclePosition, rightCirclePosition } = calcChildCirclePos(
+          position,
+          nodeLength,
+          i,
+        );
 
         const isActive = atrCons.some((con) =>
           con.attributes.find((a) => a.id === atrID),
         );
         const alertMsg = 'Connect nodes before connecting attributes.';
+        const text = `${attribute.text}: ${attribute.type}`;
 
         return (
-          <g key={i}>
-            {/* Left circles */}
-            <circle
-              className={`hover:cursor-pointer ${
-                isConnected && 'hover:opacity-100'
-              }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
-              cx={leftCirclePosition.x}
-              cy={leftCirclePosition.y}
-              r={5}
-              fill={color}
-              stroke='#818181'
-              strokeWidth={1}
-              onClick={() => {
-                if (isConnected) {
-                  onAttributeClick(atrID, leftCirclePosition);
-                } else {
-                  alert(alertMsg);
-                }
-              }}
-            />
-            {/* Right circles */}
-            <circle
-              className={`hover:cursor-pointer ${
-                isConnected && 'hover:opacity-100'
-              } ${isActive ? 'opacity-100' : 'opacity-40'}`}
-              cx={rightCirclePosition.x}
-              cy={rightCirclePosition.y}
-              r={5}
-              fill={color}
-              stroke='#818181'
-              strokeWidth={1}
-              onClick={() => {
-                if (isConnected) {
-                  onAttributeClick(atrID, rightCirclePosition);
-                } else {
-                  alert(alertMsg);
-                }
-              }}
-            />
-            <text
-              x={position.x + 10}
-              y={position.y + height + (height / 2) * (i + 1)}
-              textAnchor='start'
-              dominantBaseline='middle'
-              pointerEvents='none'
-            >
-              {attribute.text}: {attribute.type}
-            </text>
-          </g>
+          <DrawChild
+            key={atrID}
+            i={i}
+            child={attribute}
+            childID={atrID}
+            isConnected={isConnected}
+            isActive={isActive}
+            leftCirclePosition={leftCirclePosition}
+            rightCirclePosition={rightCirclePosition}
+            onChildClick={onAttributeClick}
+            color={color}
+            alertMsg={alertMsg}
+            childText={text}
+            position={position}
+          />
         );
       })}
     </>
