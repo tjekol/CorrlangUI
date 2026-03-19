@@ -45,6 +45,15 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const { calculateNodeWidth, calculateNodeHeight } = useCalculation();
   const midNodeCon = useAtomValue(midNodeConAtom);
   const midAtrCon = useAtomValue(midAtrConAtom);
+  const [liveNodePositions, setLiveNodePositions] = useAtom(
+    liveNodePositionsAtom,
+  );
+  const [diagramDimensions, setDiagramDimensions] = useState({
+    width: 800,
+    height: 600,
+  });
+  const [layoutLoading, setLayoutLoading] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null)!;
 
   // local state to store first click of node/attribute
   const [pendingNodeCon, setPendingNodeCon] = useState<IPendingCon | null>(
@@ -54,12 +63,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const [pendingEdgeCon, setPendingEdgeCon] = useState<IPendingCon | null>(
     null,
   );
-
-  const [liveNodePositions, setLiveNodePositions] = useAtom(
-    liveNodePositionsAtom,
-  );
-  const [layoutLoading, setLayoutLoading] = useState(false);
-  const svgRef = useRef<SVGSVGElement>(null)!;
 
   const handleNodeClick = handleNodeConCreate(
     nodeCon,
@@ -99,11 +102,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     pendingEdgeCon,
     setPendingEdgeCon,
   );
-
-  const [diagramDimensions, setDiagramDimensions] = useState({
-    width: 800,
-    height: 600,
-  });
 
   useEffect(() => {
     const fetchSequentially = async () => {
@@ -155,7 +153,6 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
       !attributes
     )
       return;
-
     const loadELK = async () => {
       setLayoutLoading(true);
       try {
@@ -183,7 +180,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           id: 'root',
           layoutOptions: {
             'elk.algorithm': 'org.eclipse.elk.force',
-            'elk.spacing.nodeNode': '40',
+            'elk.spacing.nodeNode': '30',
           },
           children,
           edges: elkEdges,

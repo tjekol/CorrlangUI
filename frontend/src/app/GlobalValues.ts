@@ -8,6 +8,10 @@ import { INodeConnection, IAtrConnection, IEdgeConnection, IActionConnection, IM
 import { IAction } from './interface/IAction';
 import { IMethod } from './interface/IMethod';
 
+// node height, computingVal
+export const height = 40;
+export const computingVal = 1.5
+
 // Node/attribute
 export const schemaAtom = atom<ISchema[]>([]);
 export const nodeAtom = atom<INode[]>([]);

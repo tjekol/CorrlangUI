@@ -1,31 +1,31 @@
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import Action from './action';
 import Connection from './connection';
-import { ICorrespondence } from '../interface/ICorrespondence';
-import { useSchemas } from '../hooks/useSchemas';
-import { useAction } from '../hooks/useAction';
-import { useMethod } from '../hooks/useMethod';
-import { useCalculation } from '../hooks/useCalculation';
-import { useActionCon } from '../hooks/connection/useActionCon';
-import { IPendingCon } from '../interface/IStates';
-import { useAtom, useAtomValue } from 'jotai';
+import { ICorrespondence } from '@/app/interface/ICorrespondence';
+import { useSchemas } from '@/app/hooks/useSchemas';
+import { useAction } from '@/app/hooks/useAction';
+import { useMethod } from '@/app/hooks/useMethod';
+import { useActionCon } from '@/app/hooks/connection/useActionCon';
+import { IPendingCon } from '@/app/interface/IStates';
 import {
   liveActionPositionsAtom,
   midActionConAtom,
   midMethodConAtom,
   nodeColor,
-} from '../GlobalValues';
+} from '@/app/GlobalValues';
 import {
   handleActionConCreate,
   handleActionConUpdate,
 } from '../handler/handleActionCon';
-import { useMethodCon } from '../hooks/connection/useMethodCon';
+import { useMethodCon } from '@/app/hooks/connection/useMethodCon';
 import {
   handleMethodConCreate,
   handleMethodConUpdate,
-} from '../handler/handleMethodCon';
+} from '@/app/handler/handleMethodCon';
+import { useCalculation } from '../hooks/useCalculation';
 
 export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const { schemas, refetchSchemas } = useSchemas();
@@ -38,18 +38,21 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const { calculateNodeWidth, calculateNodeHeight } = useCalculation();
   const midActionCon = useAtomValue(midActionConAtom);
   const midMethodCon = useAtomValue(midMethodConAtom);
+  const [liveNodePositions, setLiveNodePositions] = useAtom(
+    liveActionPositionsAtom,
+  );
+  const [diagramDimensions, setDiagramDimensions] = useState({
+    width: 800,
+    height: 600,
+  });
+  const [layoutLoading, setLayoutLoading] = useState(false);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   // local state to store first click of node/attribute
   const [pendingNodeCon, setPendingNodeCon] = useState<IPendingCon | null>(
     null,
   );
   const [pendingAtrCon, setPendingAtrCon] = useState<IPendingCon | null>(null);
-
-  const [liveNodePositions, setLiveNodePositions] = useAtom(
-    liveActionPositionsAtom,
-  );
-  const [layoutLoading, setLayoutLoading] = useState(false);
-  const svgRef = useRef<SVGSVGElement>(null);
 
   const handleNodeClick = handleActionConCreate(
     actionCon,
@@ -76,11 +79,6 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     pendingAtrCon,
     setPendingAtrCon,
   );
-
-  const [diagramDimensions, setDiagramDimensions] = useState({
-    width: 800,
-    height: 600,
-  });
 
   useEffect(() => {
     const fetchSequentially = async () => {
@@ -122,7 +120,6 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
       !methods
     )
       return;
-
     const loadELK = async () => {
       setLayoutLoading(true);
       try {
@@ -186,7 +183,6 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
         setLayoutLoading(false);
       }
     };
-
     loadELK();
   }, [
     filteredSchemas,
