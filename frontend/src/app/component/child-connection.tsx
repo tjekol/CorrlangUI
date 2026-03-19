@@ -1,4 +1,5 @@
 import { useCalculation } from '../hooks/useCalculation';
+import { usePath } from '../hooks/usePath';
 import { IAtrConnection, IMethodConnection } from '../interface/IConnections';
 import { IPendingCon } from '../interface/IStates';
 
@@ -18,14 +19,13 @@ export default function ChildConnecton({
   conType: number;
 }) {
   const {
-    getPathData,
     getNode,
     getAction,
-    getAttributePosition,
+    getChildrenPosition,
     getMidpoint,
-    getShortestPath,
     calculateMidpoint,
   } = useCalculation();
+  const { getPathData, getShortestPath } = usePath();
 
   const atrConColor = '#4A4E69';
   const strokeOpacity = 0.8;
@@ -47,8 +47,8 @@ export default function ChildConnecton({
         if (atrIDs && atrIDs.length === 2) {
           const srcAtrID = atrIDs[0];
           const trgtAtrID = atrIDs[1];
-          const pos1 = getAttributePosition(srcAtrID, conType);
-          const pos2 = getAttributePosition(trgtAtrID, conType);
+          const pos1 = getChildrenPosition(srcAtrID, conType);
+          const pos2 = getChildrenPosition(trgtAtrID, conType);
           let srcNode, trgtNode;
 
           if (conType === 0) {
@@ -110,7 +110,7 @@ export default function ChildConnecton({
           }
         } else if (atrIDs) {
           const atrPositions = atrIDs
-            .map((atrID) => getAttributePosition(atrID, conType))
+            .map((atrID) => getChildrenPosition(atrID, conType))
             .filter((pos): pos is { x: number; y: number } => pos !== null);
           const midpoint = getMidpoint(atrPositions);
           if (midpoint && atrPositions.length > 0) {

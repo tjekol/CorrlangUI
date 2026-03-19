@@ -5,6 +5,7 @@ import { edgeConAtom, midEdgeAtom, nodeAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { INode } from '../interface/INode';
 import { EdgeType, IEdge } from '../interface/IEdge';
+import { usePath } from '../hooks/usePath';
 
 export default function Edge({
   edges,
@@ -19,8 +20,8 @@ export default function Edge({
   const nodes = useAtomValue(nodeAtom);
   const edgeCons = useAtomValue(edgeConAtom);
   const midEdge = useAtomValue(midEdgeAtom);
-  const { getNodePosition, getArrowData, calculateMidpointEdge } =
-    useCalculation();
+  const { getNodePosition, calculateMidpointEdge } = useCalculation();
+  const { getArrowData } = usePath();
 
   const getNodes = (
     edgeID: number,

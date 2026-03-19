@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { IAction } from '../interface/IAction';
 import {
@@ -11,13 +11,11 @@ import {
   methodConAtom,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
+import { useDraggable } from '../hooks/useDraggable';
 
 interface ActionProps extends IAction {
   color: string;
-  onNodeClick: (
-    id: number,
-    circlePosition: { x: number; y: number },
-  ) => void;
+  onNodeClick: (id: number, circlePosition: { x: number; y: number }) => void;
   onAttributeClick: (
     id: number,
     circlePosition: { x: number; y: number },
@@ -35,43 +33,10 @@ export default function Action({
   onNodeClick,
   onAttributeClick,
 }: ActionProps) {
-  const [position, setPosition] = useState({ x: positionX, y: positionY });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const setLiveNodePositions = useSetAtom(liveActionPositionsAtom);
   const setLiveAtrPosition = useSetAtom(liveMethodPositionsAtom);
 
-  const { calculateNodeLength } = useCalculation();
-  const [nodeLengths, setNodeLengths] = useAtom(actionLengthAtom);
-  const nodeCons = useAtomValue(actionConAtom);
-  const atrCons = useAtomValue(methodConAtom);
-  const height = 40;
-
-  useLayoutEffect(() => {
-    const width = calculateNodeLength(methods, title);
-
-    setNodeLengths((prevLengths) => {
-      const existing = prevLengths.find((item) => item.id === id);
-      if (existing) {
-        return prevLengths;
-      }
-      return [...prevLengths, { id: id, length: width }];
-    });
-  }, [id]);
-
-  const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
-
-  const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
-  const rightCirclePosition = {
-    x: position.x + nodeLength,
-    y: position.y + height / 2,
-  };
-
-  const isConnected = nodeCons.some((con) =>
-    con.actions.find((n) => n.id === id),
-  );
-
-  const moveNode = (newX: number, newY: number) => {
+  const handlePositionChange = (newX: number, newY: number) => {
     setPosition({ x: newX, y: newY });
 
     setLiveNodePositions((prev) => {
@@ -107,20 +72,42 @@ export default function Action({
     });
   };
 
-  const handleMouseDown = (clientX: number, clientY: number) => {
-    setDragOffset({
-      x: clientX - position.x,
-      y: clientY - position.y,
+  const {
+    position,
+    setPosition,
+    setIsDragging,
+    handleMouseDown,
+    handleMouseMove,
+  } = useDraggable(positionX, positionY, handlePositionChange);
+  const { calculateNodeLength } = useCalculation();
+  const [nodeLengths, setNodeLengths] = useAtom(actionLengthAtom);
+  const nodeCons = useAtomValue(actionConAtom);
+  const atrCons = useAtomValue(methodConAtom);
+  const height = 40;
+
+  useLayoutEffect(() => {
+    const width = calculateNodeLength(methods, title);
+
+    setNodeLengths((prevLengths) => {
+      const existing = prevLengths.find((item) => item.id === id);
+      if (existing) {
+        return prevLengths;
+      }
+      return [...prevLengths, { id: id, length: width }];
     });
+  }, [id]);
+
+  const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
+
+  const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
+  const rightCirclePosition = {
+    x: position.x + nodeLength,
+    y: position.y + height / 2,
   };
 
-  const handleMouseMove = (clientX: number, clientY: number) => {
-    if (isDragging) {
-      const x = clientX - dragOffset.x;
-      const y = clientY - dragOffset.y;
-      moveNode(x, y);
-    }
-  };
+  const isConnected = nodeCons.some((con) =>
+    con.actions.find((n) => n.id === id),
+  );
 
   return (
     <>
