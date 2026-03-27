@@ -1,4 +1,5 @@
 import { IActionConnection } from '../interface/IConnections';
+import { IPosition } from '../interface/IPosition';
 import { IPendingCon } from '../interface/IStates';
 
 export const handleActionConCreate = (
@@ -7,7 +8,7 @@ export const handleActionConCreate = (
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  return (id: number, circlePosition?: { x: number, y: number }) => {
+  return (id: number, circlePosition?: IPosition) => {
     console.log('Action selected:', {
       actionID: id,
       position: circlePosition

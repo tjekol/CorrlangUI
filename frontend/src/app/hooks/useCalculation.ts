@@ -4,6 +4,7 @@ import { INode } from '../interface/INode';
 import { IAttribute } from '../interface/IAttribute';
 import { IMethod } from '../interface/IMethod';
 import { IAction } from '../interface/IAction';
+import { IPosition } from '../interface/IPosition';
 
 export const useCalculation = () => {
   const liveNodePositions = useAtomValue(liveNodePositionsAtom);
@@ -72,11 +73,14 @@ export const useCalculation = () => {
     return 40
   };
 
-  const calculateNodeLength = (attributes: IAttribute[] | IMethod[], title: string) => {
-    const labels = [...attributes.map((label) => 'text' in label ? label.text + label.type : label.name + label.input + label.output)];
+  const calculateNodeLength = (children: IAttribute[] | IMethod[], title: string) => {
+    const labels = [...children.map((label) => 'text' in label ? label.text + label.type : label.name + label.input + label.output)];
     const strLenghts = labels.map((str) =>
-      str.length > 40 ? str.length * 0.85 : str.length > 20 ? str.length * 1 : str.length > 5 ? str.length * computingVal : str.length * 2.5
-    );
+      str.length > 40 ? str.length * 0.9 :
+        str.length > 30 ? str.length * 0.8 :
+          str.length > 20 ? str.length :
+            str.length > 5 ? str.length * 1.2 :
+              str.length);
     const maxStringLength = Math.max(...strLenghts, title.length);
     const width = maxStringLength * 10;
 
@@ -251,7 +255,7 @@ export const useCalculation = () => {
   };
 
 
-  const getMidpoint = (positions: { x: number, y: number }[]) => {
+  const getMidpoint = (positions: IPosition[]) => {
     if (!positions || positions.length === 0) return null;
 
     const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
@@ -263,5 +267,26 @@ export const useCalculation = () => {
     };
   }
 
-  return { getNode, getAction, calculateNodeWidth, calculateNodeHeight, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getChildrenPosition, getMidpoint }
+  const calcChildCirclePos = (position: IPosition, nodeLength: number, index: number) => {
+    const leftCirclePosition = {
+      x: position.x,
+      y: position.y + height + (height / 2) * (index + 1),
+    };
+    const rightCirclePosition = {
+      x: position.x + nodeLength,
+      y: position.y + height + (height / 2) * (index + 1),
+    };
+    return { leftCirclePosition, rightCirclePosition }
+  }
+  const calcParentCirclePos = (position: IPosition, nodeLength: number) => {
+    const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
+    const rightCirclePosition = {
+      x: position.x + nodeLength,
+      y: position.y + height / 2,
+    };
+
+    return { leftCirclePosition, rightCirclePosition }
+  }
+
+  return { getNode, getAction, calculateNodeWidth, calculateNodeHeight, getNodePosition, calculateNodeLength, calculateMidpoint, calculateMidpointEdge, getChildrenPosition, getMidpoint, calcChildCirclePos, calcParentCirclePos }
 }

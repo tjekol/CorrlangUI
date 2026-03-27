@@ -1,4 +1,5 @@
 import { INodeConnection } from '../interface/IConnections';
+import { IPosition } from '../interface/IPosition';
 import { IPendingCon } from '../interface/IStates';
 
 export const handleNodeConCreate = (
@@ -7,7 +8,7 @@ export const handleNodeConCreate = (
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  return (id: number, circlePosition?: { x: number, y: number }) => {
+  return (id: number, circlePosition?: IPosition) => {
     console.log('Node selected:', {
       nodeID: id,
       position: circlePosition

@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai';
 import { nodeLengthAtom, actionLengthAtom, computingVal, height } from '../GlobalValues';
 import { INode } from '../interface/INode';
 import { useCalculation } from './useCalculation';
+import { IPosition } from '../interface/IPosition';
 
 export const usePath = () => {
   const { getNode, getAction, } = useCalculation()
@@ -78,7 +79,7 @@ export const usePath = () => {
   };
 
 
-  const getShortestPath = (conType: number, midpoint: { x: number, y: number }, position: { x: number, y: number }, nodeID?: number, atrID?: number) => {
+  const getShortestPath = (conType: number, midpoint: IPosition, position: IPosition, nodeID?: number, atrID?: number) => {
     let nodeLength = 0;
 
     if (conType === 0) {

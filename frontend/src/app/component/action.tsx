@@ -9,19 +9,18 @@ import {
   actionLengthAtom,
   actionConAtom,
   methodConAtom,
-  computingVal,
-  height
+  height,
 } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 import { useDraggable } from '../hooks/useDraggable';
+import DrawChild from './draw/child';
+import { IPosition } from '../interface/IPosition';
+import DrawParent from './draw/parent';
 
 interface ActionProps extends IAction {
   color: string;
-  onNodeClick: (id: number, circlePosition: { x: number; y: number }) => void;
-  onAttributeClick: (
-    id: number,
-    circlePosition: { x: number; y: number },
-  ) => void;
+  onNodeClick: (id: number, circlePosition: IPosition) => void;
+  onAttributeClick: (id: number, circlePosition: IPosition) => void;
 }
 
 export default function Action({
@@ -30,7 +29,6 @@ export default function Action({
   methods,
   positionX,
   positionY,
-  schemaID,
   color,
   onNodeClick,
   onAttributeClick,
@@ -74,17 +72,16 @@ export default function Action({
     });
   };
 
-  const {
-    position,
-    setPosition,
-    setIsDragging,
-    handleMouseDown,
-    handleMouseMove,
-  } = useDraggable(positionX, positionY, handlePositionChange);
-  const { calculateNodeLength } = useCalculation();
+  const { position, setPosition } = useDraggable(
+    positionX,
+    positionY,
+    handlePositionChange,
+  );
+  const { calculateNodeLength, calcChildCirclePos, calcParentCirclePos } =
+    useCalculation();
   const [actionLengths, setActionLengths] = useAtom(actionLengthAtom);
-  const nodeCons = useAtomValue(actionConAtom);
-  const atrCons = useAtomValue(methodConAtom);
+  const actionCons = useAtomValue(actionConAtom);
+  const methodCons = useAtomValue(methodConAtom);
 
   useLayoutEffect(() => {
     const width = calculateNodeLength(methods, title);
@@ -100,166 +97,71 @@ export default function Action({
 
   const nodeLength = actionLengths.find((item) => item.id === id)?.length || 0;
 
-  const leftCirclePosition = { x: position.x, y: position.y + height / 2 };
-  const rightCirclePosition = {
-    x: position.x + nodeLength,
-    y: position.y + height / 2,
-  };
+  const { leftCirclePosition, rightCirclePosition } = calcParentCirclePos(
+    position,
+    nodeLength,
+  );
 
-  const isConnected = nodeCons.some((con) =>
+  const isConnected = actionCons.some((con) =>
     con.actions.find((n) => n.id === id),
   );
 
   return (
     <>
       {/* Header */}
-      <rect
-        x={position.x}
-        y={position.y}
-        width={nodeLength}
-        height={height}
-        fill='#FFFFFF'
-        stroke={color}
-        strokeWidth={1}
-        rx={5}
-        onMouseDown={(e) => (
-          setIsDragging(true),
-          handleMouseDown(e.clientX, e.clientY)
-        )}
-        onMouseMove={(e) => handleMouseMove(e.clientX, e.clientY)}
-        onMouseUp={() => setIsDragging(false)}
-        className='hover:cursor-move'
-      />
-      {/* Left circle */}
-      <circle
-        className={`hover:cursor-pointer hover:opacity-100 
-          ${isConnected ? 'opacity-100' : 'opacity-40'}
-          `}
-        cx={leftCirclePosition.x}
-        cy={leftCirclePosition.y}
-        r={7}
-        fill='#D9D9D9'
-        stroke='black'
-        strokeWidth={1}
-        onClick={() => {
-          onNodeClick(id, leftCirclePosition);
-        }}
-      />
-      {/* Right circle */}
-      <circle
-        className={`hover:cursor-pointer hover:opacity-100 ${
-          isConnected ? 'opacity-100' : 'opacity-40'
-        }`}
-        cx={rightCirclePosition.x}
-        cy={rightCirclePosition.y}
-        r={7}
-        fill='#D9D9D9'
-        stroke='black'
-        strokeWidth={1}
-        onClick={() => {
-          onNodeClick(id, rightCirclePosition);
-        }}
-      />
-      {/* Header text */}
-      <text
-        x={position.x + nodeLength / 2}
-        y={position.y + height / 2}
-        textAnchor='middle'
-        dominantBaseline='middle'
-        pointerEvents='none'
-      >
-        {title}
-      </text>
-
-      {/* Body */}
-      <rect
-        x={position.x}
-        y={position.y + height}
-        width={nodeLength}
-        height={
-          methods.length === 1
-            ? height
-            : (height * methods.length) / computingVal
-        }
-        fill='#FFFFFF'
-        stroke={color}
-        strokeWidth={1}
-        rx={5}
+      <DrawParent
+        positionX={positionX}
+        positionY={positionY}
+        nodeLength={nodeLength}
+        color={color}
+        leftCirclePosition={leftCirclePosition}
+        rightCirclePosition={rightCirclePosition}
+        isConnected={isConnected}
+        onParentClick={onNodeClick}
+        id={id}
+        title={title}
+        children={methods}
+        handlePositionChange={handlePositionChange}
       />
 
       {methods.map((method, i) => {
-        const atrID = method.id;
-        const leftCirclePosition = {
-          x: position.x,
-          y: position.y + height + (height / 2) * (i + 1),
-        };
-        const rightCirclePosition = {
-          x: position.x + nodeLength,
-          y: position.y + height + (height / 2) * (i + 1),
-        };
+        const methodID = method.id;
 
-        const isActive = atrCons.some((con) =>
-          con.methods.find((a) => a.id === atrID),
+        const { leftCirclePosition, rightCirclePosition } = calcChildCirclePos(
+          position,
+          nodeLength,
+          i,
         );
-        const alertMsg = 'Connect nodes before connecting attributes.';
 
+        const isActive = methodCons.some((con) =>
+          con.methods.find((a) => a.id === methodID),
+        );
+        const alertMsg = 'Connect actions before connecting methods.';
         const methodInput = method.input
           .replaceAll(',', ', ')
           .trim()
           .slice(0, -1);
 
+        const text = method.input
+          ? `${method.name}(${methodInput}): ${method.output}`
+          : `${method.name}: ${method.output}`;
+
         return (
-          <g key={i}>
-            {/* Left circles */}
-            <circle
-              className={`hover:cursor-pointer ${
-                isConnected && 'hover:opacity-100'
-              }  ${isActive ? 'opacity-100' : 'opacity-40'}`}
-              cx={leftCirclePosition.x}
-              cy={leftCirclePosition.y}
-              r={5}
-              fill={color}
-              stroke='#818181'
-              strokeWidth={1}
-              onClick={() => {
-                if (isConnected) {
-                  onAttributeClick(atrID, leftCirclePosition);
-                } else {
-                  alert(alertMsg);
-                }
-              }}
-            />
-            {/* Right circles */}
-            <circle
-              className={`hover:cursor-pointer ${
-                isConnected && 'hover:opacity-100'
-              } ${isActive ? 'opacity-100' : 'opacity-40'}`}
-              cx={rightCirclePosition.x}
-              cy={rightCirclePosition.y}
-              r={5}
-              fill={color}
-              stroke='#818181'
-              strokeWidth={1}
-              onClick={() => {
-                if (isConnected) {
-                  onAttributeClick(atrID, rightCirclePosition);
-                } else {
-                  alert(alertMsg);
-                }
-              }}
-            />
-            <text
-              x={position.x + 10}
-              y={position.y + height + (height / 2) * (i + 1)}
-              textAnchor='start'
-              dominantBaseline='middle'
-              pointerEvents='none'
-            >
-              {method.input
-                ? `${method.name}(${methodInput}): ${method.output}`
-                : `${method.name}: ${method.output}`}
-            </text>
-          </g>
+          <DrawChild
+            key={methodID}
+            i={i}
+            child={method}
+            childID={methodID}
+            isConnected={isConnected}
+            isActive={isActive}
+            leftCirclePosition={leftCirclePosition}
+            rightCirclePosition={rightCirclePosition}
+            onChildClick={onAttributeClick}
+            color={color}
+            alertMsg={alertMsg}
+            childText={text}
+            position={position}
+          />
         );
       })}
     </>
