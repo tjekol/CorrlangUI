@@ -37,6 +37,8 @@ export default function Node({
   const setLiveAtrPosition = useSetAtom(liveAtrPositionsAtom);
 
   const handlePositionChange = (newX: number, newY: number) => {
+    setPosition({ x: newX, y: newY });
+
     setLiveNodePositions((prev) => {
       const existing = prev.find((pos) => pos.id === id);
       if (existing) {
@@ -70,7 +72,11 @@ export default function Node({
     });
   };
 
-  const { position } = useDraggable(positionX, positionY, handlePositionChange);
+  const { position, setPosition } = useDraggable(
+    positionX,
+    positionY,
+    handlePositionChange,
+  );
   const { calculateNodeLength, calcChildCirclePos, calcParentCirclePos } =
     useCalculation();
   const [nodeLengths, setNodeLengths] = useAtom(nodeLengthAtom);
