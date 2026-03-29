@@ -1,7 +1,7 @@
 import messages from '@/lib/client/client/core_pb.cjs';
 import services from '@/lib/client/client/core_grpc_pb.cjs';
 import grpc from '@grpc/grpc-js';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET - Fetch all correspondences
 export async function GET() {

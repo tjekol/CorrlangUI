@@ -89,7 +89,7 @@ export default function Connection({
     };
   }, [pendingCon, pendingChildCon, pendingEdgeCon, svgRef]);
 
-  let hasMousePosition = mousePosition.x !== 0 && mousePosition.y !== 0;
+  const hasMousePosition = mousePosition.x !== 0 && mousePosition.y !== 0;
 
   return (
     <>

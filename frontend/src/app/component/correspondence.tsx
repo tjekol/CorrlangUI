@@ -18,7 +18,8 @@ export default function Correspondence({
           <li
             className={`list-none list-inside bg-blue-50 p-2 rounded-md w-full cursor-pointer hover:bg-white hover:border`}
             onClick={() => {
-              (onDataEmit(c), reset());
+              onDataEmit(c);
+              reset();
             }}
             key={c.id}
           >

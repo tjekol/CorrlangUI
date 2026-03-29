@@ -20,15 +20,6 @@ export const useAtrCon = () => {
     }
   };
 
-  const fetchAtrCons = () => handleAsync(async () => {
-    const res = await fetch('/api/atr-connection');
-    if (!res.ok) {
-      throw new Error('Failed to fetch attribute connections');
-    }
-    const conData: IAtrConnection[] = await res.json();
-    setAtrCon(conData)
-  })
-
   const createAtrCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/atr-connection', {
       method: 'POST',
@@ -90,7 +81,17 @@ export const useAtrCon = () => {
     setAtrCon([]);
   })
 
-  useEffect(() => { fetchAtrCons() }, [])
+  useEffect(() => {
+    const fetchAtrCons = () => handleAsync(async () => {
+      const res = await fetch('/api/atr-connection');
+      if (!res.ok) {
+        throw new Error('Failed to fetch attribute connections');
+      }
+      const conData: IAtrConnection[] = await res.json();
+      setAtrCon(conData)
+    })
+    fetchAtrCons()
+  }, [setAtrCon])
 
   return { atrCon, loading, createAtrCon, updateAtrCon, deleteAtrCon: deleteCon, deleteAllAtrCons };
 };

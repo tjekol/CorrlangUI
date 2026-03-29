@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { INode } from '../interface/INode';
 import { useAtom } from 'jotai';
 import { nodeAtom } from '../GlobalValues';
@@ -28,8 +28,6 @@ export const useNodes = () => {
     const nodesData: INode[] = await res.json();
     setNodes(nodesData);
   })
-
-  // useEffect(() => { fetchNodes(); }, []);
 
   return { nodes, loading, refetchNodes: fetchNodes }
 }

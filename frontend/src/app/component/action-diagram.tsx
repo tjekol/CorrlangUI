@@ -22,8 +22,8 @@ import {
 } from '../handler/handleActionCon';
 import { useMethodCon } from '@/app/hooks/connection/useMethodCon';
 import {
-  handleMethodConCreate,
-  handleMethodConUpdate,
+  HandleMethodConCreate,
+  HandleMethodConUpdate,
 } from '@/app/handler/handleMethodCon';
 import { useCalculation } from '../hooks/useCalculation';
 
@@ -61,7 +61,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     setPendingNodeCon,
   );
 
-  const handleMethodClick = handleMethodConCreate(
+  const handleMethodClick = HandleMethodConCreate(
     methodCon,
     createMethodCon,
     pendingAtrCon,
@@ -74,7 +74,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     setPendingNodeCon,
   );
 
-  const handleMethodConClick = handleMethodConUpdate(
+  const handleMethodConClick = HandleMethodConUpdate(
     updateMethodCon,
     pendingAtrCon,
     setPendingAtrCon,
@@ -98,7 +98,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
   const filteredSchemas = useMemo(() => {
     if (!schemas) return [];
     return schemas.filter((s) => cor.schemaIDs.includes(s.id));
-  }, [schemas]);
+  }, [schemas, cor.schemaIDs]);
 
   const nodesWithAttributes = useMemo(() => {
     if (!actions || !methods) return [];
@@ -110,7 +110,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
       ...action,
       methods: methods.filter((attr) => attr.actionID === action.id),
     }));
-  }, [actions, methods]);
+  }, [actions, methods, filteredSchemas]);
 
   useEffect(() => {
     if (
@@ -126,14 +126,14 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
         const ELK = (await import('elkjs/lib/elk.bundled.js')).default;
         const elk = new ELK();
 
+        const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
+          [];
+
         const children = nodesWithAttributes.map((n) => ({
           id: n.id.toString(),
           width: calculateNodeWidth(n),
           height: calculateNodeHeight(n),
         }));
-
-        const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
-          [];
 
         const graph = {
           id: 'root',
@@ -157,13 +157,13 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
           // dynamic dimensions based on node positions and sizes
           if (newPositions.length > 0) {
             const maxX = Math.max(
-              ...newPositions.map((pos, index) => {
+              ...newPositions.map((pos) => {
                 const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
-              ...newPositions.map((pos, index) => {
+              ...newPositions.map((pos) => {
                 const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),

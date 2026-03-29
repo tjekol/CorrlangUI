@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { schemaAtom } from '../GlobalValues';
 import { ISchema } from '../interface/ISchema';
@@ -28,8 +28,6 @@ export const useSchemas = () => {
     const schemasData: ISchema[] = await res.json();
     setSchemas(schemasData);
   })
-
-  // useEffect(() => { fetchSchemas(); }, []);
 
   return { schemas, loading, refetchSchemas: fetchSchemas }
 }

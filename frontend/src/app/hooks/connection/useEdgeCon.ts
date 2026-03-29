@@ -20,15 +20,6 @@ export const useEdgeCon = () => {
     }
   };
 
-  const fetchEdgeCons = () => handleAsync(async () => {
-    const res = await fetch('/api/edge-connection');
-    if (!res.ok) {
-      throw new Error('Failed to fetch edge connections.');
-    }
-    const conData: IEdgeConnection[] = await res.json();
-    setEdgeCon(conData)
-  })
-
   const createEdgeCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/edge-connection', {
       method: 'POST',
@@ -89,7 +80,17 @@ export const useEdgeCon = () => {
     setEdgeCon([]);
   })
 
-  useEffect(() => { fetchEdgeCons() }, [])
+  useEffect(() => {
+    const fetchEdgeCons = () => handleAsync(async () => {
+      const res = await fetch('/api/edge-connection');
+      if (!res.ok) {
+        throw new Error('Failed to fetch edge connections.');
+      }
+      const conData: IEdgeConnection[] = await res.json();
+      setEdgeCon(conData)
+    })
+    fetchEdgeCons()
+  }, [setEdgeCon])
 
   return { edgeCon, loading, createEdgeCon, updateEdgeCon, deleteEdgeCon, deleteAllEdgeCons };
 };

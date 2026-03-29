@@ -3,7 +3,7 @@ import services from '@/lib/client/client/core_grpc_pb.cjs';
 import ccp from '@/lib/client/client/ccp_pb.cjs';
 import grpc from '@grpc/grpc-js';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET - Fetch all nodes
 export async function GET() {
@@ -61,9 +61,9 @@ function getNodes(id: number) {
           if (s) {
             console.log(s.title)
             for (const e of elems) {
-              let t = e.getElementtype();
+              const t = e.getElementtype();
               if (t === ccp.SchemaElementKind.OBJECT_TYPE) {
-                let n = e.getFullyqualifiedname().getPartsList()[0];
+                const n = e.getFullyqualifiedname().getPartsList()[0];
                 console.log(` Element: ${n} `);
 
                 const node = await prisma.node.findFirst({

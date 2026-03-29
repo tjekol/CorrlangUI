@@ -86,7 +86,7 @@ export const usePath = () => {
       if (nodeID) {
         nodeLength = nodeLengths.find(l => l.id === nodeID)?.length || 0;
       } else if (atrID) {
-        let node = getNode(atrID)
+        const node = getNode(atrID)
         nodeLength = nodeLengths.find(l => l.id === node?.id)?.length || 0;
       }
       else {
@@ -96,7 +96,7 @@ export const usePath = () => {
       if (nodeID) {
         nodeLength = actionLengths.find(l => l.id === nodeID)?.length || 0;
       } else if (atrID) {
-        let node = getAction(atrID)
+        const node = getAction(atrID)
         nodeLength = actionLengths.find(l => l.id === node?.id)?.length || 0;
       } else {
         return `M ${midpoint.x} ${midpoint.y} L ${position.x} ${position.y}`

@@ -20,15 +20,6 @@ export const useMethodCon = () => {
     }
   };
 
-  const fetchCons = () => handleAsync(async () => {
-    const res = await fetch('/api/method-connection');
-    if (!res.ok) {
-      throw new Error('Failed to fetch method connections');
-    }
-    const conData: IMethodConnection[] = await res.json();
-    setCon(conData)
-  })
-
   const createCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/method-connection', {
       method: 'POST',
@@ -90,7 +81,17 @@ export const useMethodCon = () => {
     setCon([]);
   })
 
-  useEffect(() => { fetchCons() }, [])
+  useEffect(() => {
+    const fetchCons = () => handleAsync(async () => {
+      const res = await fetch('/api/method-connection');
+      if (!res.ok) {
+        throw new Error('Failed to fetch method connections');
+      }
+      const conData: IMethodConnection[] = await res.json();
+      setCon(conData)
+    })
+    fetchCons()
+  }, [setCon])
 
   return { methodCon: con, loading, createMethodCon: createCon, updateMethodCon: updateCon, deleteMethodCon: deleteCon, deleteAllMethodCons: deleteAllCons };
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { edgeAtom } from '../GlobalValues';
 import { IEdge } from '../interface/IEdge';
@@ -28,8 +28,6 @@ export const useEdges = () => {
     const edgesData: IEdge[] = await res.json();
     setEdges(edgesData);
   })
-
-  // useEffect(() => { fetchEdges(); }, []);
 
   return { edges, edgeLoading: loading, refetchEdges: fetchEdges }
 }

@@ -3,7 +3,7 @@ import services from '@/lib/client/client/core_grpc_pb.cjs';
 import ccp from '@/lib/client/client/ccp_pb.cjs';
 import grpc from '@grpc/grpc-js';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET - Fetch all attributes
 export async function GET() {
@@ -57,24 +57,22 @@ async function getAttributes(id: number) {
           if (s) {
             console.log(s.title)
             for (const e of elems) {
-              let t = e.getElementtype();
+              const t = e.getElementtype();
               if (t === ccp.SchemaElementKind.ATTRIBUTE) {
-                let atr = e.getFullyqualifiedname().getPartsList()[1];
+                const atr = e.getFullyqualifiedname().getPartsList()[1];
                 console.log(`   Attribute: ${atr} `);
-                let atrOwner = e.getFullyqualifiedname().getPartsList()[0];
-                let node = await prisma.node.findFirst({
+                const atrOwner = e.getFullyqualifiedname().getPartsList()[0];
+                const node = await prisma.node.findFirst({
                   where: { title: atrOwner, schemaID: s.id },
                 });
 
                 if (node) {
-                  let dataType;
-
-                  dataType = e
+                  const dataType = e
                     .getAttributetypedetails()
                     .getDatatypename()
                     .getPartsList()[0];
 
-                  let attribute = await prisma.attribute.findFirst({
+                  const attribute = await prisma.attribute.findFirst({
                     where: {
                       nodeID: node.id,
                       text: atr,

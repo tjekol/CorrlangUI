@@ -4,7 +4,7 @@ import { IPendingCon } from '../interface/IStates';
 import { atrConAtom, nodeConAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
-export const handleAtrConCreate = (
+export const HandleAtrConCreate = (
   cons: IAtrConnection[],
   createAtrCon: (ids: number[]) => void,
   pendingCon: IPendingCon | null,
@@ -54,7 +54,7 @@ export const handleAtrConCreate = (
   }
 };
 
-export const handleAtrConUpdate = (
+export const HandleAtrConUpdate = (
   updateAtrMultiCon: (conID: number, id: number) => void,
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void

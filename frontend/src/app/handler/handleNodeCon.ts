@@ -2,7 +2,7 @@ import { INodeConnection } from '../interface/IConnections';
 import { IPosition } from '../interface/IPosition';
 import { IPendingCon } from '../interface/IStates';
 
-export const handleNodeConCreate = (
+export const HandleNodeConCreate = (
   cons: INodeConnection[],
   createNodeCon: (ids: number[]) => void,
   pendingCon: IPendingCon | null,
@@ -39,7 +39,7 @@ export const handleNodeConCreate = (
   };
 };
 
-export const handleNodeConUpdate = (
+export const HandleNodeConUpdate = (
   updateNodeCon: (conID: number, id: number) => void,
   pendingNodeCon: IPendingCon | null,
   setPendingNodeCon: (pendingEdge: IPendingCon | null) => void

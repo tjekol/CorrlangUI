@@ -3,7 +3,7 @@ import services from '@/lib/client/client/core_grpc_pb.cjs';
 import ccp from '@/lib/client/client/ccp_pb.cjs';
 import grpc from '@grpc/grpc-js';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 
 // GET - Fetch all actions
 export async function GET() {
@@ -57,10 +57,10 @@ function getActions(id: number) {
           if (s) {
             console.log(s.title)
             for (const e of elems) {
-              let t = e.getElementtype();
+              const t = e.getElementtype();
               if (t === ccp.SchemaElementKind.ACTION) {
-                let n = e.getFullyqualifiedname().getPartsList()[0];
-                let m = e.getFullyqualifiedname().getPartsList()[1];
+                const n = e.getFullyqualifiedname().getPartsList()[0];
+                const m = e.getFullyqualifiedname().getPartsList()[1];
                 console.log(`Action: ${n}`);
                 console.log(`   Method: ${m}`);
 

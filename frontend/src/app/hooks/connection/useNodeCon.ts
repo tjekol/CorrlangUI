@@ -20,15 +20,6 @@ export const useNodeCon = () => {
     }
   };
 
-  const fetchNodeCons = () => handleAsync(async () => {
-    const res = await fetch('/api/node-connection');
-    if (!res.ok) {
-      throw new Error('Failed to fetch connections');
-    }
-    const conData: INodeConnection[] = await res.json();
-    setNodeCon(conData)
-  })
-
   const createNodeCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/node-connection', {
       method: 'POST',
@@ -90,7 +81,17 @@ export const useNodeCon = () => {
     setNodeCon([]);
   })
 
-  useEffect(() => { fetchNodeCons() }, [])
+  useEffect(() => {
+    const fetchNodeCons = () => handleAsync(async () => {
+      const res = await fetch('/api/node-connection');
+      if (!res.ok) {
+        throw new Error('Failed to fetch connections');
+      }
+      const conData: INodeConnection[] = await res.json();
+      setNodeCon(conData)
+    })
+    fetchNodeCons()
+  }, [setNodeCon])
 
   return { nodeCon, loading, createNodeCon, updateNodeCon, deleteNodeCon: deleteCon, deleteAllNodeCons };
 };
