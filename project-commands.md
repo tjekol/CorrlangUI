@@ -20,7 +20,6 @@ From the `/frontend` folder
 
 - Create an `.env` file with `DATABASE_URL="file:./prisma/dev.db"`
 
-- `npm run prisma`. Sets up local database `dev.db`, generates prisma client and seeds database.
 - `npm run studio` to see visual editor of the database.
 
 Other commands:
