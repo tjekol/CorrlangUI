@@ -38,7 +38,7 @@ async function getCorres() {
 
 function fetchCorres(): Promise<{ id: number, title: string }[]> {
   const client = new services.CoreServiceClient(
-    'localhost:6969',
+    process.env.NEXT_PUBLIC_SERVER,
     grpc.credentials.createInsecure()
   );
 
@@ -70,7 +70,7 @@ function fetchCorres(): Promise<{ id: number, title: string }[]> {
 
 function getSchemasIDs(id: number): Promise<number[]> {
   const client = new services.CoreServiceClient(
-    'localhost:6969',
+    process.env.NEXT_PUBLIC_SERVER,
     grpc.credentials.createInsecure()
   );
 

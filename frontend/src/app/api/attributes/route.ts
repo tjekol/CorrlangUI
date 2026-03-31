@@ -36,7 +36,7 @@ async function injectAttributes() {
 
 async function getAttributes(id: number) {
   const client = new services.CoreServiceClient(
-    'localhost:6969',
+    process.env.NEXT_PUBLIC_SERVER,
     grpc.credentials.createInsecure()
   );
 
