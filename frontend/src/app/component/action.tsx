@@ -93,7 +93,7 @@ export default function Action({
       }
       return [...prevLengths, { id: id, length: width }];
     });
-  }, [id]);
+  }, [id, methods, title, calculateNodeLength, setActionLengths]);
 
   const nodeLength = actionLengths.find((item) => item.id === id)?.length || 0;
 
@@ -120,9 +120,10 @@ export default function Action({
         onParentClick={onNodeClick}
         id={id}
         title={title}
-        children={methods}
         handlePositionChange={handlePositionChange}
-      />
+      >
+        {methods}
+      </DrawParent>
 
       {methods.map((method, i) => {
         const methodID = method.id;

@@ -44,3 +44,6 @@ next-env.d.ts
 prisma/migrations/*
 /src/lib/generated/prisma
 prisma/dev.db
+
+# CorrLang
+corrlang/*

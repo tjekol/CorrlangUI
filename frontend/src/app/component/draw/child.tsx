@@ -5,7 +5,6 @@ import { IPosition } from '@/app/interface/IPosition';
 
 export default function DrawChild({
   i,
-  child,
   childID,
   isConnected,
   isActive,

@@ -2,7 +2,7 @@ import messages from '@/lib/client/client/core_pb.cjs';
 import services from '@/lib/client/client/core_grpc_pb.cjs';
 import grpc from '@grpc/grpc-js';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET - Fetch all schemas
 export async function GET() {
@@ -28,7 +28,7 @@ export async function GET() {
 
 function getSchemas() {
   const client = new services.CoreServiceClient(
-    'localhost:6969',
+    process.env.NEXT_PUBLIC_SERVER,
     grpc.credentials.createInsecure()
   );
 

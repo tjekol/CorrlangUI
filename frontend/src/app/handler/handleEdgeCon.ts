@@ -1,7 +1,7 @@
 import { IEdgeConnection } from '../interface/IConnections';
 import { IPendingCon } from '../interface/IStates';
 
-export const handleEdgeConCreate = (
+export const HandleEdgeConCreate = (
   cons: IEdgeConnection[],
   createEdgeCon: (ids: number[]) => void,
   pendingCon: IPendingCon | null,
@@ -38,7 +38,7 @@ export const handleEdgeConCreate = (
   };
 };
 
-export const handleEdgeConUpdate = (
+export const HandleEdgeConUpdate = (
   updateEdgeCon: (conID: number, id: number) => void,
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void

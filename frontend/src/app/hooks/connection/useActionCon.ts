@@ -20,15 +20,6 @@ export const useActionCon = () => {
     }
   };
 
-  const fetchCons = () => handleAsync(async () => {
-    const res = await fetch('/api/action-connection');
-    if (!res.ok) {
-      throw new Error('Failed to fetch action connections');
-    }
-    const conData: IActionConnection[] = await res.json();
-    setCon(conData)
-  })
-
   const createCon = (ids: number[]) => handleAsync(async () => {
     const res = await fetch('/api/action-connection', {
       method: 'POST',
@@ -90,7 +81,17 @@ export const useActionCon = () => {
     setCon([]);
   })
 
-  useEffect(() => { fetchCons() }, [])
+  useEffect(() => {
+    const fetchCons = () => handleAsync(async () => {
+      const res = await fetch('/api/action-connection');
+      if (!res.ok) {
+        throw new Error('Failed to fetch action connections');
+      }
+      const conData: IActionConnection[] = await res.json();
+      setCon(conData)
+    })
+    fetchCons()
+  }, [setCon])
 
   return { actionCon: con, loading, createActionCon: createCon, updateActionCon: updateCon, deleteActionCon: deleteCon, deleteAllActionCons: deleteAllCons };
 };

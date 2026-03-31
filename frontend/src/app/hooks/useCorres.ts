@@ -18,16 +18,17 @@ export const useCorres = () => {
     }
   };
 
-  const fetchCorres = () => handleAsync(async () => {
-    const res = await fetch('/api/correspondence');
-    if (!res.ok) {
-      throw new Error('Failed to fetch correspondence connections.');
-    }
-    const corresData: ICorrespondence[] = await res.json();
-    setCorres(corresData)
-  })
-
-  useEffect(() => { fetchCorres() }, [])
+  useEffect(() => {
+    const fetchCorres = () => handleAsync(async () => {
+      const res = await fetch('/api/correspondence');
+      if (!res.ok) {
+        throw new Error('Failed to fetch correspondence connections.');
+      }
+      const corresData: ICorrespondence[] = await res.json();
+      setCorres(corresData)
+    })
+    fetchCorres()
+  }, [setCorres])
 
   return { corres, loading };
 };

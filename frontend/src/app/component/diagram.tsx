@@ -14,8 +14,8 @@ import {
 } from '../GlobalValues';
 import { useSchemas } from '../hooks/useSchemas';
 import {
-  handleNodeConCreate,
-  handleNodeConUpdate,
+  HandleNodeConCreate,
+  HandleNodeConUpdate,
 } from '../handler/handleNodeCon';
 import { useEdges } from '../hooks/useEdges';
 import Connection from './connection';
@@ -23,12 +23,12 @@ import { useCalculation } from '../hooks/useCalculation';
 import { useAttributes } from '../hooks/useAttributes';
 import { ICorrespondence } from '../interface/ICorrespondence';
 import {
-  handleEdgeConCreate,
-  handleEdgeConUpdate,
+  HandleEdgeConCreate,
+  HandleEdgeConUpdate,
 } from '../handler/handleEdgeCon';
 import {
-  handleAtrConCreate,
-  handleAtrConUpdate,
+  HandleAtrConCreate,
+  HandleAtrConUpdate,
 } from '../handler/handleAtrCon';
 import { useAtrCon } from '../hooks/connection/useAtrCon';
 import { useEdgeCon } from '../hooks/connection/useEdgeCon';
@@ -64,40 +64,40 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
     null,
   );
 
-  const handleNodeClick = handleNodeConCreate(
+  const handleNodeClick = HandleNodeConCreate(
     nodeCon,
     createNodeCon,
     pendingNodeCon,
     setPendingNodeCon,
   );
 
-  const handleAttributeClick = handleAtrConCreate(
+  const handleAttributeClick = HandleAtrConCreate(
     atrCon,
     createAtrCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
 
-  const handleEdgeClick = handleEdgeConCreate(
+  const handleEdgeClick = HandleEdgeConCreate(
     edgeCon,
     createEdgeCon,
     pendingEdgeCon,
     setPendingEdgeCon,
   );
 
-  const handleNodeConClick = handleNodeConUpdate(
+  const handleNodeConClick = HandleNodeConUpdate(
     updateNodeCon,
     pendingNodeCon,
     setPendingNodeCon,
   );
 
-  const handleAtrConClick = handleAtrConUpdate(
+  const handleAtrConClick = HandleAtrConUpdate(
     updateAtrCon,
     pendingAtrCon,
     setPendingAtrCon,
   );
 
-  const handleEdgeConClick = handleEdgeConUpdate(
+  const handleEdgeConClick = HandleEdgeConUpdate(
     updateEdgeCon,
     pendingEdgeCon,
     setPendingEdgeCon,
@@ -123,7 +123,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
   const filteredSchemas = useMemo(() => {
     if (!schemas) return [];
     return schemas.filter((s) => cor.schemaIDs.includes(s.id));
-  }, [schemas]);
+  }, [schemas, cor.schemaIDs]);
 
   const nodesWithAttributes = useMemo(() => {
     if (!nodes || !attributes) return [];
@@ -134,7 +134,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
       ...node,
       attributes: attributes.filter((attr) => attr.nodeID === node.id),
     }));
-  }, [nodes, attributes]);
+  }, [nodes, attributes, filteredSchemas]);
 
   const filteredEdges = useMemo(() => {
     if (!edges) return [];
@@ -143,7 +143,7 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
         (n) => n.id === e.srcNodeID || n.id === e.trgtNodeID,
       ),
     );
-  }, [edges]);
+  }, [edges, nodesWithAttributes]);
 
   useEffect(() => {
     if (
@@ -198,13 +198,13 @@ export default function Diagram({ cor }: { cor: ICorrespondence }) {
           // dynamic dimensions based on node positions and sizes
           if (newPositions.length > 0) {
             const maxX = Math.max(
-              ...newPositions.map((pos, index) => {
+              ...newPositions.map((pos) => {
                 const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
-              ...newPositions.map((pos, index) => {
+              ...newPositions.map((pos) => {
                 const node = nodesWithAttributes.find((n) => n.id === pos.id);
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),

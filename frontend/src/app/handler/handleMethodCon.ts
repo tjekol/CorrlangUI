@@ -4,13 +4,13 @@ import { IPendingCon } from '../interface/IStates';
 import { actionConAtom, methodConAtom } from '../GlobalValues';
 import { useCalculation } from '../hooks/useCalculation';
 
-export const handleMethodConCreate = (
+export const HandleMethodConCreate = (
   cons: IMethodConnection[],
   createCon: (ids: number[]) => void,
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void
 ) => {
-  const parentCons = useAtomValue(actionConAtom)
+  const useParentCons = useAtomValue(actionConAtom)
   const { getAction } = useCalculation();
 
   return (id: number, circlePosition?: { x: number; y: number }) => {
@@ -35,7 +35,7 @@ export const handleMethodConCreate = (
         // check if attribute nodes are connected
         const allIDs = [id, pendingCon.id]
         const parentIDs = allIDs.map(atrID => getAction(atrID)?.id).filter(id => id !== undefined)
-        const isParentConnected = parentCons.some(parentCon => parentIDs.every(parentID => parentCon.actions.some(a => a.id === parentID)))
+        const isParentConnected = useParentCons.some(parentCon => parentIDs.every(parentID => parentCon.actions.some(a => a.id === parentID)))
 
         if (isParentConnected) {
           createCon(allIDs);
@@ -55,7 +55,7 @@ export const handleMethodConCreate = (
   }
 };
 
-export const handleMethodConUpdate = (
+export const HandleMethodConUpdate = (
   updateCon: (conID: number, id: number) => void,
   pendingCon: IPendingCon | null,
   setPendingCon: (pendingCon: IPendingCon | null) => void

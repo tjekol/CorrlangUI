@@ -3,7 +3,7 @@ import services from '@/lib/client/client/core_grpc_pb.cjs';
 import ccp from '@/lib/client/client/ccp_pb.cjs';
 import grpc from '@grpc/grpc-js';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET - Fetch all edges
 export async function GET() {
@@ -36,7 +36,7 @@ async function injectEdges() {
 
 function getEdges(id: number) {
   const client = new services.CoreServiceClient(
-    'localhost:6969',
+    process.env.NEXT_PUBLIC_SERVER,
     grpc.credentials.createInsecure()
   );
 
@@ -56,40 +56,40 @@ function getEdges(id: number) {
 
           if (s) {
             for (const e of elems) {
-              let t = e.getElementtype();
+              const t = e.getElementtype();
               if (t === ccp.SchemaElementKind.REFERENCE) {
-                let srcName = e
+                const srcName = e
                   .getReferencetypedetails()
                   .getSrctypename()
                   .getPartsList()[0];
 
-                let trgtName = e
+                const trgtName = e
                   .getReferencetypedetails()
                   .getTrgtypename()
                   .getPartsList()[0];
 
-                let refName = e.getFullyqualifiedname().getPartsList()[1];
+                const refName = e.getFullyqualifiedname().getPartsList()[1];
 
-                let lowerbound = e
+                const lowerbound = e
                   .getReferencetypedetails()
                   .getMultiplicity()
                   .getLowerbound();
 
-                let upperbound = e
+                const upperbound = e
                   .getReferencetypedetails()
                   .getMultiplicity()
                   .getUpperbound();
 
-                let isOrdered = e
+                const isOrdered = e
                   .getReferencetypedetails()
                   .getMultiplicity()
                   .getIsordered();
 
-                let srcNode = await prisma.node.findFirst({
+                const srcNode = await prisma.node.findFirst({
                   where: { title: srcName, schemaID: s.id },
                 });
 
-                let trgtNode = await prisma.node.findFirst({
+                const trgtNode = await prisma.node.findFirst({
                   where: { title: trgtName, schemaID: s.id },
                 });
 

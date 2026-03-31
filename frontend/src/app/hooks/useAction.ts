@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { IAction } from '../interface/IAction';
 import { actionAtom } from '../GlobalValues';

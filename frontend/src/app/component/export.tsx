@@ -49,110 +49,113 @@ export default function Export() {
     setExportResult(val);
   }, []);
 
-  const addConsToExport = (
-    cons:
-      | INodeConnection[]
-      | IAtrConnection[]
-      | IEdgeConnection[]
-      | IActionConnection[]
-      | IMethodConnection[],
-  ) => {
-    cons.map((con) => {
-      let ids: number[];
-      let conObjs: INode[] | IAttribute[] | IEdge[] | IAction[] | IMethod[];
-      let result = [];
+  useEffect(() => {
+    const addConsToExport = (
+      cons:
+        | INodeConnection[]
+        | IAtrConnection[]
+        | IEdgeConnection[]
+        | IActionConnection[]
+        | IMethodConnection[],
+    ) => {
+      cons.map((con) => {
+        let ids: number[];
+        let conObjs: INode[] | IAttribute[] | IEdge[] | IAction[] | IMethod[];
+        const result = [];
 
-      if ('nodes' in con) {
-        ids = con.nodes.map((n) => n.id);
-        conObjs = nodes.filter((node) => ids.includes(node.id));
+        if ('nodes' in con) {
+          ids = con.nodes.map((n) => n.id);
+          conObjs = nodes.filter((node) => ids.includes(node.id));
 
-        for (const node of conObjs) {
-          const schema = schemas.find((s) => s.id === node.schemaID);
-          if (schema)
-            result.push({ schemaTitle: schema?.title, nodeTitle: node.title });
-        }
-      } else if ('attributes' in con) {
-        ids = con.attributes.map((a) => a.id);
-        conObjs = attributes.filter((a) => ids.includes(a.id));
-
-        for (const atr of conObjs) {
-          const node = nodes.find((n) => n.id === atr.nodeID);
-          if (node) {
+          for (const node of conObjs) {
             const schema = schemas.find((s) => s.id === node.schemaID);
             if (schema)
               result.push({
                 schemaTitle: schema.title,
                 nodeTitle: node.title,
-                atrText: atr.text,
               });
           }
-        }
-      } else if ('edges' in con) {
-        ids = con.edges.map((e) => e.id);
-        conObjs = edges.filter((e) => ids.includes(e.id));
+        } else if ('attributes' in con) {
+          ids = con.attributes.map((a) => a.id);
+          conObjs = attributes.filter((a) => ids.includes(a.id));
 
-        for (const edge of conObjs) {
-          const node = nodes.find((n) => n.id === edge.srcNodeID);
-          if (node) {
-            const schema = schemas.find((s) => s.id === node.schemaID);
-            if (schema)
-              result.push({
-                schemaTitle: schema.title,
-                nodeTitle: node.title,
-                edgeText: edge.refName,
-              });
+          for (const atr of conObjs) {
+            const node = nodes.find((n) => n.id === atr.nodeID);
+            if (node) {
+              const schema = schemas.find((s) => s.id === node.schemaID);
+              if (schema)
+                result.push({
+                  schemaTitle: schema.title,
+                  nodeTitle: node.title,
+                  atrText: atr.text,
+                });
+            }
           }
-        }
-      } else if ('actions' in con) {
-        ids = con.actions.map((a) => a.id);
-        conObjs = actions.filter((action) => ids.includes(action.id));
+        } else if ('edges' in con) {
+          ids = con.edges.map((e) => e.id);
+          conObjs = edges.filter((e) => ids.includes(e.id));
 
-        for (const action of conObjs) {
-          const schema = schemas.find((s) => s.id === action.schemaID);
-          if (schema)
-            result.push({
-              schemaTitle: schema?.title,
-              actionName: action.name,
-            });
-        }
-      } else if ('methods' in con) {
-        ids = con.methods.map((m) => m.id);
-        conObjs = methods.filter((method) => ids.includes(method.id));
+          for (const edge of conObjs) {
+            const node = nodes.find((n) => n.id === edge.srcNodeID);
+            if (node) {
+              const schema = schemas.find((s) => s.id === node.schemaID);
+              if (schema)
+                result.push({
+                  schemaTitle: schema.title,
+                  nodeTitle: node.title,
+                  edgeText: edge.refName,
+                });
+            }
+          }
+        } else if ('actions' in con) {
+          ids = con.actions.map((a) => a.id);
+          conObjs = actions.filter((action) => ids.includes(action.id));
 
-        for (const method of conObjs) {
-          const action = actions.find((a) => a.id === method.actionID);
-          if (action) {
+          for (const action of conObjs) {
             const schema = schemas.find((s) => s.id === action.schemaID);
             if (schema)
               result.push({
-                schemaTitle: schema?.title,
+                schemaTitle: schema.title,
                 actionName: action.name,
-                methodName: method.name,
               });
           }
+        } else if ('methods' in con) {
+          ids = con.methods.map((m) => m.id);
+          conObjs = methods.filter((method) => ids.includes(method.id));
+
+          for (const method of conObjs) {
+            const action = actions.find((a) => a.id === method.actionID);
+            if (action) {
+              const schema = schemas.find((s) => s.id === action.schemaID);
+              if (schema)
+                result.push({
+                  schemaTitle: schema.title,
+                  actionName: action.name,
+                  methodName: method.name,
+                });
+            }
+          }
         }
-      }
 
-      const objs = result.map(
-        (r) =>
-          ` ${r.schemaTitle}.${r.nodeTitle || r.actionName}${
-            (r.atrText && '.' + r.atrText) ||
-            (r.actionName && '.' + r.actionName) ||
-            (r.edgeText && '.' + r.edgeText) ||
-            ''
-          }`,
-      );
-
-      if (objs[0] && objs)
-        setExportResult(
-          (prev) =>
-            prev +
-            `identify (${objs[0].trim()},${objs.slice(1)}) as ${objs[0].split('.').at(-1)}; \n`,
+        const objs = result.map(
+          (r) =>
+            ` ${r.schemaTitle}.${r.nodeTitle || r.actionName}${
+              (r.atrText && '.' + r.atrText) ||
+              (r.methodName && '.' + r.methodName) ||
+              (r.edgeText && '.' + r.edgeText) ||
+              ''
+            }`,
         );
-    });
-  };
 
-  useEffect(() => {
+        if (objs[0] && objs)
+          setExportResult(
+            (prev) =>
+              prev +
+              `identify (${objs[0].trim()},${objs.slice(1)}) as ${objs[0].split('.').at(-1)}; \n`,
+          );
+      });
+    };
+
     setExportResult('');
 
     addConsToExport(nodeCons);
@@ -160,7 +163,19 @@ export default function Export() {
     addConsToExport(edgeCons);
     addConsToExport(actionCons);
     addConsToExport(methodCons);
-  }, [nodeCons, atrCons, edgeCons, actionCons, methodCons]);
+  }, [
+    schemas,
+    nodes,
+    attributes,
+    edges,
+    actions,
+    methods,
+    nodeCons,
+    atrCons,
+    edgeCons,
+    actionCons,
+    methodCons,
+  ]);
 
   return (
     <ReactCodeMirror

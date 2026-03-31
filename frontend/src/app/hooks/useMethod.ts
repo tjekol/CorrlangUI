@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { methodAtom } from '../GlobalValues';
 import { IMethod } from '../interface/IMethod';
@@ -28,8 +28,6 @@ export const useMethod = () => {
     const methodData: IMethod[] = await res.json();
     setMethod(methodData);
   })
-
-  // useEffect(() => { fetchaction(); }, []);
 
   return { methods, methodLoading: loading, refetchMethods: fetchMethod }
 }

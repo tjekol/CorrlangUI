@@ -93,7 +93,7 @@ export default function Node({
       }
       return [...prevLengths, { id: id, length: width }];
     });
-  }, [id]);
+  }, [id, setNodeLengths, calculateNodeLength, attributes, title]);
 
   const nodeLength = nodeLengths.find((item) => item.id === id)?.length || 0;
 
@@ -120,9 +120,10 @@ export default function Node({
         onParentClick={onNodeClick}
         id={id}
         title={title}
-        children={attributes}
         handlePositionChange={handlePositionChange}
-      />
+      >
+        {attributes}
+      </DrawParent>
 
       {attributes.map((attribute, i) => {
         const atrID = attribute.id;

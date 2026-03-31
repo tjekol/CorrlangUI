@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import { atrAtom } from '../GlobalValues';
 import { IAttribute } from '../interface/IAttribute';
