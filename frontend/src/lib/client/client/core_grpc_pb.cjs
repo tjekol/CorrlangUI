@@ -3,7 +3,7 @@
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var client_core_pb = require('./core_pb.cjs');
-var client_ccp_pb = require('../client/ccp_pb.cjs');
+var client_ccp_pb = require('./ccp_pb.cjs');
 
 function serialize_CorrLangServiceStatus(arg) {
   if (!(arg instanceof client_core_pb.CorrLangServiceStatus)) {
@@ -159,6 +159,32 @@ function serialize_MergeCorrSpecRequest(arg) {
 
 function deserialize_MergeCorrSpecRequest(buffer_arg) {
   return client_core_pb.MergeCorrSpecRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_ParseCorrespondenceRequest(arg) {
+  if (!(arg instanceof client_core_pb.ParseCorrespondenceRequest)) {
+    throw new Error('Expected argument of type ParseCorrespondenceRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ParseCorrespondenceRequest(buffer_arg) {
+  return client_core_pb.ParseCorrespondenceRequest.deserializeBinary(
+    new Uint8Array(buffer_arg),
+  );
+}
+
+function serialize_ParseResponse(arg) {
+  if (!(arg instanceof client_core_pb.ParseResponse)) {
+    throw new Error('Expected argument of type ParseResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ParseResponse(buffer_arg) {
+  return client_core_pb.ParseResponse.deserializeBinary(
     new Uint8Array(buffer_arg),
   );
 }
@@ -474,11 +500,11 @@ var CoreServiceService = (exports.CoreServiceService = {
     requestStream: false,
     responseStream: false,
     requestType: client_core_pb.MergeCorrSpecRequest,
-    responseType: client_ccp_pb.Ack,
+    responseType: client_core_pb.ParseResponse,
     requestSerialize: serialize_MergeCorrSpecRequest,
     requestDeserialize: deserialize_MergeCorrSpecRequest,
-    responseSerialize: serialize_ccp_Ack,
-    responseDeserialize: deserialize_ccp_Ack,
+    responseSerialize: serialize_ParseResponse,
+    responseDeserialize: deserialize_ParseResponse,
   },
   // Lists the registered TechSpace plugins.
   getRegisteredTechSpaces: {
@@ -599,6 +625,17 @@ var CoreServiceService = (exports.CoreServiceService = {
     requestDeserialize: deserialize_RegisterCommonalityRequest,
     responseSerialize: serialize_ccp_Commonality,
     responseDeserialize: deserialize_ccp_Commonality,
+  },
+  parseCorrespondence: {
+    path: '/CoreService/ParseCorrespondence',
+    requestStream: false,
+    responseStream: false,
+    requestType: client_core_pb.ParseCorrespondenceRequest,
+    responseType: client_core_pb.ParseResponse,
+    requestSerialize: serialize_ParseCorrespondenceRequest,
+    requestDeserialize: deserialize_ParseCorrespondenceRequest,
+    responseSerialize: serialize_ParseResponse,
+    responseDeserialize: deserialize_ParseResponse,
   },
   // Registers a new view within the context.
   registerView: {
