@@ -192,6 +192,14 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     setLiveNodePositions,
   ]);
 
+  if (actionWithMethods.length < 1) {
+    return (
+      <div className='bg-[#F9F9F9] h-screen rounded-sm border p-4'>
+        The correspondence has no actions.
+      </div>
+    );
+  }
+
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
       <svg
