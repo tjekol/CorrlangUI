@@ -19,7 +19,7 @@ service CoreService {
   rpc RegisterTechSpace (RegisterTechSpaceRequest) returns (TechSpaceRegistered);
 
   // Instruct CorrLang to parse a _corr-spec_ file and merge it into the context.
-  rpc MergeCorrSpec(MergeCorrSpecRequest) returns (ccp.Ack);
+  rpc MergeCorrSpec(MergeCorrSpecRequest) returns (ParseResponse);
 
   // Lists the registered TechSpace plugins.
   rpc GetRegisteredTechSpaces (GetRegisteredTechSpacesRequest) returns (GetRegisteredTechSpacesResponse);
@@ -50,6 +50,8 @@ service CoreService {
 
   // Registers a new commonality within the context of a correspondence.
   rpc RegisterCommonality (RegisterCommonalityRequest) returns (ccp.Commonality);
+
+  rpc ParseCorrespondence(ParseCorrespondenceRequest) returns (ParseResponse);
 
   // Registers a new view within the context.
   rpc RegisterView (RegisterViewRequest) returns (ccp.View);
@@ -344,16 +346,21 @@ message StartProxyRequest {
 
 message MergeCorrSpecRequest {
 
+  /**
+   * The base path (absolute), which will be used to retrieve files etc.
+   */
+  required string basePath = 1;
 
   /**
-   * The absolute file path of the CorrLang _corr-spec_ file to be merged into the project.
+   * The path of the corrspec to parse, relative to the base path.
    */
-  required string corrSpecFilePath = 1;
+  required string corrSpec = 2;
 
   /**
-   * The absolute file path for the project directory containing the CorrLang _corr-spec_ file, which is to be merged.
+   * The name of the project, if not assigned the base path will be used.
    */
-  optional string project = 2;
+  optional string project = 3;
+
 }
 
 message GetEndpointRequest {
@@ -389,3 +396,53 @@ message RegisterCommonalityRequest {
   optional ccp.ConsistencyRule rule = 7;
 }
 
+message ParseResponse {
+  repeated ParseMessage errors = 1;
+  repeated ParseMessage warnings = 2;
+  repeated ParseAction actions = 3;
+}
+
+message ParseMessage {
+  required string message = 1;
+  optional MessageLocation location = 2;
+}
+
+message MessageLocation {
+  required int32 startLine = 1;
+  required int32 startColumn = 2;
+  optional int32 stopLine = 3;
+  optional int32 stopColumn = 4;
+}
+
+message ParseAction {
+  required string tech = 1;
+  oneof action {
+    SchemaWrittenAction schemaWritten = 2;
+    DataWrittenAction dataWritten = 3;
+    PortListeningAction protListen = 4;
+    UrlListeningActions urlListen = 5;
+  }
+}
+
+message SchemaWrittenAction {
+  required string filePath = 1;
+}
+
+message DataWrittenAction {
+  required string filePath = 1;
+}
+
+message PortListeningAction {
+  required fixed32 port = 1;
+}
+
+message UrlListeningActions {
+  required string url = 1;
+}
+
+message ParseCorrespondenceRequest {
+  // must be the id of an existing correspondence
+  required int32 correspondenceId = 1;
+  // the "content" of a correspondence.
+  required string correspondenceText = 2;
+}

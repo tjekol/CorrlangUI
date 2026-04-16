@@ -100,13 +100,13 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     return schemas.filter((s) => cor.schemaIDs.includes(s.id));
   }, [schemas, cor.schemaIDs]);
 
-  const nodesWithAttributes = useMemo(() => {
+  const actionWithMethods = useMemo(() => {
     if (!actions || !methods) return [];
-    const filteredNodes = actions.filter((n) =>
+    const filteredActions = actions.filter((n) =>
       filteredSchemas.map((s) => s.id).includes(n.schemaID),
     );
 
-    return filteredNodes.map((action) => ({
+    return filteredActions.map((action) => ({
       ...action,
       methods: methods.filter((attr) => attr.actionID === action.id),
     }));
@@ -114,8 +114,8 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
 
   useEffect(() => {
     if (
-      !nodesWithAttributes ||
-      nodesWithAttributes.length === 0 ||
+      !actionWithMethods ||
+      actionWithMethods.length === 0 ||
       methodLoading ||
       !methods
     )
@@ -129,7 +129,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
         const elkEdges: { id: string; sources: string[]; targets: string[] }[] =
           [];
 
-        const children = nodesWithAttributes.map((n) => ({
+        const children = actionWithMethods.map((n) => ({
           id: n.id.toString(),
           width: calculateNodeWidth(n),
           height: calculateNodeHeight(n),
@@ -158,13 +158,13 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
           if (newPositions.length > 0) {
             const maxX = Math.max(
               ...newPositions.map((pos) => {
-                const node = nodesWithAttributes.find((n) => n.id === pos.id);
+                const node = actionWithMethods.find((n) => n.id === pos.id);
                 return pos.positionX + (node ? calculateNodeWidth(node) : 120);
               }),
             );
             const maxY = Math.max(
               ...newPositions.map((pos) => {
-                const node = nodesWithAttributes.find((n) => n.id === pos.id);
+                const node = actionWithMethods.find((n) => n.id === pos.id);
                 return pos.positionY + (node ? calculateNodeHeight(node) : 80);
               }),
             );
@@ -186,11 +186,19 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
     loadELK();
   }, [
     filteredSchemas,
-    nodesWithAttributes,
+    actionWithMethods,
     methods,
     methodLoading,
     setLiveNodePositions,
   ]);
+
+  if (actionWithMethods.length < 1) {
+    return (
+      <div className='bg-[#F9F9F9] h-screen rounded-sm border p-4'>
+        The correspondence has no actions.
+      </div>
+    );
+  }
 
   return (
     <div className='border rounded-sm h-screen w-full bg-[#F9F9F9] overflow-auto'>
@@ -237,7 +245,7 @@ export default function ActionDiagram({ cor }: { cor: ICorrespondence }) {
             {loading || methodLoading ? 'Loading...' : 'Calculating layout...'}
           </text>
         ) : (
-          nodesWithAttributes.map((n, i) => {
+          actionWithMethods.map((n, i) => {
             const livePositions = liveNodePositions.find(
               (pos) => pos.id === n.id,
             );

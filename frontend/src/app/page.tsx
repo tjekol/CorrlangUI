@@ -6,25 +6,14 @@ import Diagram from './component/diagram';
 import Export from './component/export';
 import { ICorrespondence } from './interface/ICorrespondence';
 import ActionDiagram from './component/action-diagram';
-import { useAtrCon } from './hooks/connection/useAtrCon';
-import { useEdgeCon } from './hooks/connection/useEdgeCon';
-import { useNodeCon } from './hooks/connection/useNodeCon';
-import { useActionCon } from './hooks/connection/useActionCon';
-import { useMethodCon } from './hooks/connection/useMethodCon';
 
 export default function Home() {
-  const { deleteAllNodeCons } = useNodeCon();
-  const { deleteAllEdgeCons } = useEdgeCon();
-  const { deleteAllAtrCons } = useAtrCon();
-  const { deleteAllActionCons } = useActionCon();
-  const { deleteAllMethodCons } = useMethodCon();
-
-  const reset = () => {
-    deleteAllNodeCons();
-    deleteAllEdgeCons();
-    deleteAllAtrCons();
-    deleteAllActionCons();
-    deleteAllMethodCons();
+  const reset = async () => {
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+    } catch (error) {
+      console.error('Failed to reset database:', error);
+    }
   };
 
   const [actionIsOpen, setActionIsOpen] = useState<boolean>(false);
